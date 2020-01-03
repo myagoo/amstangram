@@ -1,0 +1,22 @@
+.tangram {
+  display: flex;
+  position: relative;
+  flex: 1;
+
+  & > canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  & > canvas + canvas {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  & > button {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+}

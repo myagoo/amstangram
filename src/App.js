@@ -1,24 +1,19 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import "./App.css";
+import { Tangram } from "./Tangram";
+import { Galery } from "./Galery";
 
 function App() {
+  const [galery, setGalery] = useState([]);
+
+  const handleSave = imageDataUrl => {
+    setGalery([...galery, imageDataUrl]);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      <Galery galery={galery}></Galery>
+      <Tangram onSave={handleSave}></Tangram>
     </div>
   );
 }
