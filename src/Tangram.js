@@ -19,8 +19,8 @@ const b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
 const SCALE = 30;
 const WALL_WIDTH = 10;
 const FPS = 60;
-const MARGIN = 10;
 
+const STROKE_WIDTH = 6;
 function createTrianglePoints(size) {
   return [
     { x: 0, y: 0 },
@@ -68,21 +68,19 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
   const patternsRef = useRef();
 
   useEffect(() => {
-    console.log(patternImageDataUrl);
     if (patternImageDataUrl) {
       const canvas = document.createElement("canvas");
       canvas.width = canvasRef.current.width;
       canvas.height = canvasRef.current.height;
 
       const context = canvas.getContext("2d");
-      const img = new Image();
+      const image = new Image();
 
-      img.onload = function() {
-        context.drawImage(img, 0, 0); // Or at whatever offset you like
+      image.onload = function() {
+        context.drawImage(image, 0, 0); // Or at whatever offset you like
       };
-      img.src = patternImageDataUrl;
 
-      document.body.appendChild(canvas);
+      image.src = patternImageDataUrl;
 
       const options = {
         numberofcolors: 2,
@@ -99,20 +97,15 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
           canvas.width,
           canvas.height
         );
-        console.log(imageData);
-        console.log(
-          "every pix is 0",
-          imageData.data.every(pix => pix === 0)
-        );
+
         var traceData = ImageTracer.imagedataToTracedata(imageData, options);
-        console.log(traceData);
 
         patternsRef.current = traceData.layers[0].map(({ segments }) => {
           const graphics = new Graphics();
 
           graphics
             .setStrokeStyle(1)
-            .beginStroke("#000000")
+            .beginStroke("green")
             .moveTo(segments[0].x1, segments[0].y1);
 
           for (let i = 1; i < segments.length; i++) {
@@ -189,10 +182,10 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
     const context = canvasRef.current.getContext("2d");
 
     const imageData = context.getImageData(
-      minX * SCALE - MARGIN,
-      minY * SCALE - MARGIN,
-      maxX * SCALE - minX * SCALE + MARGIN * 2,
-      maxY * SCALE - minY * SCALE + MARGIN * 2
+      minX * SCALE,
+      minY * SCALE,
+      maxX * SCALE - minX * SCALE,
+      maxY * SCALE - minY * SCALE
     );
 
     const pix = imageData.data;
@@ -238,7 +231,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       const color = randomColor();
       const graphics = new Graphics();
       graphics
-        .setStrokeStyle(10, "butt", "round")
+        .setStrokeStyle(STROKE_WIDTH, "butt", "round")
         .beginStroke("#000000")
         .beginFill(color)
         .moveTo(points[0].x, points[0].y);
@@ -290,6 +283,19 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
 
       stageRef.current.addChild(shape);
 
+      shape.addEventListener("click", event => {
+        // Fix jump issue
+        if (window.event.ctrlKey) {
+          if (body.GetType() === b2Body.b2_dynamicBody) {
+            body.SetType(b2Body.b2_kinematicBody);
+            body.SetAwake(false);
+          } else {
+            body.SetType(b2Body.b2_dynamicBody);
+            body.SetAwake(true);
+          }
+        }
+      });
+
       if (invertedPoints) {
         let inverted = false;
 
@@ -316,8 +322,8 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
 
         const invertedGraphics = new Graphics();
         invertedGraphics
-          .setStrokeStyle(5, "butt", "round")
-          .beginStroke("#00000080")
+          .setStrokeStyle(STROKE_WIDTH, "butt", "round")
+          .beginStroke("#000000")
           .beginFill(color)
           .moveTo(invertedPoints[0].x, invertedPoints[0].y);
 
@@ -336,6 +342,9 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       }
 
       shape.addEventListener("mousedown", function(mdEvent) {
+        if (window.event.ctrlKey) {
+          return;
+        }
         var physicsMoveJoint, mouseMoveListener, mouseUpListener;
 
         body.GetFixtureList().SetDensity(1);
@@ -412,14 +421,11 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
 
       const everyPiecePointIsWithingPattern = piecesRef.current.every(
         ({ body, shape }, i) => {
-          console.log("Checking piece ", i);
           const pieceVertices = body
             .GetFixtureList()
             .GetShape()
             .GetVertices();
           return pieceVertices.every((pieceVertex, j) => {
-            console.log("Checking vertex ", j);
-
             let intersect = 0;
             const piecePoint = body.GetWorldPoint(pieceVertex);
 
@@ -447,16 +453,14 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
             }
 
             const isOdd = intersect % 2;
-            console.log("intersection", intersect);
 
             return isOdd;
           });
         }
       );
-      console.log(
-        "everyPiecePointIsWithingPattern",
-        everyPiecePointIsWithingPattern
-      );
+      if (everyPiecePointIsWithingPattern) {
+        alert("YOU WIN MOTHERFUCKER");
+      }
     }
 
     function setupPieces() {
@@ -464,16 +468,16 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       const mediumBase = Math.sqrt(Math.pow(smallBase, 2) * 2);
       const largeBase = Math.sqrt(Math.pow(mediumBase, 2) * 2);
       piecesRef.current = [
-        // createPiece(createTrianglePoints(smallBase)),
-        // createPiece(createTrianglePoints(smallBase)),
-        // createPiece(createTrianglePoints(mediumBase)),
+        createPiece(createTrianglePoints(smallBase)),
+        createPiece(createTrianglePoints(smallBase)),
+        createPiece(createTrianglePoints(mediumBase)),
         createPiece(createTrianglePoints(largeBase)),
-        createPiece(createTrianglePoints(largeBase))
-        // createPiece(createSquarePoints(mediumBase))
-        // createPiece(
-        //   createRhombusPoints(smallBase),
-        //   createInvertedRhombusPoints(smallBase)
-        // )
+        createPiece(createTrianglePoints(largeBase)),
+        createPiece(createSquarePoints(mediumBase)),
+        createPiece(
+          createRhombusPoints(smallBase),
+          createInvertedRhombusPoints(smallBase)
+        )
       ];
     }
 
