@@ -1,26 +1,15 @@
 import React, { useRef, useLayoutEffect, useEffect } from "react";
 
-import Box2D from "box2dweb";
-
+import { World, Vec2, Polygon, MouseJoint } from "planck-js";
 import { Stage, Ticker, Shape, Graphics } from "@createjs/easeljs";
-
 import "./Tangram.scss";
 import ImageTracer from "imagetracerjs";
-
-const b2Vec2 = Box2D.Common.Math.b2Vec2;
-const b2BodyDef = Box2D.Dynamics.b2BodyDef;
-const b2Body = Box2D.Dynamics.b2Body;
-const b2FixtureDef = Box2D.Dynamics.b2FixtureDef;
-const b2World = Box2D.Dynamics.b2World;
-const b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
-const b2MouseJointDef = Box2D.Dynamics.Joints.b2MouseJointDef;
-const b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
 
 const SCALE = 30;
 const WALL_WIDTH = 10;
 const FPS = 60;
 
-const STROKE_WIDTH = 6;
+const STROKE_WIDTH = 10;
 function createTrianglePoints(size) {
   return [
     { x: 0, y: 0 },
@@ -122,29 +111,34 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
           shape.y = 200;
           stageRef.current.addChild(shape);
 
-          const fixtureDef = new b2FixtureDef();
-          fixtureDef.filter.categoryBits = 0x0002;
-          fixtureDef.filter.maskBits = 0x0002;
+          const bodyDef = {
+            type: "static",
+            position: {
+              x: 200 / SCALE,
+              y: 200 / SCALE
+            }
+          };
 
-          fixtureDef.shape = new b2PolygonShape();
+          const body = worldRef.current.createBody(bodyDef);
 
           const vertices = [];
+
           for (let i = 0; i < segments.length; i++) {
-            vertices[i] = new b2Vec2(
+            vertices[i] = new Vec2(
               segments[i].x1 / SCALE,
               segments[i].y1 / SCALE
             );
           }
 
-          fixtureDef.shape.SetAsArray(vertices, vertices.length);
+          const fixtureDef = {
+            filterCategoryBits: 0x0002,
+            filterMaskBits: 0x0002,
+            shape: new Polygon(vertices)
+          };
 
-          const bodyDef = new b2BodyDef();
-          bodyDef.type = b2Body.b2_staticBody;
-          bodyDef.position.x = 200 / SCALE;
-          bodyDef.position.y = 200 / SCALE;
+          body.createFixture(fixtureDef);
 
-          const body = worldRef.current.CreateBody(bodyDef);
-          body.CreateFixture(fixtureDef);
+          debugger;
 
           return { body, shape };
         });
@@ -152,7 +146,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
 
       return () => {
         patternsRef.current.forEach(({ body, shape }) => {
-          worldRef.current.DestroyBody(body);
+          worldRef.current.destroyBody(body);
           stageRef.current.removeChild(shape);
         });
       };
@@ -163,7 +157,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
     let minX, minY, maxX, maxY, aabb;
 
     for (let i = 0; i < piecesRef.current.length; i++) {
-      aabb = piecesRef.current[i].body.GetFixtureList().m_aabb;
+      aabb = piecesRef.current[i].body.getFixtureList().getAABB(0);
 
       if (minX === undefined || aabb.lowerBound.x < minX) {
         minX = aabb.lowerBound.x;
@@ -248,37 +242,37 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       shape.regX = 0;
       shape.cursor = "pointer";
 
-      const fixtureDef = new b2FixtureDef();
-      fixtureDef.density = 1000;
-      fixtureDef.friction = 0;
-      fixtureDef.restitution = 0;
-      fixtureDef.filter.categoryBits = 0x0001;
-      fixtureDef.filter.maskBits = 0x0001;
-
-      fixtureDef.shape = new b2PolygonShape();
-
       const vertices = [];
       for (let i = 0; i < points.length; i++) {
-        vertices[i] = new b2Vec2(points[i].x / SCALE, points[i].y / SCALE);
+        vertices[i] = new Vec2(points[i].x / SCALE, points[i].y / SCALE);
       }
 
-      fixtureDef.shape.SetAsArray(vertices, vertices.length);
+      const fixtureDef = {
+        density: 1000,
+        friction: 0,
+        restitution: 0,
+        shape: new Polygon(vertices)
+      };
 
-      const bodyDef = new b2BodyDef();
-      bodyDef.type = b2Body.b2_dynamicBody;
-      bodyDef.position.x = 200 / SCALE;
-      bodyDef.position.y = 200 / SCALE;
-      bodyDef.linearDamping = 100.0;
-      bodyDef.angularDamping = 100.0;
+      const bodyDef = {
+        type: "dynamic",
+        position: {
+          x: 200 / SCALE,
+          y: 200 / SCALE
+        },
 
-      const body = worldRef.current.CreateBody(bodyDef);
-      body.CreateFixture(fixtureDef);
+        linearDamping: 100.0,
+        angularDamping: 100.0
+      };
+
+      const body = worldRef.current.createBody(bodyDef);
+      body.createFixture(fixtureDef);
 
       Ticker.addEventListener("tick", function() {
-        const position = body.GetPosition();
+        const position = body.getPosition();
         shape.x = position.x * SCALE;
         shape.y = position.y * SCALE;
-        shape.rotation = body.GetAngle() * (180 / Math.PI);
+        shape.rotation = body.getAngle() * (180 / Math.PI);
       });
 
       stageRef.current.addChild(shape);
@@ -286,12 +280,12 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       shape.addEventListener("click", event => {
         // Fix jump issue
         if (window.event.ctrlKey) {
-          if (body.GetType() === b2Body.b2_dynamicBody) {
-            body.SetType(b2Body.b2_kinematicBody);
-            body.SetAwake(false);
+          if (body.getType() === "dynamic") {
+            body.setType("static");
+            body.setAwake(false);
           } else {
-            body.SetType(b2Body.b2_dynamicBody);
-            body.SetAwake(true);
+            body.setType("dynamic");
+            body.setAwake(true);
           }
         }
       });
@@ -299,26 +293,21 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       if (invertedPoints) {
         let inverted = false;
 
-        const invertedFixtureDef = new b2FixtureDef();
-        invertedFixtureDef.density = 1000;
-        invertedFixtureDef.friction = 0;
-        invertedFixtureDef.restitution = 0;
-
-        invertedFixtureDef.shape = new b2PolygonShape();
-
         const invertedVertices = [];
 
         for (let i = 0; i < invertedPoints.length; i++) {
-          invertedVertices[i] = new b2Vec2(
+          invertedVertices[i] = new Vec2(
             invertedPoints[i].x / SCALE,
             invertedPoints[i].y / SCALE
           );
         }
 
-        invertedFixtureDef.shape.SetAsArray(
-          invertedVertices,
-          invertedVertices.length
-        );
+        const invertedFixtureDef = {
+          density: 1000,
+          friction: 0,
+          restitution: 0,
+          shape: new Polygon(invertedVertices)
+        };
 
         const invertedGraphics = new Graphics();
         invertedGraphics
@@ -334,8 +323,8 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
         invertedGraphics.closePath();
 
         shape.addEventListener("dblclick", () => {
-          body.DestroyFixture(body.GetFixtureList());
-          body.CreateFixture(inverted ? fixtureDef : invertedFixtureDef);
+          body.destroyFixture(body.getFixtureList());
+          body.createFixture(inverted ? fixtureDef : invertedFixtureDef);
           shape.graphics = inverted ? graphics : invertedGraphics;
           inverted = !inverted;
         });
@@ -347,26 +336,29 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
         }
         var physicsMoveJoint, mouseMoveListener, mouseUpListener;
 
-        body.GetFixtureList().SetDensity(1);
-        body.ResetMassData();
-        body.SetBullet(true);
+        body.getFixtureList().setDensity(1);
+        body.resetMassData();
+        body.setBullet(true);
 
         function handleMouseMove(mmEvent) {
-          const physicsPoint = new b2Vec2(
+          const physicsPoint = new Vec2(
             mmEvent.stageX / SCALE,
             mmEvent.stageY / SCALE
           );
           if (!physicsMoveJoint) {
-            const def = new b2MouseJointDef();
-            def.bodyA = ground;
-            def.bodyB = body;
-            def.target = physicsPoint;
-            def.collideConnected = true;
-            def.maxForce = 2000 * body.GetMass();
-            def.dampingRatio = 0;
-            physicsMoveJoint = worldRef.current.CreateJoint(def);
+            const mouseJointDef = {
+              bodyA: ground,
+              bodyB: body,
+              target: physicsPoint,
+              collideConnected: true,
+              maxForce: 2000 * body.getMass(),
+              dampingRatio: 0
+            };
+            physicsMoveJoint = worldRef.current.createJoint(
+              MouseJoint(mouseJointDef)
+            );
           } else {
-            physicsMoveJoint.SetTarget(physicsPoint);
+            physicsMoveJoint.setTarget(physicsPoint);
           }
         }
 
@@ -374,11 +366,11 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
           stageRef.current.off("stagemousemove", mouseMoveListener);
           stageRef.current.off("stagemouseup", mouseUpListener);
           if (physicsMoveJoint) {
-            worldRef.current.DestroyJoint(physicsMoveJoint);
+            worldRef.current.destroyJoint(physicsMoveJoint);
           }
-          body.SetBullet(false);
-          body.GetFixtureList().SetDensity(1000);
-          body.ResetMassData();
+          body.setBullet(false);
+          body.getFixtureList().setDensity(1000);
+          body.resetMassData();
 
           patternsRef.current && check();
         }
@@ -409,25 +401,21 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
     function check() {
       // on verifie que points des pieces est à l'intereieuse de chaque polygon
       // on verifie que chq rayon allant vers un pt des pieces intersecte
-      const startingPoint = new b2Vec2(0, 0);
+      const startingPoint = new Vec2(0, 0);
 
       const patternsPoints = patternsRef.current.map(({ body }) =>
         body
-          .GetFixtureList()
-          .GetShape()
-          .GetVertices()
-          .map(patternVertex => body.GetWorldPoint(patternVertex))
+          .getFixtureList()
+          .getShape()
+          .m_vertices.map(patternVertex => body.getWorldPoint(patternVertex))
       );
 
       const everyPiecePointIsWithingPattern = piecesRef.current.every(
         ({ body, shape }, i) => {
-          const pieceVertices = body
-            .GetFixtureList()
-            .GetShape()
-            .GetVertices();
+          const pieceVertices = body.getFixtureList().getShape().m_vertices;
           return pieceVertices.every((pieceVertex, j) => {
             let intersect = 0;
-            const piecePoint = body.GetWorldPoint(pieceVertex);
+            const piecePoint = body.getWorldPoint(pieceVertex);
 
             for (let i = 0; i < patternsPoints.length; i++) {
               const patternPoints = patternsPoints[i];
@@ -453,6 +441,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
             }
 
             const isOdd = intersect % 2;
+            console.log(pieceVertex, isOdd);
 
             return isOdd;
           });
@@ -482,30 +471,34 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
     }
 
     function createWall(width, height, position) {
-      const wallFixtureDef = new b2FixtureDef();
-      const wallBodyDef = new b2BodyDef();
-      wallBodyDef.type = b2Body.b2_staticBody;
-      wallBodyDef.position.x = position.x / SCALE;
-      wallBodyDef.position.y = position.y / SCALE;
-      wallFixtureDef.shape = new b2PolygonShape();
+      const wallBodyDef = {
+        type: "static",
+        position: {
+          x: position.x / SCALE,
+          y: position.y / SCALE
+        }
+      };
 
-      const vertices = [
-        new b2Vec2(0 / SCALE, 0 / SCALE),
-        new b2Vec2(width / SCALE, 0 / SCALE),
-        new b2Vec2(width / SCALE, height / SCALE),
-        new b2Vec2(0 / SCALE, height / SCALE)
-      ];
+      const wallBody = worldRef.current.createBody(wallBodyDef);
 
-      wallFixtureDef.shape.SetAsArray(vertices, vertices.length);
-      const wallBody = worldRef.current.CreateBody(wallBodyDef);
-      wallBody.CreateFixture(wallFixtureDef);
+      const wallFixtureDef = {
+        shape: new Polygon([
+          new Vec2(0 / SCALE, 0 / SCALE),
+          new Vec2(width / SCALE, 0 / SCALE),
+          new Vec2(width / SCALE, height / SCALE),
+          new Vec2(0 / SCALE, height / SCALE)
+        ])
+      };
+
+      wallBody.createFixture(wallFixtureDef);
+
       return wallBody;
     }
 
     function setupPhysics() {
       const canvasRect = canvasRef.current.getBoundingClientRect();
-      const gravity = new b2Vec2(0, 0);
-      worldRef.current = new b2World(gravity, true);
+      const gravity = new Vec2(0, 0);
+      worldRef.current = new World(gravity, true);
 
       ground = createWall(canvasRect.width, WALL_WIDTH, { x: 0, y: 0 });
       createWall(canvasRect.width, WALL_WIDTH, {
@@ -518,19 +511,19 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
         y: 0
       });
 
-      const debugDraw = new b2DebugDraw();
-      debugDraw.SetSprite(debugRef.current.getContext("2d"));
-      debugDraw.SetDrawScale(SCALE);
-      debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
+      // const debugDraw = new b2DebugDraw();
+      // debugDraw.SetSprite(debugRef.current.getContext("2d"));
+      // debugDraw.SetDrawScale(SCALE);
+      // debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
 
-      worldRef.current.SetDebugDraw(debugDraw);
+      // worldRef.current.SetDebugDraw(debugDraw);
     }
 
     function tick() {
       stageRef.current.update();
-      worldRef.current.DrawDebugData();
-      worldRef.current.Step(1 / FPS, 10, 10);
-      worldRef.current.ClearForces();
+      // worldRef.current.DrawDebugData();
+      worldRef.current.step(1 / FPS, 10, 10);
+      worldRef.current.clearForces();
     }
 
     init();
