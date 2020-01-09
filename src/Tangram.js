@@ -1,15 +1,15 @@
 import React, { useRef, useLayoutEffect, useEffect } from "react";
 
 import { World, Vec2, Polygon, MouseJoint } from "planck-js";
-import { Stage, Ticker, Shape, Graphics } from "@createjs/easeljs";
 import "./Tangram.scss";
 import ImageTracer from "imagetracerjs";
+import paper from "paper/dist/paper-core";
 
 const SCALE = 30;
 const WALL_WIDTH = 10;
 const FPS = 60;
 
-const STROKE_WIDTH = 10;
+const STROKE_WIDTH = 2;
 function createTrianglePoints(size) {
   return [
     { x: 0, y: 0 },
@@ -44,15 +44,11 @@ function createRhombusPoints(size) {
     { x: size, y: size }
   ];
 }
-function randomColor() {
-  return "hsla(" + Math.random() * 360 + ", 100%, 50%, 1)";
-}
 
 export const Tangram = ({ onSave, patternImageDataUrl }) => {
   const canvasRef = useRef();
   const debugRef = useRef();
   const piecesRef = useRef();
-  const stageRef = useRef();
   const worldRef = useRef();
   const patternsRef = useRef();
 
@@ -90,26 +86,11 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
         var traceData = ImageTracer.imagedataToTracedata(imageData, options);
 
         patternsRef.current = traceData.layers[0].map(({ segments }) => {
-          const graphics = new Graphics();
-
-          graphics
-            .setStrokeStyle(1)
-            .beginStroke("green")
-            .moveTo(segments[0].x1, segments[0].y1);
-
-          for (let i = 1; i < segments.length; i++) {
-            graphics.lineTo(segments[i].x1, segments[i].y1);
-          }
-
-          graphics.closePath();
-
-          const shape = new Shape(graphics);
-
-          shape.regY = 0;
-          shape.regX = 0;
-          shape.x = 200;
-          shape.y = 200;
-          stageRef.current.addChild(shape);
+          const path = new paper.Path(segments.map(({ x1, y1 }) => [x1, y1]));
+          path.closed = true;
+          path.strokeWidth = 1;
+          path.strokeColor = "green";
+          path.position = { x: 200, y: 200 };
 
           const bodyDef = {
             type: "static",
@@ -138,16 +119,14 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
 
           body.createFixture(fixtureDef);
 
-          debugger;
-
-          return { body, shape };
+          return { body, path };
         });
       }, 0);
 
       return () => {
-        patternsRef.current.forEach(({ body, shape }) => {
+        patternsRef.current.forEach(({ body, path }) => {
           worldRef.current.destroyBody(body);
-          stageRef.current.removeChild(shape);
+          path.remove();
         });
       };
     }
@@ -212,35 +191,22 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       canvasRef.current.height = parentRect.height;
       debugRef.current.width = parentRect.width;
       debugRef.current.height = parentRect.height;
-
-      stageRef.current = new Stage(canvasRef.current);
-      stageRef.current.enableMouseOver(FPS);
+      // Create an empty project and a view for the canvas:
+      paper.setup(canvasRef.current);
+      paper.view.autoUpdate = false;
       setupPhysics();
       setupPieces();
-      Ticker.addEventListener("tick", tick);
-      Ticker.framerate = FPS;
+      paper.view.on("frame", tick);
     }
 
     function createPiece(points, invertedPoints) {
-      const color = randomColor();
-      const graphics = new Graphics();
-      graphics
-        .setStrokeStyle(STROKE_WIDTH, "butt", "round")
-        .beginStroke("#000000")
-        .beginFill(color)
-        .moveTo(points[0].x, points[0].y);
-
-      for (let i = 1; i < points.length; i++) {
-        graphics.lineTo(points[i].x, points[i].y);
-      }
-
-      graphics.closePath();
-
-      const shape = new Shape(graphics);
-
-      shape.regY = 0;
-      shape.regX = 0;
-      shape.cursor = "pointer";
+      var path = new paper.Path(points);
+      path.strokeColor = "black";
+      path.strokeWidth = STROKE_WIDTH;
+      path.fillColor = paper.Color.random();
+      path.closed = true;
+      path.applyMatrix = false;
+      path.pivot = new paper.Point(0, 0);
 
       const vertices = [];
       for (let i = 0; i < points.length; i++) {
@@ -268,17 +234,13 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       const body = worldRef.current.createBody(bodyDef);
       body.createFixture(fixtureDef);
 
-      Ticker.addEventListener("tick", function() {
+      paper.view.on("frame", function() {
         const position = body.getPosition();
-        shape.x = position.x * SCALE;
-        shape.y = position.y * SCALE;
-        shape.rotation = body.getAngle() * (180 / Math.PI);
+        path.position = new paper.Point(position.x * SCALE, position.y * SCALE);
+        path.rotation = body.getAngle() * (180 / Math.PI);
       });
 
-      stageRef.current.addChild(shape);
-
-      shape.addEventListener("click", event => {
-        // Fix jump issue
+      path.on("click", () => {
         if (window.event.ctrlKey) {
           if (body.getType() === "dynamic") {
             body.setType("static");
@@ -309,28 +271,15 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
           shape: new Polygon(invertedVertices)
         };
 
-        const invertedGraphics = new Graphics();
-        invertedGraphics
-          .setStrokeStyle(STROKE_WIDTH, "butt", "round")
-          .beginStroke("#000000")
-          .beginFill(color)
-          .moveTo(invertedPoints[0].x, invertedPoints[0].y);
-
-        for (let i = 1; i < invertedPoints.length; i++) {
-          invertedGraphics.lineTo(invertedPoints[i].x, invertedPoints[i].y);
-        }
-
-        invertedGraphics.closePath();
-
-        shape.addEventListener("dblclick", () => {
+        path.on("dblclick", () => {
           body.destroyFixture(body.getFixtureList());
           body.createFixture(inverted ? fixtureDef : invertedFixtureDef);
-          shape.graphics = inverted ? graphics : invertedGraphics;
+          path.segments(invertedPoints);
           inverted = !inverted;
         });
       }
 
-      shape.addEventListener("mousedown", function(mdEvent) {
+      path.on("mousedown", function(mdEvent) {
         if (window.event.ctrlKey) {
           return;
         }
@@ -342,8 +291,8 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
 
         function handleMouseMove(mmEvent) {
           const physicsPoint = new Vec2(
-            mmEvent.stageX / SCALE,
-            mmEvent.stageY / SCALE
+            mmEvent.point.x / SCALE,
+            mmEvent.point.y / SCALE
           );
           if (!physicsMoveJoint) {
             const mouseJointDef = {
@@ -363,8 +312,8 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
         }
 
         function handleMouseUp() {
-          stageRef.current.off("stagemousemove", mouseMoveListener);
-          stageRef.current.off("stagemouseup", mouseUpListener);
+          paper.view.off("mousemove", mouseMoveListener);
+          paper.view.off("mouseup", mouseUpListener);
           if (physicsMoveJoint) {
             worldRef.current.destroyJoint(physicsMoveJoint);
           }
@@ -375,14 +324,11 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
           patternsRef.current && check();
         }
 
-        mouseMoveListener = stageRef.current.on(
-          "stagemousemove",
-          handleMouseMove
-        );
-        mouseUpListener = stageRef.current.on("stagemouseup", handleMouseUp);
+        mouseMoveListener = paper.view.on("mousemove", handleMouseMove);
+        mouseUpListener = paper.view.on("mouseup", handleMouseUp);
       });
 
-      return { body, shape, points, invertedPoints };
+      return { body, path, points, invertedPoints };
     }
 
     function intersects(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) {
@@ -411,7 +357,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       );
 
       const everyPiecePointIsWithingPattern = piecesRef.current.every(
-        ({ body, shape }, i) => {
+        ({ body }) => {
           const pieceVertices = body.getFixtureList().getShape().m_vertices;
           return pieceVertices.every((pieceVertex, j) => {
             let intersect = 0;
@@ -441,7 +387,6 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
             }
 
             const isOdd = intersect % 2;
-            console.log(pieceVertex, isOdd);
 
             return isOdd;
           });
@@ -510,18 +455,10 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
         x: canvasRect.width - WALL_WIDTH,
         y: 0
       });
-
-      // const debugDraw = new b2DebugDraw();
-      // debugDraw.SetSprite(debugRef.current.getContext("2d"));
-      // debugDraw.SetDrawScale(SCALE);
-      // debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
-
-      // worldRef.current.SetDebugDraw(debugDraw);
     }
 
     function tick() {
-      stageRef.current.update();
-      // worldRef.current.DrawDebugData();
+      paper.view.update();
       worldRef.current.step(1 / FPS, 10, 10);
       worldRef.current.clearForces();
     }
@@ -532,7 +469,6 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
   return (
     <div className="tangram">
       <canvas ref={canvasRef}></canvas>
-      <canvas ref={debugRef}></canvas>
       <div>
         <button onClick={() => onSave(getCroppedImageDataUrl())}>Save</button>
       </div>
