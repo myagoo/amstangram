@@ -60,7 +60,7 @@ export const Galery = ({ galery, onSelect }) => {
         style={{ transform: "translateX(-50%)", cursor: "pointer" }}
         onClick={() => setOpened(!opened)}
       >
-        <View as={FiArrowDownCircle} width={30} height={30} />
+        <View as={FiArrowDownCircle} width={30} height={30} style={{ transform: `rotate(${opened ? 180 : 0}deg)`, transition: "transform ease 500ms" }}/>
       </View>
     </View>
   )
