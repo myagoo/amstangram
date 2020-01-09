@@ -16,10 +16,8 @@
   .galery {
     display: flex;
     flex-direction: row;
-    align-items: stretch;
     padding: 10px;
-    height: 160px;
-    background: green;
+
     overflow: auto;
     scroll-snap-type: x mandatory;
 

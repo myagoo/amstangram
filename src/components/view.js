@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "styled-components"
 import {
   background,
   border,
@@ -7,8 +7,8 @@ import {
   layout,
   position,
   space,
-  typography
-} from "styled-system";
+  typography,
+} from "styled-system"
 
 export const View = styled.div`
   ${space}
@@ -19,4 +19,4 @@ export const View = styled.div`
   ${background}
   ${border}
   ${position}
-`;
+`
