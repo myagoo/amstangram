@@ -2,7 +2,7 @@ import ImageTracer from "imagetracerjs";
 import paper from "paper/dist/paper-core";
 import { MouseJoint, Polygon, Vec2, World } from "planck-js";
 import React, { useEffect, useLayoutEffect, useRef } from "react";
-import "./Tangram.scss";
+import { View } from "./components/view";
 
 const SCALE = 30;
 const WALL_WIDTH = 10;
@@ -465,11 +465,17 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
   }, []);
 
   return (
-    <div className="tangram">
-      <canvas ref={canvasRef}></canvas>
-      <div>
-        <button onClick={() => onSave(getCroppedImageDataUrl())}>Save</button>
-      </div>
-    </div>
+    <View display="flex" flex="1" position="relative">
+      <View as="canvas" ref={canvasRef} position="absolute" top={0} left={0} />
+      <View
+        as="button"
+        position="absolute"
+        bottom={0}
+        right={0}
+        onClick={() => onSave(getCroppedImageDataUrl())}
+      >
+        Save
+      </View>
+    </View>
   );
 };

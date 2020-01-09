@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import "./App.css";
-import { Tangram } from "./Tangram";
+import { ThemeProvider } from "styled-components";
+import { View } from "./components/view";
 import { Galery } from "./Galery";
+import { Tangram } from "./Tangram";
 
 function App() {
   const [galery, setGalery] = useState([]);
@@ -14,14 +15,15 @@ function App() {
     setSelectedImageDataUrl(imageDataUrl);
   };
   return (
-    <div className="app">
-      <p id="statusEl">Running</p>
-      <Tangram
-        onSave={handleSave}
-        patternImageDataUrl={selectedImageDataUrl}
-      ></Tangram>
-      <Galery galery={galery} onSelect={handleSelect}></Galery>
-    </div>
+    <ThemeProvider theme={{}}>
+      <View display="flex" flexDirection="column" height="100vh" width="100vw">
+        <Tangram
+          onSave={handleSave}
+          patternImageDataUrl={selectedImageDataUrl}
+        ></Tangram>
+        <Galery galery={galery} onSelect={handleSelect}></Galery>
+      </View>
+    </ThemeProvider>
   );
 }
 
