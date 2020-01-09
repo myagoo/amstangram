@@ -8,6 +8,9 @@ const WALL_WIDTH = 10
 const FPS = 60
 const STROKE_WIDTH = 0
 
+const LENGTH_MIN = 863
+const LENGTH_MAX = 1970
+
 function createTrianglePoints(size) {
   return [
     { x: 0, y: 0 },
@@ -82,10 +85,21 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
     )
 
     const svg = result.exportSVG({ asString: true })
+    const width = result.bounds.width
+    const height = result.bounds.height
+    const length = Math.ceil(result.length)
+    const percent = Math.floor(
+      ((length - LENGTH_MIN) / (LENGTH_MAX - LENGTH_MIN)) * 100
+    )
 
     result.remove()
 
-    return { svg, width: result.bounds.width, height: result.bounds.height }
+    return {
+      svg,
+      width,
+      height,
+      percent,
+    }
   }
 
   useLayoutEffect(() => {
@@ -146,7 +160,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       })
 
       path.on("click", () => {
-        if (window.event.ctrlKey) {
+        if (window.event.ctrlKey || window.event.metaKey) {
           if (body.getType() === "dynamic") {
             body.setType("static")
             body.setAwake(false)
@@ -185,7 +199,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       }
 
       path.on("mousedown", function(mdEvent) {
-        if (window.event.ctrlKey) {
+        if (window.event.ctrlKey || window.event.metaKey) {
           return
         }
         var physicsMoveJoint
