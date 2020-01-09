@@ -1,9 +1,8 @@
-import React, { useRef, useLayoutEffect, useEffect } from "react";
-
-import { World, Vec2, Polygon, MouseJoint } from "planck-js";
-import "./Tangram.scss";
 import ImageTracer from "imagetracerjs";
 import paper from "paper/dist/paper-core";
+import { MouseJoint, Polygon, Vec2, World } from "planck-js";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
+import "./Tangram.scss";
 
 const SCALE = 30;
 const WALL_WIDTH = 10;
@@ -47,7 +46,7 @@ function createRhombusPoints(size) {
 
 export const Tangram = ({ onSave, patternImageDataUrl }) => {
   const canvasRef = useRef();
-  const debugRef = useRef();
+
   const piecesRef = useRef();
   const worldRef = useRef();
   const patternsRef = useRef();
@@ -189,8 +188,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       const parentRect = canvasRef.current.parentElement.getBoundingClientRect();
       canvasRef.current.width = parentRect.width;
       canvasRef.current.height = parentRect.height;
-      debugRef.current.width = parentRect.width;
-      debugRef.current.height = parentRect.height;
+
       // Create an empty project and a view for the canvas:
       paper.setup(canvasRef.current);
       paper.view.autoUpdate = false;
@@ -271,10 +269,10 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
           shape: new Polygon(invertedVertices)
         };
 
-        path.on("dblclick", () => {
+        path.on("doubleclick", () => {
           body.destroyFixture(body.getFixtureList());
           body.createFixture(inverted ? fixtureDef : invertedFixtureDef);
-          path.segments(invertedPoints);
+          path.segments = inverted ? points : invertedPoints;
           inverted = !inverted;
         });
       }
@@ -283,7 +281,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
         if (window.event.ctrlKey) {
           return;
         }
-        var physicsMoveJoint, mouseMoveListener, mouseUpListener;
+        var physicsMoveJoint;
 
         body.getFixtureList().setDensity(1);
         body.resetMassData();
@@ -312,8 +310,8 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
         }
 
         function handleMouseUp() {
-          paper.view.off("mousemove", mouseMoveListener);
-          paper.view.off("mouseup", mouseUpListener);
+          paper.view.off("mousemove", handleMouseMove);
+          paper.view.off("mouseup", handleMouseUp);
           if (physicsMoveJoint) {
             worldRef.current.destroyJoint(physicsMoveJoint);
           }
@@ -324,8 +322,8 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
           patternsRef.current && check();
         }
 
-        mouseMoveListener = paper.view.on("mousemove", handleMouseMove);
-        mouseUpListener = paper.view.on("mouseup", handleMouseUp);
+        paper.view.on("mousemove", handleMouseMove);
+        paper.view.on("mouseup", handleMouseUp);
       });
 
       return { body, path, points, invertedPoints };
