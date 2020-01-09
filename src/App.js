@@ -1,8 +1,18 @@
 import React, { useState } from "react"
-import { ThemeProvider } from "styled-components"
+import { createGlobalStyle, ThemeProvider } from "styled-components"
 import { View } from "./components/view"
 import { Galery } from "./Galery"
 import { Tangram } from "./Tangram"
+import { theme } from "./theme"
+
+const GlobalStyle = createGlobalStyle`
+  body {	
+    margin: 0;	
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',	'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',	sans-serif;	
+    -webkit-font-smoothing: antialiased;	
+    -moz-osx-font-smoothing: grayscale;
+  }
+`
 
 function App() {
   const [galery, setGalery] = useState([])
@@ -15,7 +25,8 @@ function App() {
     setSelectedImageDataUrl(imageDataUrl)
   }
   return (
-    <ThemeProvider theme={{}}>
+    <ThemeProvider theme={theme}>
+      <GlobalStyle />
       <View display="flex" flexDirection="column" height="100vh" width="100vw">
         <Tangram
           onSave={handleSave}
