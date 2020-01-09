@@ -34,6 +34,7 @@
     "node-sass": "^4.13.0",
     "paper": "^0.12.4",
     "planck-js": "^0.3.12",
+    "polygon-offset": "^0.3.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-icons": "^3.8.0",

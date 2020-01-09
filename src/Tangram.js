@@ -1,6 +1,6 @@
 import paper from "paper/dist/paper-core"
 import { MouseJoint, Polygon, Vec2, World } from "planck-js"
-import React, { useLayoutEffect, useRef } from "react"
+import React, { useLayoutEffect, useRef, useEffect } from "react"
 import { Button } from "./components/button"
 import { View } from "./components/view"
 
@@ -11,6 +11,7 @@ const STROKE_WIDTH = 0
 
 const LENGTH_MIN = 863
 const LENGTH_MAX = 1970
+const ERROR_SCALING = 1.04
 
 function createTrianglePoints(size) {
   return [
@@ -51,7 +52,76 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
   const canvasRef = useRef()
   const piecesRef = useRef()
   const worldRef = useRef()
-  const patternsRef = useRef()
+  const groupRef = useRef()
+  const patternsRef = useRef([])
+
+  useEffect(() => {
+    if (!patternImageDataUrl) {
+      return
+    }
+
+    const group = new paper.Group()
+    group.importSVG(patternImageDataUrl)
+    group.children.forEach(child => {
+      child.fillColor = "black"
+      child.strokeWidth = 2
+      child.strokeColor = "red"
+    })
+    group.sendToBack()
+    group.position = paper.view.center
+    groupRef.current = group
+
+    const offsettedPaths = []
+
+    const handleChild = path => {
+      var co = new window.ClipperLib.ClipperOffset() // constructor
+
+      co.AddPaths(
+        [path.segments.map(({ point: { x, y } }) => ({ X: x, Y: y }))],
+        true
+      ) // we add paths only once
+
+      var offsetted_paths = new window.ClipperLib.Paths() // empty solution
+      co.Clear()
+      co.AddPaths(
+        [path.segments.map(({ point: { x, y } }) => ({ X: x, Y: y }))],
+        window.ClipperLib.JoinType.jtMiter,
+        window.ClipperLib.EndType.etClosedPolygon
+      )
+
+      co.MiterLimit = 2
+      co.ArcTolerance = 0.25
+
+      co.Execute(offsetted_paths, 5)
+
+      const offsettedPath = new paper.Path(
+        offsetted_paths[0].map(({ X, Y }) => ({
+          x: X,
+          y: Y,
+        }))
+      )
+      offsettedPath.strokeWidth = 1
+      offsettedPath.strokeColor = "red"
+      offsettedPath.closed = true
+
+      offsettedPaths.push(offsettedPath)
+    }
+
+    group.children.forEach(child => {
+      if (child.children) {
+        child.children.forEach(handleChild)
+      } else {
+        handleChild(child)
+      }
+    })
+
+    patternsRef.current = offsettedPaths
+
+    return () => {
+      group.remove()
+      offsettedPaths.forEach(path => path.remove())
+    }
+  }, [patternImageDataUrl])
 
   const getCompoundPath = () => {
     const [firstTan, ...otherTans] = [...piecesRef.current]
@@ -64,7 +134,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
               tan.path.localToGlobal(segment.point)
             ),
             closed: true,
-            scaling: 1.02,
+            scaling: ERROR_SCALING,
           }),
           { insert: false }
         )
@@ -74,10 +144,10 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
           firstTan.path.localToGlobal(segment.point)
         ),
         closed: true,
-        scaling: 1.02,
+        scaling: ERROR_SCALING,
       })
     )
-
+    result.fillRule = "evenodd"
     result.closed = true
     result.fillColor = "black"
     result.position = new paper.Point(
@@ -165,9 +235,11 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
           if (body.getType() === "dynamic") {
             body.setType("static")
             body.setAwake(false)
+            path.opacity = 0.5
           } else {
             body.setType("dynamic")
             body.setAwake(true)
+            path.opacity = 1
           }
         }
       })
@@ -267,21 +339,16 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
     function check() {
       // on verifie que points des pieces est à l'intereieuse de chaque polygon
       // on verifie que chq rayon allant vers un pt des pieces intersecte
-      const startingPoint = new Vec2(0, 0)
 
-      const patternsPoints = patternsRef.current.map(({ body }) =>
-        body
-          .getFixtureList()
-          .getShape()
-          .m_vertices.map(patternVertex => body.getWorldPoint(patternVertex))
+      const patternsPoints = patternsRef.current.map(path =>
+        path.segments.map(segment => path.localToGlobal(segment.point))
       )
 
       const everyPiecePointIsWithingPattern = piecesRef.current.every(
-        ({ body }) => {
-          const pieceVertices = body.getFixtureList().getShape().m_vertices
-          return pieceVertices.every((pieceVertex, j) => {
+        ({ path }) => {
+          return path.segments.every((segment, j) => {
             let intersect = 0
-            const piecePoint = body.getWorldPoint(pieceVertex)
+            const piecePoint = path.localToGlobal(segment.point)
 
             for (let i = 0; i < patternsPoints.length; i++) {
               const patternPoints = patternsPoints[i]
@@ -290,8 +357,8 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
                 const currentPatternPoint = patternPoints[j]
                 if (
                   intersects(
-                    startingPoint.x,
-                    startingPoint.y,
+                    0,
+                    0,
                     piecePoint.x,
                     piecePoint.y,
                     lastPatternPoint.x,
@@ -387,8 +454,8 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
   }, [])
 
   return (
-    <View to display="flex" flex="1" position="relative">
-      <View as="canvas" ref={canvasRef} position="absolute" top={0} left={0} />
+    <View display="flex" flexDirection="column" flex="1" position="relative">
+      <View as="canvas" ref={canvasRef} flex="1" />
       <Button
         position="absolute"
         top={450}

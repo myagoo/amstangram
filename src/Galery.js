@@ -25,7 +25,10 @@ export const Galery = ({ galery, onSelect }) => {
           index <= card && (
             <View
               key={index}
-              onClick={() => setCard(card - 1)}
+              onClick={() => {
+                setCard(card - 1)
+                onSelect(svg)
+              }}
               background="#aabbcc"
               borderRadius={5}
               position="absolute"

@@ -1,3 +1,9 @@
+# TODO
+
+- snap pieces together
+- handle holes in solutions
+- cleans littles paths in solutions
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
