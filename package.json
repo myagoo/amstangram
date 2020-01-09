@@ -6,7 +6,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "yarn build",
+    "deploy": "gh-pages -d build"
   },
   "homepage": "http://myagoo.github.io/amstangram",
   "eslintConfig": {
@@ -39,6 +41,7 @@
     "styled-system": "^5.1.4"
   },
   "devDependencies": {
-    "babel-plugin-styled-components": "^1.10.6"
+    "babel-plugin-styled-components": "^1.10.6",
+    "gh-pages": "^2.2.0"
   }
 }
