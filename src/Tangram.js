@@ -1,17 +1,20 @@
 import paper from "paper/dist/paper-core"
-import { MouseJoint, Polygon, Vec2, World } from "planck-js"
+import { MouseJoint, Polygon, Vec2, World, Edge } from "planck-js"
 import React, { useLayoutEffect, useRef, useEffect } from "react"
 import { Button } from "./components/button"
 import { View } from "./components/view"
+import simplify from "simplify-js"
 
 const SCALE = 30
 const WALL_WIDTH = 10
 const FPS = 60
-const STROKE_WIDTH = 0
+const STROKE_WIDTH = 1
 
-const LENGTH_MIN = 863
-const LENGTH_MAX = 1970
-const ERROR_SCALING = 1.04
+const SMALL_TRIANGLE_BASE = 40
+const LENGTH_MIN = SMALL_TRIANGLE_BASE * 21.575
+const LENGTH_MAX = SMALL_TRIANGLE_BASE * 49.25
+const ERROR_MARGIN = 5
+const SIMPLIFY_TOLERANCE = 5
 
 function createTrianglePoints(size) {
   return [
@@ -48,11 +51,37 @@ function createRhombusPoints(size) {
   ]
 }
 
+const getOffsettedPoints = (points, offset) => {
+  console.log(points)
+  const co = new window.ClipperLib.ClipperOffset() // constructor
+
+  const pathClipperPath = points.map(({ x, y }) => ({
+    X: x,
+    Y: y,
+  }))
+
+  co.AddPaths([pathClipperPath], true) // we add paths only once
+
+  const offsettedPaths = new window.ClipperLib.Paths() // empty solution
+  co.Clear()
+  co.AddPaths(
+    [pathClipperPath],
+    window.ClipperLib.JoinType.jtMiter,
+    window.ClipperLib.EndType.etClosedPolygon
+  )
+
+  co.MiterLimit = 2
+  co.ArcTolerance = 0.25
+
+  co.Execute(offsettedPaths, offset)
+
+  return offsettedPaths[0].map(({ X, Y }) => new paper.Point(X, Y))
+}
+
 export const Tangram = ({ onSave, patternImageDataUrl }) => {
   const canvasRef = useRef()
   const piecesRef = useRef()
   const worldRef = useRef()
-  const groupRef = useRef()
   const patternsRef = useRef([])
 
   useEffect(() => {
@@ -61,58 +90,35 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
     }
 
     const group = new paper.Group()
-    group.importSVG(patternImageDataUrl)
-    group.children.forEach(child => {
-      child.fillColor = "black"
-      child.strokeWidth = 2
-      child.strokeColor = "red"
-    })
+
+    const item = group.importSVG(patternImageDataUrl, {})
+    group.fillColor = "black"
     group.sendToBack()
     group.position = paper.view.center
-    groupRef.current = group
 
-    const offsettedPaths = []
+    let paths
 
-    const handleChild = path => {
-      var co = new window.ClipperLib.ClipperOffset() // constructor
-
-      co.AddPaths(
-        [path.segments.map(({ point: { x, y } }) => ({ X: x, Y: y }))],
-        true
-      ) // we add paths only once
-
-      var offsetted_paths = new window.ClipperLib.Paths() // empty solution
-      co.Clear()
-      co.AddPaths(
-        [path.segments.map(({ point: { x, y } }) => ({ X: x, Y: y }))],
-        window.ClipperLib.JoinType.jtMiter,
-        window.ClipperLib.EndType.etClosedPolygon
-      )
-
-      co.MiterLimit = 2
-      co.ArcTolerance = 0.25
-
-      co.Execute(offsetted_paths, 5)
-
-      const offsettedPath = new paper.Path(
-        offsetted_paths[0].map(({ X, Y }) => ({
-          x: X,
-          y: Y,
-        }))
-      )
-      offsettedPath.strokeWidth = 1
-      offsettedPath.strokeColor = "red"
-      offsettedPath.closed = true
-
-      offsettedPaths.push(offsettedPath)
+    if (item instanceof paper.CompoundPath) {
+      paths = item.children
+    } else {
+      paths = [item]
     }
 
-    group.children.forEach(child => {
-      if (child.children) {
-        child.children.forEach(handleChild)
-      } else {
-        handleChild(child)
-      }
+    const offsettedPaths = paths.map(path => {
+      const points = path.segments.map(({ point }) => point)
+      const simplifiedPoints = simplify(points, SIMPLIFY_TOLERANCE, true)
+      path.segments = simplifiedPoints
+
+      const offsettedPath = new paper.Path({
+        segments: getOffsettedPoints(simplifiedPoints, ERROR_MARGIN),
+        fillColor: "green",
+        closed: true,
+        opacity: 0.5,
+      })
+
+      offsettedPath.sendToBack()
+
+      return offsettedPath
     })
 
     patternsRef.current = offsettedPaths
@@ -130,21 +136,25 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       (compoundPath, tan, i) => {
         return compoundPath.unite(
           new paper.Path({
-            segments: tan.path.segments.map(segment =>
-              tan.path.localToGlobal(segment.point)
+            segments: getOffsettedPoints(
+              tan.path.segments.map(segment =>
+                tan.path.localToGlobal(segment.point)
+              ),
+              1
             ),
             closed: true,
-            scaling: ERROR_SCALING,
           }),
           { insert: false }
         )
       },
       new paper.Path({
-        segments: firstTan.path.segments.map(segment =>
-          firstTan.path.localToGlobal(segment.point)
+        segments: getOffsettedPoints(
+          firstTan.path.segments.map(segment =>
+            firstTan.path.localToGlobal(segment.point)
+          ),
+          1
         ),
         closed: true,
-        scaling: ERROR_SCALING,
       })
     )
     result.fillRule = "evenodd"
@@ -385,7 +395,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
     }
 
     function setupPieces() {
-      const smallBase = 40
+      const smallBase = SMALL_TRIANGLE_BASE
       const mediumBase = Math.sqrt(Math.pow(smallBase, 2) * 2)
       const largeBase = Math.sqrt(Math.pow(mediumBase, 2) * 2)
       piecesRef.current = [
@@ -412,7 +422,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       }
 
       const wallBody = worldRef.current.createBody(wallBodyDef)
-
+      new Edge()
       const wallFixtureDef = {
         shape: new Polygon([
           new Vec2(0 / SCALE, 0 / SCALE),
