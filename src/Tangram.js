@@ -1,6 +1,7 @@
 import paper from "paper/dist/paper-core"
 import { MouseJoint, Polygon, Vec2, World } from "planck-js"
 import React, { useLayoutEffect, useRef } from "react"
+import { Button } from "./components/button"
 import { View } from "./components/view"
 
 const SCALE = 30
@@ -386,17 +387,16 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
   }, [])
 
   return (
-    <View display="flex" flex="1" position="relative">
+    <View to display="flex" flex="1" position="relative">
       <View as="canvas" ref={canvasRef} position="absolute" top={0} left={0} />
-      <View
-        as="button"
+      <Button
         position="absolute"
-        bottom={10}
-        right={10}
+        top={450}
+        right={50}
         onClick={() => onSave(getCompoundPath())}
       >
-        Save
-      </View>
+        Add to Galery
+      </Button>
     </View>
   )
 }
