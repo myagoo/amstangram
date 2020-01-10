@@ -458,8 +458,8 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       <View as="canvas" ref={canvasRef} flex="1" />
       <Button
         position="absolute"
-        top={450}
-        right={50}
+        top={10}
+        right={10}
         onClick={() => onSave(getCompoundPath())}
       >
         Add to Galery

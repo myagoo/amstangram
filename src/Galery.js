@@ -1,68 +1,69 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
+import { FiArrowDownCircle } from "react-icons/fi"
+import { Card } from "./components/card"
 import { View } from "./components/view"
 
 export const Galery = ({ galery, onSelect }) => {
-  const [card, setCard] = useState(galery.length - 1)
-
-  useEffect(() => {
-    setCard(galery.length - 1)
-  }, [galery.length])
-
-  useEffect(() => {
-    if (card < 0) {
-      setCard(galery.length - 1)
-    }
-  }, [galery.length, card])
+  const [opened, setOpened] = useState(false)
 
   if (galery.length === 0) {
     return null
   }
 
   return (
-    <View position="fixed" right={200} top={200}>
-      {galery.map(
-        ({ svg, width, height, percent }, index) =>
-          index <= card && (
-            <View
+    <>
+      <View
+        position="fixed"
+        top={0}
+        left={0}
+        right={0}
+        p={2}
+        pb={0}
+        background="#34495e"
+        display="flex"
+        flexWrap="wrap"
+        style={{
+          transform: `translateY(${opened ? 0 : -100}%)`,
+          transition: "transform ease 500ms",
+        }}
+      >
+        {galery.map((tangram, index) => {
+          return (
+            <Card
               key={index}
+              flex="none"
+              mr={2}
+              mb={2}
+              tangram={tangram}
               onClick={() => {
-                setCard(card - 1)
-                onSelect(svg)
+                onSelect(tangram.svg)
               }}
-              background="#aabbcc"
-              borderRadius={5}
-              position="absolute"
-              top={0}
-              p={2}
-              display="flex"
-              flexDirection="column"
-              justifyContent="space-between"
-              textAlign="center"
-              border="5px solid #fff"
-              width={128}
-              height={178}
-              style={{
-                transform: `translate(-${index}px, -${index}px)`,
-                zIndex: index,
-                boxShadow: "0px 0px 0px 1px rgba(0, 0, 0, 0.1)",
-                cursor: "pointer",
-              }}
-            >
-              <View mb={2}>{index}</View>
-              <View
-                as="svg"
-                key={index}
-                flex="1"
-                alt=""
-                viewBox={`0 0 ${width} ${height}`}
-                dangerouslySetInnerHTML={{ __html: svg }}
-              />
-              <View mt={2}>
-                {percent > 70 ? "Easy" : percent > 40 ? "Medium" : "Easy"}
-              </View>
-            </View>
+            ></Card>
           )
-      )}
-    </View>
+        })}
+        <View
+          position="absolute"
+          top="100%"
+          left="50%"
+          background="#34495e"
+          color="#fff"
+          p={1}
+          borderBottomLeftRadius={5}
+          borderBottomRightRadius={5}
+          style={{ transform: "translateX(-50%)", cursor: "pointer" }}
+          onClick={() => setOpened(!opened)}
+        >
+          <View
+            as={FiArrowDownCircle}
+            width={30}
+            height={30}
+            style={{
+              transform: `rotate(${opened ? 180 : 0}deg)`,
+              transition: "transform ease 500ms",
+            }}
+          />
+        </View>
+      </View>
+    </>
   )
 }
