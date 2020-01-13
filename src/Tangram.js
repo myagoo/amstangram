@@ -1,9 +1,17 @@
 import paper from "paper/dist/paper-core"
-import { MouseJoint, Polygon, Vec2, World, Edge } from "planck-js"
-import React, { useLayoutEffect, useRef, useEffect } from "react"
+import {
+  Edge,
+  internal,
+  MouseJoint,
+  Polygon,
+  Transform,
+  Vec2,
+  World,
+} from "planck-js"
+import React, { useEffect, useLayoutEffect, useRef } from "react"
+import simplify from "simplify-js"
 import { Button } from "./components/button"
 import { View } from "./components/view"
-import simplify from "simplify-js"
 
 const SCALE = 30
 const WALL_WIDTH = 10
@@ -52,7 +60,6 @@ function createRhombusPoints(size) {
 }
 
 const getOffsettedPoints = (points, offset) => {
-  console.log(points)
   const co = new window.ClipperLib.ClipperOffset() // constructor
 
   const pathClipperPath = points.map(({ x, y }) => ({
@@ -199,7 +206,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       paper.view.on("frame", tick)
     }
 
-    function createPiece(points, invertedPoints) {
+    function createPiece(id, points, invertedPoints) {
       var path = new paper.Path(points)
       path.strokeColor = "black"
       path.strokeWidth = STROKE_WIDTH
@@ -218,6 +225,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
         friction: 0,
         restitution: 0,
         shape: new Polygon(vertices),
+        userData: id,
       }
 
       const bodyDef = {
@@ -399,13 +407,14 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       const mediumBase = Math.sqrt(Math.pow(smallBase, 2) * 2)
       const largeBase = Math.sqrt(Math.pow(mediumBase, 2) * 2)
       piecesRef.current = [
-        createPiece(createTrianglePoints(smallBase)),
-        createPiece(createTrianglePoints(smallBase)),
-        createPiece(createTrianglePoints(mediumBase)),
-        createPiece(createTrianglePoints(largeBase)),
-        createPiece(createTrianglePoints(largeBase)),
-        createPiece(createSquarePoints(mediumBase)),
+        createPiece("ts1", createTrianglePoints(smallBase)),
+        createPiece("ts2", createTrianglePoints(smallBase)),
+        createPiece("tm", createTrianglePoints(mediumBase)),
+        createPiece("tl1", createTrianglePoints(largeBase)),
+        createPiece("tl2", createTrianglePoints(largeBase)),
+        createPiece("s", createSquarePoints(mediumBase)),
         createPiece(
+          "p",
           createRhombusPoints(smallBase),
           createInvertedRhombusPoints(smallBase)
         ),
@@ -451,6 +460,29 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       createWall(WALL_WIDTH, canvasRect.height, {
         x: canvasRect.width - WALL_WIDTH,
         y: 0,
+      })
+
+      worldRef.current.on("begin-contact", contact => {
+        var transformA = Transform(
+          contact.m_fixtureA.m_body.getPosition(),
+          contact.m_fixtureA.m_body.getAngle()
+        )
+        var transformB = Transform(
+          contact.m_fixtureB.m_body.getPosition(),
+          contact.m_fixtureB.m_body.getAngle()
+        )
+
+        console.log(contact)
+        var input = new internal.Distance.Input()
+        input.proxyA.set(contact.m_fixtureA.m_shape, 0)
+        input.proxyB.set(contact.m_fixtureB.m_shape, 0)
+        input.transformA = transformA
+        input.transformB = transformB
+        input.useRadii = true
+        var output = new internal.Distance.Output()
+        var cache = new internal.Distance.Cache()
+        internal.Distance(output, cache, input)
+        console.log(output.distance)
       })
     }
 
