@@ -14,7 +14,6 @@ import { Button } from "./components/button"
 import { View } from "./components/view"
 
 const SCALE = 30
-const WALL_WIDTH = 10
 const FPS = 60
 const STROKE_WIDTH = 1
 
@@ -22,7 +21,7 @@ const SMALL_TRIANGLE_BASE = 40
 const LENGTH_MIN = SMALL_TRIANGLE_BASE * 21.575
 const LENGTH_MAX = SMALL_TRIANGLE_BASE * 49.25
 const ERROR_MARGIN = 5
-const SIMPLIFY_TOLERANCE = 5
+const SIMPLIFY_TOLERANCE = 3
 
 function createTrianglePoints(size) {
   return [
@@ -202,6 +201,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       paper.setup(canvasRef.current)
       paper.view.autoUpdate = false
       setupPhysics()
+      setupBox()
       setupPieces()
       paper.view.on("frame", tick)
     }
@@ -231,8 +231,8 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       const bodyDef = {
         type: "dynamic",
         position: {
-          x: 200 / SCALE,
-          y: 200 / SCALE,
+          x: canvasRef.current.width / 2 / SCALE,
+          y: canvasRef.current.height / 2 / SCALE,
         },
 
         linearDamping: 100.0,
@@ -421,46 +421,59 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       ]
     }
 
-    function createWall(width, height, position) {
-      const wallBodyDef = {
-        type: "static",
+    function setupBox() {
+      const canvasRect = canvasRef.current.getBoundingClientRect()
+
+      ground = worldRef.current.createBody({
         position: {
-          x: position.x / SCALE,
-          y: position.y / SCALE,
+          x: canvasRect.width / 2 / SCALE,
+          y: canvasRect.height / 2 / SCALE,
         },
-      }
+      })
 
-      const wallBody = worldRef.current.createBody(wallBodyDef)
-      new Edge()
-      const wallFixtureDef = {
-        shape: new Polygon([
-          new Vec2(0 / SCALE, 0 / SCALE),
-          new Vec2(width / SCALE, 0 / SCALE),
-          new Vec2(width / SCALE, height / SCALE),
-          new Vec2(0 / SCALE, height / SCALE),
-        ]),
-      }
+      const SIZE = 600
 
-      wallBody.createFixture(wallFixtureDef)
+      // Floor
+      ground.createFixture(
+        new Edge(
+          new Vec2(-SIZE / 2 / SCALE, -SIZE / 2 / SCALE),
+          new Vec2(SIZE / 2 / SCALE, -SIZE / 2 / SCALE)
+        ),
+        0
+      )
+      ground.createFixture(
+        new Edge(
+          new Vec2(SIZE / 2 / SCALE, -SIZE / 2 / SCALE),
+          new Vec2(SIZE / 2 / SCALE, SIZE / 2 / SCALE)
+        ),
+        0
+      )
+      ground.createFixture(
+        new Edge(
+          new Vec2(SIZE / 2 / SCALE, SIZE / 2 / SCALE),
+          new Vec2(-SIZE / 2 / SCALE, SIZE / 2 / SCALE)
+        ),
+        0
+      )
+      ground.createFixture(
+        new Edge(
+          new Vec2(-SIZE / 2 / SCALE, SIZE / 2 / SCALE),
+          new Vec2(-SIZE / 2 / SCALE, -SIZE / 2 / SCALE)
+        ),
+        0
+      )
 
-      return wallBody
+      var rect = new paper.Rectangle([-SIZE / 2, -SIZE / 2], [SIZE, SIZE])
+      rect.center = paper.view.center
+      var path = new paper.Path.Rectangle(rect)
+
+      path.strokeColor = "black"
+      path.strokeWidth = 1
     }
 
     function setupPhysics() {
-      const canvasRect = canvasRef.current.getBoundingClientRect()
       const gravity = new Vec2(0, 0)
       worldRef.current = new World(gravity, true)
-
-      ground = createWall(canvasRect.width, WALL_WIDTH, { x: 0, y: 0 })
-      createWall(canvasRect.width, WALL_WIDTH, {
-        x: 0,
-        y: canvasRect.height - WALL_WIDTH,
-      })
-      createWall(WALL_WIDTH, canvasRect.height, { x: 0, y: 0 })
-      createWall(WALL_WIDTH, canvasRect.height, {
-        x: canvasRect.width - WALL_WIDTH,
-        y: 0,
-      })
 
       worldRef.current.on("begin-contact", contact => {
         var transformA = Transform(
