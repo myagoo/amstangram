@@ -7,6 +7,7 @@ import {
   Transform,
   Vec2,
   World,
+  RevoluteJoint,
 } from "planck-js"
 import React, { useEffect, useLayoutEffect, useRef } from "react"
 import simplify from "simplify-js"
@@ -18,10 +19,12 @@ const FPS = 60
 const STROKE_WIDTH = 1
 
 const SMALL_TRIANGLE_BASE = 40
-const LENGTH_MIN = SMALL_TRIANGLE_BASE * 21.575
+const LENGTH_MIN = SMALL_TRIANGLE_BASE * 16.325
 const LENGTH_MAX = SMALL_TRIANGLE_BASE * 49.25
 const ERROR_MARGIN = 5
 const SIMPLIFY_TOLERANCE = 3
+const SNAP_DISTANCE = 0.05
+const SNAP_BREAK_DISTANCE = 2
 
 function createTrianglePoints(size) {
   return [
@@ -58,6 +61,22 @@ function createRhombusPoints(size) {
   ]
 }
 
+const asArray = list => {
+  const array = []
+  let current = list
+  while (current !== null) {
+    array.push(current)
+    current = current.next
+  }
+  return array
+}
+
+const getDistanceBetweenPoints = (pointA, pointB) => {
+  return Math.sqrt(
+    Math.pow(pointA.x - pointB.x, 2) + Math.pow(pointA.y - pointB.y, 2)
+  )
+}
+
 const getOffsettedPoints = (points, offset) => {
   const co = new window.ClipperLib.ClipperOffset() // constructor
 
@@ -89,7 +108,8 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
   const piecesRef = useRef()
   const worldRef = useRef()
   const patternsRef = useRef([])
-
+  const mouseJointRef = useRef()
+  const revoluteJointsRef = useRef([])
   useEffect(() => {
     if (!patternImageDataUrl) {
       return
@@ -165,19 +185,21 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
     )
     result.fillRule = "evenodd"
     result.closed = true
-    result.fillColor = "black"
+    // result.fillColor = "green"
     result.position = new paper.Point(
       result.bounds.width / 2,
       result.bounds.height / 2
     )
 
-    const svg = result.exportSVG({ asString: true })
+    const svg = result.exportSVG({ asString: true }).replace(/fill="none"/g, "")
     const width = result.bounds.width
     const height = result.bounds.height
     const length = Math.ceil(result.length)
     const percent = Math.floor(
       ((length - LENGTH_MIN) / (LENGTH_MAX - LENGTH_MIN)) * 100
     )
+
+    console.log(LENGTH_MIN, LENGTH_MAX, length, percent)
 
     result.remove()
 
@@ -190,7 +212,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
   }
 
   useLayoutEffect(() => {
-    let ground
+    let boxBody
 
     function init() {
       const parentRect = canvasRef.current.parentElement.getBoundingClientRect()
@@ -293,40 +315,59 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
         if (window.event.ctrlKey || window.event.metaKey) {
           return
         }
-        var physicsMoveJoint
 
         body.getFixtureList().setDensity(1)
         body.resetMassData()
         body.setBullet(true)
 
         function handleMouseMove(mmEvent) {
-          const physicsPoint = new Vec2(
+          const mousePoint = new Vec2(
             mmEvent.point.x / SCALE,
             mmEvent.point.y / SCALE
           )
-          if (!physicsMoveJoint) {
+          if (!mouseJointRef.current) {
             const mouseJointDef = {
-              bodyA: ground,
+              bodyA: boxBody,
               bodyB: body,
-              target: physicsPoint,
+              target: mousePoint,
               collideConnected: true,
               maxForce: 2000 * body.getMass(),
               dampingRatio: 0,
             }
-            physicsMoveJoint = worldRef.current.createJoint(
+
+            mouseJointRef.current = worldRef.current.createJoint(
               MouseJoint(mouseJointDef)
             )
           } else {
-            physicsMoveJoint.setTarget(physicsPoint)
+            mouseJointRef.current.setTarget(mousePoint)
+
+            const bodyAnchorPoint = body.getWorldPoint(
+              mouseJointRef.current.m_localAnchorB
+            )
+
+            const distance = getDistanceBetweenPoints(
+              mousePoint,
+              bodyAnchorPoint
+            )
+
+            if (distance > SNAP_BREAK_DISTANCE) {
+              asArray(body.getJointList()).forEach(joint => {
+                if (joint.joint.m_type === "revolute-joint") {
+                  worldRef.current.destroyJoint(joint.joint)
+                }
+              })
+            }
           }
         }
 
         function handleMouseUp() {
           paper.view.off("mousemove", handleMouseMove)
           paper.view.off("mouseup", handleMouseUp)
-          if (physicsMoveJoint) {
-            worldRef.current.destroyJoint(physicsMoveJoint)
+          if (mouseJointRef.current) {
+            worldRef.current.destroyJoint(mouseJointRef.current)
+            mouseJointRef.current = null
           }
+
           body.setBullet(false)
           body.getFixtureList().setDensity(1000)
           body.resetMassData()
@@ -424,7 +465,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
     function setupBox() {
       const canvasRect = canvasRef.current.getBoundingClientRect()
 
-      ground = worldRef.current.createBody({
+      boxBody = worldRef.current.createBody({
         position: {
           x: canvasRect.width / 2 / SCALE,
           y: canvasRect.height / 2 / SCALE,
@@ -434,28 +475,28 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       const SIZE = 600
 
       // Floor
-      ground.createFixture(
+      boxBody.createFixture(
         new Edge(
           new Vec2(-SIZE / 2 / SCALE, -SIZE / 2 / SCALE),
           new Vec2(SIZE / 2 / SCALE, -SIZE / 2 / SCALE)
         ),
         0
       )
-      ground.createFixture(
+      boxBody.createFixture(
         new Edge(
           new Vec2(SIZE / 2 / SCALE, -SIZE / 2 / SCALE),
           new Vec2(SIZE / 2 / SCALE, SIZE / 2 / SCALE)
         ),
         0
       )
-      ground.createFixture(
+      boxBody.createFixture(
         new Edge(
           new Vec2(SIZE / 2 / SCALE, SIZE / 2 / SCALE),
           new Vec2(-SIZE / 2 / SCALE, SIZE / 2 / SCALE)
         ),
         0
       )
-      ground.createFixture(
+      boxBody.createFixture(
         new Edge(
           new Vec2(-SIZE / 2 / SCALE, SIZE / 2 / SCALE),
           new Vec2(-SIZE / 2 / SCALE, -SIZE / 2 / SCALE)
@@ -475,27 +516,58 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       const gravity = new Vec2(0, 0)
       worldRef.current = new World(gravity, true)
 
-      worldRef.current.on("begin-contact", contact => {
-        var transformA = Transform(
-          contact.m_fixtureA.m_body.getPosition(),
-          contact.m_fixtureA.m_body.getAngle()
-        )
-        var transformB = Transform(
-          contact.m_fixtureB.m_body.getPosition(),
-          contact.m_fixtureB.m_body.getAngle()
-        )
+      worldRef.current.on("post-solve", contact => {
+        const fixtureA = contact.m_fixtureA
+        const fixtureB = contact.m_fixtureB
 
-        console.log(contact)
-        var input = new internal.Distance.Input()
-        input.proxyA.set(contact.m_fixtureA.m_shape, 0)
-        input.proxyB.set(contact.m_fixtureB.m_shape, 0)
-        input.transformA = transformA
-        input.transformB = transformB
-        input.useRadii = true
-        var output = new internal.Distance.Output()
-        var cache = new internal.Distance.Cache()
-        internal.Distance(output, cache, input)
-        console.log(output.distance)
+        const bodyA = fixtureA.m_body
+        const bodyB = fixtureB.m_body
+
+        const draggedBody =
+          mouseJointRef.current && mouseJointRef.current.m_bodyB
+
+        if (
+          boxBody === bodyA ||
+          boxBody === bodyB ||
+          (draggedBody !== bodyA && draggedBody !== bodyB)
+        ) {
+          return
+        }
+
+        fixtureA.m_shape.m_vertices.forEach(pointA => {
+          const worldPointA = bodyA.getWorldPoint(pointA)
+
+          fixtureB.m_shape.m_vertices.forEach(pointB => {
+            const worldPointB = bodyB.getWorldPoint(pointB)
+
+            const distance = getDistanceBetweenPoints(worldPointA, worldPointB)
+
+            if (distance < SNAP_DISTANCE) {
+              const alreadyHasRevoluteJoint = asArray(
+                bodyA.getJointList()
+              ).some(joint => {
+                return (
+                  joint.joint.m_type === "revolute-joint" &&
+                  joint.other === bodyB
+                )
+              })
+
+              if (!alreadyHasRevoluteJoint) {
+                setTimeout(() => {
+                  const revoluteJoint = new RevoluteJoint({
+                    localAnchorA: pointA,
+                    localAnchorB: pointB,
+                    referenceAngle: 0,
+                    bodyA: bodyA,
+                    bodyB: bodyB,
+                    collideConnected: true,
+                  })
+                  worldRef.current.createJoint(revoluteJoint)
+                })
+              }
+            }
+          })
+        })
       })
     }
 
