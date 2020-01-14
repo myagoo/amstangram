@@ -83,10 +83,8 @@ const getOffsettedPoints = (points, offset) => {
     Y: y,
   }))
 
-  co.AddPaths([pathClipperPath], true) // we add paths only once
-
   const offsettedPaths = new window.ClipperLib.Paths() // empty solution
-  co.Clear()
+
   co.AddPaths(
     [pathClipperPath],
     window.ClipperLib.JoinType.jtMiter,
@@ -98,7 +96,9 @@ const getOffsettedPoints = (points, offset) => {
 
   co.Execute(offsettedPaths, offset)
 
-  return offsettedPaths[0].map(({ X, Y }) => new paper.Point(X, Y))
+  if (offsettedPaths.length) {
+    return offsettedPaths[0].map(({ X, Y }) => new paper.Point(X, Y))
+  }
 }
 
 export const Tangram = ({ onSave, patternImageDataUrl }) => {
@@ -128,78 +128,88 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       paths = [item]
     }
 
-    const offsettedPaths = paths.map(path => {
-      const points = path.segments.map(({ point }) => point)
-      const simplifiedPoints = simplify(points, SIMPLIFY_TOLERANCE, true)
-      path.segments = simplifiedPoints
+    patternsRef.current = []
 
+    const co = new window.ClipperLib.ClipperOffset() // constructor
+
+    const simplifiedClipperPaths = paths.map(path => {
+      const points = path.segments.map(({ point }) => point)
+
+      const simplifiedPoints = simplify(points, SIMPLIFY_TOLERANCE, true)
+
+      return simplifiedPoints.map(({ x, y }) => ({
+        X: x,
+        Y: y,
+      }))
+    })
+
+    const resultPaths = new window.ClipperLib.Paths() // empty solution
+
+    co.AddPaths(
+      simplifiedClipperPaths,
+      window.ClipperLib.JoinType.jtMiter,
+      window.ClipperLib.EndType.etClosedPolygon
+    )
+
+    co.MiterLimit = 2
+    co.ArcTolerance = 0.25
+
+    co.Execute(resultPaths, ERROR_MARGIN)
+
+    resultPaths.forEach(resultPath => {
       const offsettedPath = new paper.Path({
-        segments: getOffsettedPoints(simplifiedPoints, ERROR_MARGIN),
+        segments: resultPath.map(({ X, Y }) => new paper.Point(X, Y)),
+        fillRule: "evenodd",
         fillColor: "green",
         closed: true,
         opacity: 0.5,
       })
-
       offsettedPath.sendToBack()
-
-      return offsettedPath
+      patternsRef.current.push(offsettedPath)
     })
-
-    patternsRef.current = offsettedPaths
 
     return () => {
       group.remove()
-      offsettedPaths.forEach(path => path.remove())
+      patternsRef.current.forEach(path => path.remove())
     }
   }, [patternImageDataUrl])
 
   const getCompoundPath = () => {
-    const [firstTan, ...otherTans] = [...piecesRef.current]
+    let compoundPath
 
-    const result = otherTans.reduce(
-      (compoundPath, tan, i) => {
-        return compoundPath.unite(
-          new paper.Path({
-            segments: getOffsettedPoints(
-              tan.path.segments.map(segment =>
-                tan.path.localToGlobal(segment.point)
-              ),
-              1
-            ),
-            closed: true,
-          }),
-          { insert: false }
-        )
-      },
-      new paper.Path({
+    for (const { path } of piecesRef.current) {
+      const offsettedPath = new paper.Path({
         segments: getOffsettedPoints(
-          firstTan.path.segments.map(segment =>
-            firstTan.path.localToGlobal(segment.point)
-          ),
+          path.segments.map(segment => path.localToGlobal(segment.point)),
           1
         ),
         closed: true,
       })
-    )
-    result.fillRule = "evenodd"
-    result.closed = true
-    // result.fillColor = "green"
-    result.position = new paper.Point(
-      result.bounds.width / 2,
-      result.bounds.height / 2
+      if (!compoundPath) {
+        compoundPath = offsettedPath
+      } else {
+        compoundPath = compoundPath.unite(offsettedPath, { insert: false })
+      }
+    }
+
+    compoundPath.fillRule = "evenodd"
+    compoundPath.closed = true
+    compoundPath.position = new paper.Point(
+      compoundPath.bounds.width / 2,
+      compoundPath.bounds.height / 2
     )
 
-    const svg = result.exportSVG({ asString: true }).replace(/fill="none"/g, "")
-    const width = result.bounds.width
-    const height = result.bounds.height
-    const length = Math.ceil(result.length)
+    const svg = compoundPath
+      .exportSVG({ asString: true })
+      .replace(/fill="none"/g, "")
+    const width = compoundPath.bounds.width
+    const height = compoundPath.bounds.height
+    const length = Math.ceil(compoundPath.length)
     const percent = Math.floor(
       ((length - LENGTH_MIN) / (LENGTH_MAX - LENGTH_MIN)) * 100
     )
 
-    console.log(LENGTH_MIN, LENGTH_MAX, length, percent)
-
-    result.remove()
+    compoundPath.remove()
 
     return {
       svg,
@@ -235,6 +245,15 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       path.applyMatrix = false
       path.pivot = new paper.Point(0, 0)
 
+      const body = worldRef.current.createDynamicBody({
+        position: {
+          x: canvasRef.current.width / SCALE / (2 * window.devicePixelRatio),
+          y: canvasRef.current.height / SCALE / (2 * window.devicePixelRatio),
+        },
+        linearDamping: 100.0,
+        angularDamping: 100.0,
+      })
+
       const vertices = []
       for (let i = 0; i < points.length; i++) {
         vertices[i] = new Vec2(points[i].x / SCALE, points[i].y / SCALE)
@@ -248,18 +267,6 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
         userData: id,
       }
 
-      const bodyDef = {
-        type: "dynamic",
-        position: {
-          x: canvasRef.current.width / SCALE / (2 * window.devicePixelRatio),
-          y: canvasRef.current.height / SCALE / (2 * window.devicePixelRatio),
-        },
-
-        linearDamping: 100.0,
-        angularDamping: 100.0,
-      }
-
-      const body = worldRef.current.createBody(bodyDef)
       body.createFixture(fixtureDef)
 
       paper.view.on("frame", function() {
@@ -404,7 +411,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       )
 
       const everyPiecePointIsWithingPattern = piecesRef.current.every(
-        ({ path }) => {
+        ({ id, path }) => {
           return path.segments.every((segment, j) => {
             let intersect = 0
             const piecePoint = path.localToGlobal(segment.point)
@@ -516,21 +523,20 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       const gravity = new Vec2(0, 0)
       worldRef.current = new World(gravity, true)
 
-      worldRef.current.on("post-solve", contact => {
-        const areAllDynamics = piecesRef.current.every(
-          ({ body }) => body.getType() === "dynamic"
-        )
+      let timeoutId
+      let initDone = false
 
-        if (areAllDynamics) {
-          piecesRef.current.forEach(tan => {
-            setTimeout(() => {
-              tan.body.setType("static")
-            }, 200)
-          })
+      worldRef.current.on("post-solve", contact => {
+        if (!initDone) {
+          clearTimeout(timeoutId)
+          timeoutId = setTimeout(() => {
+            piecesRef.current.forEach(({ body }) => {
+              body.setType("static")
+            })
+            initDone = true
+          }, 200)
         }
-      })
 
-      worldRef.current.on("post-solve", contact => {
         const fixtureA = contact.m_fixtureA
         const fixtureB = contact.m_fixtureB
 
