@@ -1,13 +1,11 @@
 import paper from "paper/dist/paper-core"
 import {
   Edge,
-  internal,
   MouseJoint,
   Polygon,
-  Transform,
+  RevoluteJoint,
   Vec2,
   World,
-  RevoluteJoint,
 } from "planck-js"
 import React, { useEffect, useLayoutEffect, useRef } from "react"
 import simplify from "simplify-js"
@@ -109,7 +107,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
   const worldRef = useRef()
   const patternsRef = useRef([])
   const mouseJointRef = useRef()
-  const revoluteJointsRef = useRef([])
+
   useEffect(() => {
     if (!patternImageDataUrl) {
       return
@@ -253,8 +251,8 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       const bodyDef = {
         type: "dynamic",
         position: {
-          x: canvasRef.current.width / 2 / SCALE,
-          y: canvasRef.current.height / 2 / SCALE,
+          x: canvasRef.current.width / SCALE / (2 * window.devicePixelRatio),
+          y: canvasRef.current.height / SCALE / (2 * window.devicePixelRatio),
         },
 
         linearDamping: 100.0,
