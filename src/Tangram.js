@@ -22,7 +22,7 @@ const LENGTH_MAX = SMALL_TRIANGLE_BASE * 49.25
 const ERROR_MARGIN = 5
 const SIMPLIFY_TOLERANCE = 3
 const SNAP_DISTANCE = 0.05
-const SNAP_BREAK_DISTANCE = 2
+const SNAP_BREAK_DISTANCE = 1
 
 function createTrianglePoints(size) {
   return [
