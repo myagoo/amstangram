@@ -314,6 +314,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
           return
         }
 
+        body.setType("dynamic")
         body.getFixtureList().setDensity(1)
         body.resetMassData()
         body.setBullet(true)
@@ -366,6 +367,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
             mouseJointRef.current = null
           }
 
+          body.setType("static")
           body.setBullet(false)
           body.getFixtureList().setDensity(1000)
           body.resetMassData()
@@ -513,6 +515,20 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
     function setupPhysics() {
       const gravity = new Vec2(0, 0)
       worldRef.current = new World(gravity, true)
+
+      worldRef.current.on("post-solve", contact => {
+        const areAllDynamics = piecesRef.current.every(
+          ({ body }) => body.getType() === "dynamic"
+        )
+
+        if (areAllDynamics) {
+          piecesRef.current.forEach(tan => {
+            setTimeout(() => {
+              tan.body.setType("static")
+            }, 200)
+          })
+        }
+      })
 
       worldRef.current.on("post-solve", contact => {
         const fixtureA = contact.m_fixtureA
