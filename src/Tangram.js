@@ -105,8 +105,8 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
   const canvasRef = useRef()
   const piecesRef = useRef()
   const worldRef = useRef()
-  const patternsRef = useRef([])
   const mouseJointRef = useRef()
+  const coumpoundPathRef = useRef()
 
   useEffect(() => {
     if (!patternImageDataUrl) {
@@ -127,8 +127,6 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
     } else {
       paths = [item]
     }
-
-    patternsRef.current = []
 
     const co = new window.ClipperLib.ClipperOffset() // constructor
 
@@ -156,16 +154,14 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
 
     co.Execute(resultPaths, ERROR_MARGIN)
 
-    const childrenPaths = resultPaths.map(resultPath => {
-      const offsettedPath = new paper.Path({
-        segments: resultPath.map(({ X, Y }) => new paper.Point(X, Y)),
-        insert: false,
-      })
-      return offsettedPath
-    })
-
     const coumpoundPath = new paper.CompoundPath({
-      children: childrenPaths,
+      children: resultPaths.map(resultPath => {
+        const offsettedPath = new paper.Path({
+          segments: resultPath.map(({ X, Y }) => new paper.Point(X, Y)),
+          insert: false,
+        })
+        return offsettedPath
+      }),
       fillRule: "evenodd",
       fillColor: "green",
       closed: true,
@@ -174,13 +170,11 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
 
     coumpoundPath.sendToBack()
 
-    childrenPaths.forEach(childPath => {
-      patternsRef.current.push(childPath)
-    })
+    coumpoundPathRef.current = coumpoundPath
 
     return () => {
       group.remove()
-      patternsRef.current.forEach(path => path.remove())
+      coumpoundPath.remove()
     }
   }, [patternImageDataUrl])
 
@@ -390,7 +384,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
           body.getFixtureList().setDensity(1000)
           body.resetMassData()
 
-          patternsRef.current && check()
+          coumpoundPathRef.current && check()
         }
 
         paper.view.on("mousemove", handleMouseMove)
@@ -400,63 +394,12 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       return { body, path, points, invertedPoints }
     }
 
-    function intersects(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) {
-      const det = (ax2 - ax1) * (by2 - by1) - (bx2 - bx1) * (ay2 - ay1)
-      if (det === 0) {
-        return false
-      } else {
-        const lambda =
-          ((by2 - by1) * (bx2 - ax1) + (bx1 - bx2) * (by2 - ay1)) / det
-        const gamma =
-          ((ay1 - ay2) * (bx2 - ax1) + (ax2 - ax1) * (by2 - ay1)) / det
-        return 0 < lambda && lambda < 1 && 0 < gamma && gamma < 1
-      }
-    }
-
     function check() {
-      // on verifie que points des pieces est à l'intereieuse de chaque polygon
-      // on verifie que chq rayon allant vers un pt des pieces intersecte
-
-      const patternsPoints = patternsRef.current.map(path =>
-        path.segments.map(segment => path.localToGlobal(segment.point))
-      )
-
-      const everyPiecePointIsWithingPattern = piecesRef.current.every(
-        ({ id, path }) => {
-          return path.segments.every((segment, j) => {
-            let intersect = 0
-            const piecePoint = path.localToGlobal(segment.point)
-
-            for (let i = 0; i < patternsPoints.length; i++) {
-              const patternPoints = patternsPoints[i]
-              let lastPatternPoint = patternPoints[patternPoints.length - 1]
-              for (let j = 0; j < patternPoints.length; j++) {
-                const currentPatternPoint = patternPoints[j]
-                if (
-                  intersects(
-                    0,
-                    0,
-                    piecePoint.x,
-                    piecePoint.y,
-                    lastPatternPoint.x,
-                    lastPatternPoint.y,
-                    currentPatternPoint.x,
-                    currentPatternPoint.y
-                  )
-                ) {
-                  intersect++
-                }
-                lastPatternPoint = currentPatternPoint
-              }
-            }
-
-            const isOdd = intersect % 2
-
-            return isOdd
-          })
-        }
-      )
-      if (everyPiecePointIsWithingPattern) {
+      let newCoumpoundPath = coumpoundPathRef.current
+      for (const { path } of piecesRef.current) {
+        newCoumpoundPath = newCoumpoundPath.unite(path, { insert: false })
+      }
+      if (newCoumpoundPath.length === coumpoundPathRef.current.length) {
         alert("YOU WIN MOTHERFUCKER")
       }
     }
