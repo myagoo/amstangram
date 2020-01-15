@@ -156,16 +156,26 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
 
     co.Execute(resultPaths, ERROR_MARGIN)
 
-    resultPaths.forEach(resultPath => {
+    const childrenPaths = resultPaths.map(resultPath => {
       const offsettedPath = new paper.Path({
         segments: resultPath.map(({ X, Y }) => new paper.Point(X, Y)),
-        fillRule: "evenodd",
-        fillColor: "green",
-        closed: true,
-        opacity: 0.5,
+        insert: false,
       })
-      offsettedPath.sendToBack()
-      patternsRef.current.push(offsettedPath)
+      return offsettedPath
+    })
+
+    const coumpoundPath = new paper.CompoundPath({
+      children: childrenPaths,
+      fillRule: "evenodd",
+      fillColor: "green",
+      closed: true,
+      opacity: 0.5,
+    })
+
+    coumpoundPath.sendToBack()
+
+    childrenPaths.forEach(childPath => {
+      patternsRef.current.push(childPath)
     })
 
     return () => {
@@ -184,6 +194,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
           1
         ),
         closed: true,
+        insert: false,
       })
       if (!compoundPath) {
         compoundPath = offsettedPath
