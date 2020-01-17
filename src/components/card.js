@@ -1,27 +1,36 @@
 import React from "react"
+import styled from "styled-components"
+import { ReactComponent as Logo } from "../logo.svg"
 import { View } from "./view"
 
-export const Card = ({ tangram, ...props }) => {
+const Card = styled(View).attrs({
+  borderRadius: 5,
+  boxShadow: "0px 0px 0px 1px rgba(0, 0, 0, 0.1)",
+})``
+
+Card.defaultProps = {
+  width: 200,
+  height: 275,
+}
+
+export const CardVerso = ({ tangram, ...props }) => {
   const difficulty =
     tangram.percent > 50 ? "Easy" : tangram.percent > 20 ? "Medium" : "Hard"
   const color =
-    difficulty === "Easy" ? "green" : difficulty === "Medium" ? "blue" : "red"
+    difficulty === "Easy"
+      ? "#10ac84"
+      : difficulty === "Medium"
+      ? "#2e86de"
+      : "#ee5253"
   return (
-    <View
-      background="#FFF"
-      borderRadius={5}
+    <Card
+      background="#fff"
       p={2}
       display="flex"
       flexDirection="column"
       justifyContent="space-between"
       textAlign="center"
-      border="5px solid #fff"
-      width={128}
-      height={178}
-      style={{
-        boxShadow: "0px 0px 0px 1px rgba(0, 0, 0, 0.1)",
-        cursor: "pointer",
-      }}
+      position="relative"
       {...props}
     >
       <View
@@ -32,9 +41,36 @@ export const Card = ({ tangram, ...props }) => {
         dangerouslySetInnerHTML={{ __html: tangram.svg }}
         fill={color}
       />
-      <View mt={2} fontFamily="Sail" fontSize="32px" color={color}>
+      <View
+        position="absolute"
+        top={0}
+        right="-10px"
+        background={color}
+        color="#fff"
+        borderRadius={10}
+        px={1}
+        py="4px"
+        style={{
+          transform: "translateY(-50%)",
+        }}
+      >
         {difficulty}
       </View>
-    </View>
+    </Card>
+  )
+}
+
+export const CardRecto = props => {
+  return (
+    <Card
+      background="#10ac84"
+      border={`10px solid #fff`}
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      {...props}
+    >
+      <Logo />
+    </Card>
   )
 }

@@ -1,69 +1,104 @@
-import React, { useState } from "react"
-import { FiArrowDownCircle } from "react-icons/fi"
-import { Card } from "./components/card"
+import React, { useContext, useState } from "react"
+import { FiX } from "react-icons/fi"
+import { CardRecto, CardVerso } from "./components/card"
 import { View } from "./components/view"
+import { GalleryContext } from "./gallery-provider"
 
-export const Galery = ({ galery, onSelect }) => {
-  const [opened, setOpened] = useState(false)
-
-  if (galery.length === 0) {
-    return null
-  }
+export const Galery = ({ onSelect }) => {
+  const [open, setOpen] = useState(false)
+  const { tangrams, setSelectedTangram } = useContext(GalleryContext)
 
   return (
     <>
+      <CardStack
+        tangrams={tangrams}
+        onClick={() => setOpen(true)}
+        style={{
+          cursor: "pointer",
+        }}
+      />
       <View
         position="fixed"
-        top={0}
-        left={0}
         right={0}
-        p={2}
-        pb={0}
-        background="#34495e"
+        top={0}
+        width="100vw"
+        height="100vh"
+        background="#ecf0f1"
+        borderLeft="10px solid #fff"
         display="flex"
-        flexWrap="wrap"
+        justifyContent="center"
+        alignItems="center"
+        overflowY="scroll"
         style={{
-          transform: `translateY(${opened ? 0 : -100}%)`,
+          transform: `translateX(${open ? 0 : 100}%)`,
           transition: "transform ease 500ms",
         }}
       >
-        {galery.map((tangram, index) => {
-          return (
-            <Card
-              key={index}
-              flex="none"
-              mr={2}
-              mb={2}
-              tangram={tangram}
-              onClick={() => {
-                onSelect(tangram.svg)
-              }}
-            ></Card>
-          )
-        })}
         <View
+          as={FiX}
           position="absolute"
-          top="100%"
-          left="50%"
-          background="#34495e"
-          color="#fff"
-          p={1}
-          borderBottomLeftRadius={5}
-          borderBottomRightRadius={5}
-          style={{ transform: "translateX(-50%)", cursor: "pointer" }}
-          onClick={() => setOpened(!opened)}
-        >
+          top={20}
+          right={20}
+          fontSize="40px"
+          onClick={() => setOpen(false)}
+          style={{
+            cursor: "pointer",
+          }}
+        />
+        {tangrams.length > 0 ? (
           <View
-            as={FiArrowDownCircle}
-            width={30}
-            height={30}
-            style={{
-              transform: `rotate(${opened ? 180 : 0}deg)`,
-              transition: "transform ease 500ms",
-            }}
-          />
-        </View>
+            width="100%"
+            height="100%"
+            display="grid"
+            gridTemplateColumns="repeat(auto-fill, 180px)"
+            gridColumnGap={10}
+            gridRowGap={15}
+            gridAutoRows={220}
+            justifyContent="center"
+            alignContent="center"
+          >
+            {tangrams.map((tangram, index) => (
+              <CardVerso
+                key={index}
+                tangram={tangram}
+                width={128}
+                height={178}
+                onClick={() => {
+                  setOpen(false)
+                  setSelectedTangram(tangram.svg)
+                }}
+                style={{
+                  cursor: "pointer",
+                }}
+              />
+            ))}
+          </View>
+        ) : (
+          <View>{"Aucun tangram dans la galerie"}</View>
+        )}
       </View>
     </>
+  )
+}
+
+const CardStack = ({ tangrams, ...props }) => {
+  return (
+    <View position="fixed" right={300} top={200} {...props}>
+      <CardRecto
+        position="absolute"
+        top={1}
+        style={{
+          transform: "rotateZ(-2deg)",
+        }}
+      />
+      <CardRecto
+        position="absolute"
+        top={7}
+        style={{
+          transform: "rotateZ(6deg)",
+        }}
+      />
+      <CardRecto position="absolute" top={0} />
+    </View>
   )
 }

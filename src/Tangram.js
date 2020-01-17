@@ -7,10 +7,11 @@ import {
   Vec2,
   World,
 } from "planck-js"
-import React, { useEffect, useLayoutEffect, useRef } from "react"
+import React, { useContext, useEffect, useLayoutEffect, useRef } from "react"
+import { FiSave } from "react-icons/fi"
 import simplify from "simplify-js"
-import { Button } from "./components/button"
 import { View } from "./components/view"
+import { GalleryContext } from "./gallery-provider"
 
 const SCALE = 30
 const FPS = 60
@@ -101,21 +102,22 @@ const getOffsettedPoints = (points, offset) => {
   }
 }
 
-export const Tangram = ({ onSave, patternImageDataUrl }) => {
+export const Tangram = () => {
   const canvasRef = useRef()
   const piecesRef = useRef()
   const worldRef = useRef()
   const mouseJointRef = useRef()
   const coumpoundPathRef = useRef()
+  const { addToGallery, selectedTangram } = useContext(GalleryContext)
 
   useEffect(() => {
-    if (!patternImageDataUrl) {
+    if (!selectedTangram) {
       return
     }
 
     const group = new paper.Group()
 
-    const item = group.importSVG(patternImageDataUrl, {})
+    const item = group.importSVG(selectedTangram, {})
     group.fillColor = "black"
     group.sendToBack()
     group.position = paper.view.center
@@ -176,7 +178,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       group.remove()
       coumpoundPath.remove()
     }
-  }, [patternImageDataUrl])
+  }, [selectedTangram])
 
   const getCompoundPath = () => {
     let compoundPath
@@ -243,9 +245,10 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
 
     function createPiece(id, points, invertedPoints) {
       var path = new paper.Path(points)
-      path.strokeColor = "black"
+      const color = paper.Color.random()
+      path.strokeColor = color
       path.strokeWidth = STROKE_WIDTH
-      path.fillColor = paper.Color.random()
+      path.fillColor = color
       path.closed = true
       path.applyMatrix = false
       path.pivot = new paper.Point(0, 0)
@@ -469,8 +472,7 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
       rect.center = paper.view.center
       var path = new paper.Path.Rectangle(rect)
 
-      path.strokeColor = "black"
-      path.strokeWidth = 1
+      path.strokeColor = "#000"
     }
 
     function setupPhysics() {
@@ -555,16 +557,29 @@ export const Tangram = ({ onSave, patternImageDataUrl }) => {
   }, [])
 
   return (
-    <View display="flex" flexDirection="column" flex="1" position="relative">
+    <View
+      display="flex"
+      flexDirection="column"
+      flex="1"
+      alignItems="center"
+      position="relative"
+    >
       <View as="canvas" ref={canvasRef} flex="1" />
-      <Button
+      <View
+        onClick={() => addToGallery(getCompoundPath())}
+        background="#fff"
+        p={1}
         position="absolute"
+        borderRadius="50%"
         top={10}
-        right={10}
-        onClick={() => onSave(getCompoundPath())}
+        left="50%"
+        style={{
+          transform: "translateX(-50%)",
+          cursor: "pointer",
+        }}
       >
-        Add to Galery
-      </Button>
+        <FiSave as={View} fontSize="30px" display="block" />
+      </View>
     </View>
   )
 }

@@ -4,19 +4,23 @@ import {
   border,
   color,
   flexbox,
+  grid,
   layout,
   position,
+  shadow,
   space,
   typography,
 } from "styled-system"
 
 export const View = styled.div`
-  ${space}
-  ${layout}
-  ${typography}
-  ${color}
-  ${flexbox}
   ${background}
   ${border}
+  ${color}
+  ${flexbox}
+  ${grid}
+  ${layout}
   ${position}
+  ${shadow}
+  ${space}
+  ${typography}
 `

@@ -1,7 +1,8 @@
-import React, { useState } from "react"
+import React from "react"
 import { createGlobalStyle, ThemeProvider } from "styled-components"
 import { View } from "./components/view"
 import { Galery } from "./Galery"
+import { GalleryProvider } from "./gallery-provider"
 import { Tangram } from "./Tangram"
 import { theme } from "./theme"
 
@@ -10,6 +11,7 @@ const GlobalStyle = createGlobalStyle`
 
   body {	
     margin: 0;	
+    background: #fff;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',	'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',	sans-serif;	
     -webkit-font-smoothing: antialiased;	
     -moz-osx-font-smoothing: grayscale;
@@ -17,25 +19,20 @@ const GlobalStyle = createGlobalStyle`
 `
 
 function App() {
-  const [galery, setGalery] = useState([])
-  const [selectedImageDataUrl, setSelectedImageDataUrl] = useState()
-
-  const handleSave = tan => {
-    setGalery([...galery, tan])
-  }
-  const handleSelect = imageDataUrl => {
-    setSelectedImageDataUrl(imageDataUrl)
-  }
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <View display="flex" flexDirection="column" height="100vh" width="100vw">
-        <Tangram
-          onSave={handleSave}
-          patternImageDataUrl={selectedImageDataUrl}
-        ></Tangram>
-        <Galery galery={galery} onSelect={handleSelect}></Galery>
-      </View>
+      <GalleryProvider>
+        <View
+          display="flex"
+          flexDirection="column"
+          height="100vh"
+          width="100vw"
+        >
+          <Tangram></Tangram>
+          <Galery></Galery>
+        </View>
+      </GalleryProvider>
     </ThemeProvider>
   )
 }
