@@ -3,6 +3,7 @@ import React, { createContext, useCallback, useMemo, useState } from "react"
 const GalleryContext = createContext(null)
 
 const GalleryProvider = ({ children }) => {
+  const [isGalleryOpened, setIsGalleryOpened] = useState(false)
   const [tangrams, setTangrams] = useState([])
   const [selectedTangram, setSelectedTangram] = useState(null)
 
@@ -16,8 +17,11 @@ const GalleryProvider = ({ children }) => {
       addToGallery,
       selectedTangram,
       setSelectedTangram,
+      openGallery: () => setIsGalleryOpened(true),
+      closeGallery: () => setIsGalleryOpened(false),
+      isGalleryOpened,
     }),
-    [tangrams, addToGallery, selectedTangram]
+    [tangrams, addToGallery, isGalleryOpened, selectedTangram]
   )
 
   return (

@@ -431,48 +431,29 @@ export const Tangram = () => {
 
       boxBody = worldRef.current.createBody({
         position: {
-          x: canvasRect.width / 2 / SCALE,
-          y: canvasRect.height / 2 / SCALE,
+          x: 0,
+          y: 0,
         },
       })
 
-      const SIZE = 600
+      const width = canvasRect.width / SCALE
+      const height = canvasRect.height / SCALE
 
-      // Floor
-      boxBody.createFixture(
-        new Edge(
-          new Vec2(-SIZE / 2 / SCALE, -SIZE / 2 / SCALE),
-          new Vec2(SIZE / 2 / SCALE, -SIZE / 2 / SCALE)
-        ),
-        0
-      )
-      boxBody.createFixture(
-        new Edge(
-          new Vec2(SIZE / 2 / SCALE, -SIZE / 2 / SCALE),
-          new Vec2(SIZE / 2 / SCALE, SIZE / 2 / SCALE)
-        ),
-        0
-      )
-      boxBody.createFixture(
-        new Edge(
-          new Vec2(SIZE / 2 / SCALE, SIZE / 2 / SCALE),
-          new Vec2(-SIZE / 2 / SCALE, SIZE / 2 / SCALE)
-        ),
-        0
-      )
-      boxBody.createFixture(
-        new Edge(
-          new Vec2(-SIZE / 2 / SCALE, SIZE / 2 / SCALE),
-          new Vec2(-SIZE / 2 / SCALE, -SIZE / 2 / SCALE)
-        ),
-        0
-      )
+      // Top
+      boxBody.createFixture(new Edge(new Vec2(0, 0), new Vec2(width, 0)), 0)
 
-      var rect = new paper.Rectangle([-SIZE / 2, -SIZE / 2], [SIZE, SIZE])
-      rect.center = paper.view.center
-      var path = new paper.Path.Rectangle(rect)
-
-      path.strokeColor = "#000"
+      // Right
+      boxBody.createFixture(
+        new Edge(new Vec2(width, 0), new Vec2(width, height)),
+        0
+      )
+      // Bottom
+      boxBody.createFixture(
+        new Edge(new Vec2(width, height), new Vec2(0, height)),
+        0
+      )
+      // Left
+      boxBody.createFixture(new Edge(new Vec2(0, height), new Vec2(0, 0)), 0)
     }
 
     function setupPhysics() {
@@ -569,16 +550,16 @@ export const Tangram = () => {
         onClick={() => addToGallery(getCompoundPath())}
         background="#fff"
         p={1}
-        position="absolute"
+        position="fixed"
         borderRadius="50%"
-        top={10}
+        top={20}
         left="50%"
         style={{
           transform: "translateX(-50%)",
           cursor: "pointer",
         }}
       >
-        <FiSave as={View} fontSize="30px" display="block" />
+        <FiSave as={View} fontSize="30px" display="block" color="#1DD1A1" />
       </View>
     </View>
   )

@@ -1,22 +1,19 @@
-import React, { useContext, useState } from "react"
+import React, { useContext } from "react"
 import { FiX } from "react-icons/fi"
-import { CardRecto, CardVerso } from "./components/card"
+import { CardVerso } from "./components/card"
 import { View } from "./components/view"
 import { GalleryContext } from "./gallery-provider"
 
 export const Galery = ({ onSelect }) => {
-  const [open, setOpen] = useState(false)
-  const { tangrams, setSelectedTangram } = useContext(GalleryContext)
+  const {
+    tangrams,
+    setSelectedTangram,
+    isGalleryOpened,
+    closeGallery,
+  } = useContext(GalleryContext)
 
   return (
     <>
-      <CardStack
-        tangrams={tangrams}
-        onClick={() => setOpen(true)}
-        style={{
-          cursor: "pointer",
-        }}
-      />
       <View
         position="fixed"
         right={0}
@@ -30,7 +27,7 @@ export const Galery = ({ onSelect }) => {
         alignItems="center"
         overflowY="scroll"
         style={{
-          transform: `translateX(${open ? 0 : 100}%)`,
+          transform: `translateX(${isGalleryOpened ? 0 : 100}%)`,
           transition: "transform ease 500ms",
         }}
       >
@@ -40,7 +37,7 @@ export const Galery = ({ onSelect }) => {
           top={20}
           right={20}
           fontSize="40px"
-          onClick={() => setOpen(false)}
+          onClick={closeGallery}
           style={{
             cursor: "pointer",
           }}
@@ -64,7 +61,7 @@ export const Galery = ({ onSelect }) => {
                 width={128}
                 height={178}
                 onClick={() => {
-                  setOpen(false)
+                  closeGallery()
                   setSelectedTangram(tangram.svg)
                 }}
                 style={{
@@ -78,27 +75,5 @@ export const Galery = ({ onSelect }) => {
         )}
       </View>
     </>
-  )
-}
-
-const CardStack = ({ tangrams, ...props }) => {
-  return (
-    <View position="fixed" right={300} top={200} {...props}>
-      <CardRecto
-        position="absolute"
-        top={1}
-        style={{
-          transform: "rotateZ(-2deg)",
-        }}
-      />
-      <CardRecto
-        position="absolute"
-        top={7}
-        style={{
-          transform: "rotateZ(6deg)",
-        }}
-      />
-      <CardRecto position="absolute" top={0} />
-    </View>
   )
 }
