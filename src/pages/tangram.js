@@ -8,10 +8,9 @@ import {
   World,
 } from "planck-js"
 import React, { useContext, useEffect, useLayoutEffect, useRef } from "react"
-import { FiSave } from "react-icons/fi"
 import simplify from "simplify-js"
-import { View } from "./components/view"
-import { GalleryContext } from "./gallery-provider"
+import { GalleryContext } from "../components/gallery-provider"
+import { View } from "../components/view"
 
 const SCALE = 30
 const FPS = 60
@@ -108,7 +107,7 @@ export const Tangram = () => {
   const worldRef = useRef()
   const mouseJointRef = useRef()
   const coumpoundPathRef = useRef()
-  const { addToGallery, selectedTangram } = useContext(GalleryContext)
+  const { selectedTangram, addToTempGallery } = useContext(GalleryContext)
 
   useEffect(() => {
     if (!selectedTangram) {
@@ -387,6 +386,8 @@ export const Tangram = () => {
           body.getFixtureList().setDensity(1000)
           body.resetMassData()
 
+          addToTempGallery(getCompoundPath())
+
           coumpoundPathRef.current && check()
         }
 
@@ -535,31 +536,18 @@ export const Tangram = () => {
     }
 
     init()
-  }, [])
+  }, [addToTempGallery])
 
   return (
     <View
-      display="flex"
-      flexDirection="column"
       flex="1"
+      display="flex"
       alignItems="center"
-      position="relative"
+      justifyContent="center"
+      background="#b7efe0"
     >
-      <View as="canvas" ref={canvasRef} flex="1" />
-      <View
-        onClick={() => addToGallery(getCompoundPath())}
-        background="#fff"
-        p={1}
-        position="fixed"
-        borderRadius="50%"
-        top={20}
-        left="50%"
-        style={{
-          transform: "translateX(-50%)",
-          cursor: "pointer",
-        }}
-      >
-        <FiSave as={View} fontSize="30px" display="block" color="#1DD1A1" />
+      <View width="50vw" height="80%" background="#fff">
+        <View as="canvas" ref={canvasRef} flex="1" />
       </View>
     </View>
   )

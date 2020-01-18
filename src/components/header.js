@@ -1,38 +1,54 @@
 import React, { useContext } from "react"
-import { FiGrid } from "react-icons/fi"
-import { GalleryContext } from "../gallery-provider"
-import { ReactComponent as Logo } from "../logo2.svg"
+import { FiSave } from "react-icons/fi"
+import { ReactComponent as Logo } from "../assets/logo.svg"
+import { Button } from "./button"
+import { GalleryContext } from "./gallery-provider"
+import { Link } from "./link"
 import { View } from "./view"
 
 export const Header = () => {
-  const { openGallery } = useContext(GalleryContext)
+  const { temporaryTangram, addToGallery, addToTempGallery } = useContext(
+    GalleryContext
+  )
   return (
     <View
-      maxWidth={1250}
+      background="#fff"
+      borderTop="10px solid #FF9FF3"
       width="100%"
-      alignSelf="center"
       display="flex"
-      justifyContent="space-between"
-      py={2}
+      justifyContent="center"
     >
-      <Logo width={300} />
       <View
+        maxWidth={1250}
+        width="100%"
+        alignSelf="center"
         display="flex"
-        alignItems="center"
-        style={{ cursor: "pointer" }}
-        onClick={openGallery}
+        justifyContent="space-between"
       >
-        <View color="#1DD1A1">Gallery</View>
-        <View
-          width={50}
-          height={50}
-          background="#1DD1A1"
-          ml={1}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <FiGrid color="#fff" fontSize="30px" />
+        <Link to="/" color="#fff" py={2}>
+          <Logo width={300} />
+        </Link>
+        <View display="flex" alignItems="center">
+          <Link to="/gallery" color="#fff" px={2}>
+            Gallery
+          </Link>
+          <Button
+            disabled={!temporaryTangram}
+            onClick={() => {
+              if (temporaryTangram) {
+                addToGallery(temporaryTangram)
+                addToTempGallery(null)
+              }
+            }}
+            ml={3}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            p={1}
+          >
+            <FiSave as={View} fontSize="30px" display="block" color="#fff" />
+            <View ml={1}>Enregistrer dans la gallery</View>
+          </Button>
         </View>
       </View>
     </View>

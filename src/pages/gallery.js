@@ -1,47 +1,24 @@
 import React, { useContext } from "react"
-import { FiX } from "react-icons/fi"
-import { CardVerso } from "./components/card"
-import { View } from "./components/view"
-import { GalleryContext } from "./gallery-provider"
+import { useHistory } from "react-router-dom"
+import { CardVerso } from "../components/card"
+import { GalleryContext } from "../components/gallery-provider"
+import { View } from "../components/view"
 
-export const Galery = ({ onSelect }) => {
-  const {
-    tangrams,
-    setSelectedTangram,
-    isGalleryOpened,
-    closeGallery,
-  } = useContext(GalleryContext)
+export const Gallery = () => {
+  const { tangrams, setSelectedTangram } = useContext(GalleryContext)
+  const history = useHistory()
 
   return (
     <>
       <View
-        position="fixed"
-        right={0}
-        top={0}
-        width="100vw"
-        height="100vh"
+        width="100%"
+        height="100%"
         background="#ecf0f1"
-        borderLeft="10px solid #fff"
         display="flex"
         justifyContent="center"
         alignItems="center"
         overflowY="scroll"
-        style={{
-          transform: `translateX(${isGalleryOpened ? 0 : 100}%)`,
-          transition: "transform ease 500ms",
-        }}
       >
-        <View
-          as={FiX}
-          position="absolute"
-          top={20}
-          right={20}
-          fontSize="40px"
-          onClick={closeGallery}
-          style={{
-            cursor: "pointer",
-          }}
-        />
         {tangrams.length > 0 ? (
           <View
             width="100%"
@@ -61,7 +38,7 @@ export const Galery = ({ onSelect }) => {
                 width={128}
                 height={178}
                 onClick={() => {
-                  closeGallery()
+                  history.push("/")
                   setSelectedTangram(tangram.svg)
                 }}
                 style={{

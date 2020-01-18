@@ -1,6 +1,5 @@
 import React from "react"
 import styled from "styled-components"
-import { ReactComponent as Logo } from "../logo.svg"
 import { View } from "./view"
 
 const Card = styled(View).attrs({
@@ -56,21 +55,6 @@ export const CardVerso = ({ tangram, ...props }) => {
       >
         {difficulty}
       </View>
-    </Card>
-  )
-}
-
-export const CardRecto = props => {
-  return (
-    <Card
-      background="#10ac84"
-      border={`10px solid #fff`}
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      {...props}
-    >
-      <Logo />
     </Card>
   )
 }

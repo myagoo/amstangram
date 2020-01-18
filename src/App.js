@@ -1,10 +1,7 @@
 import React from "react"
 import { createGlobalStyle, ThemeProvider } from "styled-components"
-import { Header } from "./components/header"
-import { View } from "./components/view"
-import { Galery } from "./Galery"
-import { GalleryProvider } from "./gallery-provider"
-import { Tangram } from "./Tangram"
+import { GalleryProvider } from "./components/gallery-provider"
+import { Routes } from "./routes"
 import { theme } from "./theme"
 
 const GlobalStyle = createGlobalStyle`
@@ -24,19 +21,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <GalleryProvider>
-        <View borderTop="10px solid #1DD1A1">
-          <View
-            display="flex"
-            flexDirection="column"
-            height="100vh"
-            width="100vw"
-          >
-            <Header />
-
-            <Tangram></Tangram>
-            <Galery></Galery>
-          </View>
-        </View>
+        <Routes />
       </GalleryProvider>
     </ThemeProvider>
   )

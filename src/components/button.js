@@ -3,17 +3,21 @@ import { View } from "./view"
 
 export const Button = styled(View).attrs({
   as: "button",
-  border: "3px solid #aabbcc",
+  background: "#48DBFB",
   borderRadius: 5,
   fontSize: 2,
-  color: "#aabbcc",
+  color: "#fff",
   px: 2,
   py: 1,
 })`
-  cursor: pointer;
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 
-  &:hover {
+  &:not(:disabled):hover {
     opacity: 0.6;
+    cursor: pointer;
   }
 
   &:focus {
