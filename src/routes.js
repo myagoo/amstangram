@@ -1,5 +1,6 @@
 import React from "react"
 import { BrowserRouter, Route, Switch } from "react-router-dom"
+import { AnimatedRoute } from "react-router-transition"
 import { Header } from "./components/header"
 import { View } from "./components/view"
 import { Gallery } from "./pages/gallery"
@@ -20,10 +21,20 @@ export const Routes = () => {
             <Route exact path="/">
               <Tangram />
             </Route>
-            <Route path="/gallery">
-              <Gallery />
-            </Route>
           </Switch>
+          <AnimatedRoute
+            path="/gallery"
+            atEnter={{ offset: 100 }}
+            atLeave={{ offset: 100 }}
+            atActive={{ offset: 0 }}
+            mapStyles={styles => ({
+              position: "absolute",
+              width: "100%",
+              height: "100%",
+              transform: `translateX(${styles.offset}%)`,
+            })}
+            component={Gallery}
+          />
         </View>
       </View>
     </BrowserRouter>
