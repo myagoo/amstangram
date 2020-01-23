@@ -1,5 +1,6 @@
 # TODO
 
+- drag rotate
 - simplify paths on save instead of only simplifying on the loaded offsetted path
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
