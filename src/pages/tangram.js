@@ -187,8 +187,8 @@ export const Tangram = () => {
       children: [shape, inner],
       position: paper.view.center,
       pivot: [triangleCenterX, triangleCenterY],
-      applyMatrix: false,
       data: { id },
+      applyMatrix: true,
     })
 
     group.on("mousedrag", mdEvent => {
@@ -199,40 +199,40 @@ export const Tangram = () => {
       //   fillColor: paper.Color.random(),
       //   closed: true,
       //   segments: inner.segments.map(point => {
-      //     console.log(point)
       //     return inner.localToGlobal(point)
       //   }),
+      //   insert: true,
       // })
 
-      for (const piece in piecesRef.current) {
+      for (const piece of piecesRef.current) {
         if (piece === group) {
           continue
         }
 
-        if (group.isInside(piece.bounds)) {
-          console.log("INTERSECT")
-        } else {
-          console.log(":(")
-        }
+        group.firstChild.intersects(piece.firstChild)
+        console.log(
+          "group.firstChild.intersects(piece.firstChild)",
+          group.firstChild.intersects(piece.firstChild)
+        )
+        console.log("djsghdfsj")
+        // const otherInner = piece.lastChild
+        // const otherGlobalInner = new paper.Path({
+        //   fillColor: "#000000",
+        //   closed: true,
+        //   segments: otherInner.segments.map(point => {
+        //     return otherInner.localToGlobal(point)
+        //   }),
+        //   insert: true,
+        // })
+        // otherGlobalInner.bringToFront()
+        // console.log(otherGlobalInner.segments)
+
+        // console.log(globalInner.intersects(otherGlobalInner))
       }
-
-      // const result = piecesRef.current.filter(piece => {
-      //   if (piece === group) {
-      //     console.log("skip")
-      //     return false
-      //   }
-
-      //   console.log("cjecking crossing between, ", id, piece.lastChild.data.id)
-      //   const intersections = inner.intersects(piece.lastChild)
-      //   console.log("inte", intersections)
-      //   return intersections
-      // })
-
-      // console.log(result.map(r => r.data.id))
     })
 
     group.on("doubleclick", mdEvent => {
-      group.rotation += 45
+      group.matrix.rotate(45, group.pivot)
     })
 
     return group
