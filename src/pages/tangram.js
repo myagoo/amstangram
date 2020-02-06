@@ -8,24 +8,7 @@ const SMALL_TRIANGLE_BASE = 50
 const LENGTH_MIN = SMALL_TRIANGLE_BASE * 16.325
 const LENGTH_MAX = SMALL_TRIANGLE_BASE * 49.25
 const ERROR_MARGIN = 5
-const SIMPLIFY_TOLERANCE = 3
-const SHAPE_PADDING = 5
-
-/*
- * Calculates the angle ABC (in radians)
- *
- * A first point, ex: {x: 0, y: 0}
- * C second point
- * B center point
- */
-function find_angle(A, B, C) {
-  var AB = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2))
-  var BC = Math.sqrt(Math.pow(B.x - C.x, 2) + Math.pow(B.y - C.y, 2))
-  var AC = Math.sqrt(Math.pow(C.x - A.x, 2) + Math.pow(C.y - A.y, 2))
-  return (
-    (Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB)) * 180) / Math.PI
-  )
-}
+const OVERLAPING_OPACITY = 0.5
 
 const getDistanceBetweenPoints = (pointA, pointB) => {
   return Math.sqrt(
@@ -59,6 +42,10 @@ const getOffsettedPoints = (points, offset) => {
   }
 }
 
+function contains(item1, item2) {
+  return item2.segments.every(segment => item1.contains(segment.point))
+}
+
 export const Tangram = () => {
   const theme = useContext(ThemeContext)
   const canvasRef = useRef()
@@ -68,70 +55,9 @@ export const Tangram = () => {
 
   useEffect(() => {
     if (onSaveRequest) {
-      console.log("zizi")
       onSaveRequest(getCompoundPath())
     }
   }, [onSaveRequest])
-
-  function contains(item1, item2) {
-    return item2.segments.every(segment =>
-      item1.contains(item2.localToGlobal(segment))
-    )
-  }
-
-  function attachEvents(group) {
-    group.on("mousedown", () => group.bringToFront())
-    group.on("mousedrag", mdEvent => {
-      const parentRect = canvasRef.current.parentElement.getBoundingClientRect()
-      const newX = group.position.x + mdEvent.delta.x
-      const newY = group.position.y + mdEvent.delta.y
-
-      const isOutsideCanvas =
-        newX - group.bounds.width / 2 <= 0 ||
-        newY - group.bounds.height / 2 <= 0 ||
-        newX + group.bounds.width / 2 > parentRect.width ||
-        newY + group.bounds.height / 2 > parentRect.height
-
-      if (isOutsideCanvas) {
-        return
-      }
-
-      group.position.x = group.position.x + mdEvent.delta.x
-      group.position.y = group.position.y + mdEvent.delta.y
-
-      for (const group2 of groupsRef.current) {
-        if (group2 === group) {
-          continue
-        }
-
-        if (
-          group.lastChild.intersects(group2.lastChild) ||
-          contains(group.lastChild, group2.lastChild) ||
-          contains(group2.lastChild, group.lastChild)
-        ) {
-          group.data.collisions.add(group2.data.id)
-          group2.data.collisions.add(group.data.id)
-        } else {
-          group.data.collisions.delete(group2.data.id)
-          group2.data.collisions.delete(group.data.id)
-        }
-      }
-
-      for (const group2 of groupsRef.current) {
-        if (group2.data.collisions.size > 0) {
-          group2.children[0].fillColor = theme.colors.collision
-          group2.children[0].opacity = 0.3
-        } else {
-          group2.children[0].fillColor = theme.colors[group2.data.id]
-          group2.children[0].opacity = 1
-        }
-      }
-    })
-
-    group.on("doubleclick", mdEvent => {
-      group.rotation += 45
-    })
-  }
 
   function createRhombusGroup(size, id) {
     const points = [
@@ -148,8 +74,10 @@ export const Tangram = () => {
     })
 
     const inner = new paper.Path({
-      segments: getOffsettedPoints(points, -10),
+      segments: getOffsettedPoints(points, -ERROR_MARGIN),
       closed: true,
+      strokeWidth: 2,
+      strokeColor: theme.colors[id],
     })
 
     const group = new paper.Group({
@@ -170,8 +98,10 @@ export const Tangram = () => {
     })
 
     const inner = new paper.Path.Rectangle({
-      point: [10, 10],
-      size: [size - 20, size - 20],
+      point: [ERROR_MARGIN, ERROR_MARGIN],
+      size: [size - ERROR_MARGIN * 2, size - ERROR_MARGIN * 2],
+      strokeWidth: 2,
+      strokeColor: theme.colors[id],
     })
 
     const group = new paper.Group({
@@ -198,9 +128,10 @@ export const Tangram = () => {
     })
 
     const inner = new paper.Path({
-      segments: getOffsettedPoints(points, -10),
+      segments: getOffsettedPoints(points, -ERROR_MARGIN),
       closed: true,
-      fillColor: "blue",
+      strokeWidth: 2,
+      strokeColor: theme.colors[id],
     })
 
     const d1 = getDistanceBetweenPoints(points[1], points[2])
@@ -231,35 +162,17 @@ export const Tangram = () => {
       return
     }
 
-    const group = new paper.Group()
+    const item = paper.project.importSVG(selectedTangram, {})
+    item.sendToBack()
+    item.position = paper.view.center
+    item.fillRule = "evenodd"
+    item.fillColor = "black"
+    item.closed = true
 
-    const item = group.importSVG(selectedTangram, {})
-    group.fillColor = "black"
-    group.sendToBack()
-    group.position = paper.view.center
-
-    let paths
-
-    if (item instanceof paper.CompoundPath) {
-      paths = item.children
-    } else {
-      paths = [item]
-    }
-    const coumpoundPath = new paper.CompoundPath({
-      children: paths,
-      fillRule: "evenodd",
-      fillColor: "green",
-      closed: true,
-      opacity: 0.5,
-    })
-
-    coumpoundPath.sendToBack()
-
-    coumpoundPathRef.current = coumpoundPath
+    coumpoundPathRef.current = item
 
     return () => {
-      group.remove()
-      coumpoundPath.remove()
+      item.remove()
     }
   }, [selectedTangram])
 
@@ -319,7 +232,67 @@ export const Tangram = () => {
       // Create an empty project and a view for the canvas:
       paper.setup(canvasRef.current)
       setupPieces()
-      // paper.view.on("frame", check)
+    }
+
+    const checkForIntersections = group => {
+      for (const group2 of groupsRef.current) {
+        if (group2 === group) {
+          continue
+        }
+
+        if (
+          group.lastChild.intersects(group2.lastChild) ||
+          contains(group.lastChild, group2.lastChild) ||
+          contains(group2.lastChild, group.lastChild)
+        ) {
+          group.data.collisions.add(group2.data.id)
+          group2.data.collisions.add(group.data.id)
+        } else {
+          group.data.collisions.delete(group2.data.id)
+          group2.data.collisions.delete(group.data.id)
+        }
+      }
+
+      for (const otherGroup of groupsRef.current) {
+        if (otherGroup.data.collisions.size > 0) {
+          otherGroup.firstChild.fillColor = theme.colors.collision
+          otherGroup.firstChild.opacity = OVERLAPING_OPACITY
+        } else {
+          otherGroup.firstChild.fillColor = theme.colors[otherGroup.data.id]
+          otherGroup.firstChild.opacity = 1
+        }
+      }
+    }
+
+    function attachEvents(group) {
+      group.on("mousedown", () => group.bringToFront())
+
+      group.on("mouseup", check)
+
+      group.on("mousedrag", mdEvent => {
+        const newX = group.position.x + mdEvent.delta.x
+        const newY = group.position.y + mdEvent.delta.y
+
+        const isOutsideCanvas =
+          newX - group.bounds.width / 2 <= 0 ||
+          newY - group.bounds.height / 2 <= 0 ||
+          newX + group.bounds.width / 2 > canvasRef.current.offsetWidth ||
+          newY + group.bounds.height / 2 > canvasRef.current.offsetHeight
+
+        if (isOutsideCanvas) {
+          return
+        }
+
+        group.position.x = newX
+        group.position.y = newY
+
+        checkForIntersections(group)
+      })
+
+      group.on("doubleclick", mdEvent => {
+        group.rotation += 45
+        checkForIntersections(group)
+      })
     }
 
     function check() {
@@ -329,6 +302,9 @@ export const Tangram = () => {
       let newCoumpoundPath = coumpoundPathRef.current
 
       for (const group of groupsRef.current) {
+        if (group.data.collisions.size > 0) {
+          return
+        }
         newCoumpoundPath = newCoumpoundPath.unite(group.lastChild, {
           insert: false,
         })
@@ -355,6 +331,7 @@ export const Tangram = () => {
 
       for (const group of groupsRef.current) {
         attachEvents(group)
+        checkForIntersections(group)
       }
     }
 
