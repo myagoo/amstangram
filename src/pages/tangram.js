@@ -1,7 +1,6 @@
 import paper from "paper/dist/paper-core"
 
 import React, { useContext, useEffect, useLayoutEffect, useRef } from "react"
-import simplify from "simplify-js"
 import { GalleryContext } from "../components/gallery-provider"
 import { View } from "../components/view"
 
@@ -64,7 +63,14 @@ export const Tangram = () => {
   const canvasRef = useRef()
   const piecesRef = useRef()
   const coumpoundPathRef = useRef()
-  const { selectedTangram, addToTempGallery } = useContext(GalleryContext)
+  const { onSaveRequest, selectedTangram } = useContext(GalleryContext)
+
+  useEffect(() => {
+    if (onSaveRequest) {
+      console.log("zizi")
+      onSaveRequest(getCompoundPath())
+    }
+  }, [onSaveRequest])
 
   function createRhombusGroup(size, id) {
     const points = [
@@ -257,41 +263,8 @@ export const Tangram = () => {
     } else {
       paths = [item]
     }
-
-    const co = new window.ClipperLib.ClipperOffset() // constructor
-
-    const simplifiedClipperPaths = paths.map(path => {
-      const points = path.segments.map(({ point }) => point)
-
-      const simplifiedPoints = simplify(points, SIMPLIFY_TOLERANCE, true)
-
-      return simplifiedPoints.map(({ x, y }) => ({
-        X: x,
-        Y: y,
-      }))
-    })
-
-    const resultPaths = new window.ClipperLib.Paths() // empty solution
-
-    co.AddPaths(
-      simplifiedClipperPaths,
-      window.ClipperLib.JoinType.jtMiter,
-      window.ClipperLib.EndType.etClosedPolygon
-    )
-
-    co.MiterLimit = 2
-    co.ArcTolerance = 0.25
-
-    co.Execute(resultPaths, ERROR_MARGIN)
-
     const coumpoundPath = new paper.CompoundPath({
-      children: resultPaths.map(resultPath => {
-        const offsettedPath = new paper.Path({
-          segments: resultPath.map(({ X, Y }) => new paper.Point(X, Y)),
-          insert: false,
-        })
-        return offsettedPath
-      }),
+      children: paths,
       fillRule: "evenodd",
       fillColor: "green",
       closed: true,
@@ -311,7 +284,8 @@ export const Tangram = () => {
   const getCompoundPath = () => {
     let compoundPath
 
-    for (const { path } of piecesRef.current) {
+    for (const group of piecesRef.current) {
+      const path = group.firstChild
       const offsettedPath = new paper.Path({
         segments: getOffsettedPoints(
           path.segments.map(segment => path.localToGlobal(segment.point)),
@@ -363,7 +337,7 @@ export const Tangram = () => {
       // Create an empty project and a view for the canvas:
       paper.setup(canvasRef.current)
       setupPieces()
-      paper.view.on("frame", check)
+      // paper.view.on("frame", check)
     }
 
     function check() {
@@ -371,10 +345,13 @@ export const Tangram = () => {
         return
       }
       let newCoumpoundPath = coumpoundPathRef.current
-      for (const { path } of piecesRef.current) {
-        newCoumpoundPath = newCoumpoundPath.unite(path, { insert: false })
+
+      for (const group of piecesRef.current) {
+        newCoumpoundPath = newCoumpoundPath.unite(group.lastChild, {
+          insert: false,
+        })
       }
-      if (newCoumpoundPath.compare(coumpoundPathRef.current)) {
+      if (newCoumpoundPath.length === coumpoundPathRef.current.length) {
         alert("YOU WIN MOTHERFUCKER")
       }
     }
@@ -396,7 +373,7 @@ export const Tangram = () => {
     }
 
     init()
-  }, [addToTempGallery])
+  }, [])
 
   return (
     <View

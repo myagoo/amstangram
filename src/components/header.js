@@ -7,9 +7,7 @@ import { Link } from "./link"
 import { View } from "./view"
 
 export const Header = () => {
-  const { temporaryTangram, addToGallery, addToTempGallery } = useContext(
-    GalleryContext
-  )
+  const { requestSave } = useContext(GalleryContext)
   return (
     <View
       background="#fff"
@@ -33,13 +31,7 @@ export const Header = () => {
             Gallery
           </Link>
           <Button
-            disabled={!temporaryTangram}
-            onClick={() => {
-              if (temporaryTangram) {
-                addToGallery(temporaryTangram)
-                addToTempGallery(null)
-              }
-            }}
+            onClick={requestSave}
             ml={3}
             display="flex"
             alignItems="center"

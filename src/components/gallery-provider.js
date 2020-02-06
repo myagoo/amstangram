@@ -5,32 +5,29 @@ const GalleryContext = createContext(null)
 const GalleryProvider = ({ children }) => {
   const [tangrams, setTangrams] = useState([])
   const [selectedTangram, setSelectedTangram] = useState(null)
-  const [temporaryTangram, setTemporaryTangram] = useState(null)
+  const [requestId, setRequestId] = useState(0)
 
-  const addToGallery = useCallback(tangram => {
-    setTangrams(tangrams => [...tangrams, tangram])
+  const requestSave = useCallback(() => {
+    console.log("requestSave")
+    setRequestId(prevRequestId => prevRequestId + 1)
   }, [])
 
-  const addToTempGallery = useCallback(tangram => {
-    setTemporaryTangram(tangram)
-  }, [])
+  const onSaveRequest = useMemo(() => {
+    console.log("requestId", requestId)
+    if (requestId) {
+      return tangram => setTangrams(prevTangrams => [...prevTangrams, tangram])
+    }
+  }, [requestId])
 
   const contextValue = useMemo(
     () => ({
       tangrams,
-      addToGallery,
       selectedTangram,
       setSelectedTangram,
-      temporaryTangram,
-      addToTempGallery,
+      requestSave,
+      onSaveRequest,
     }),
-    [
-      tangrams,
-      addToGallery,
-      selectedTangram,
-      temporaryTangram,
-      addToTempGallery,
-    ]
+    [tangrams, selectedTangram, requestSave, onSaveRequest]
   )
 
   return (
