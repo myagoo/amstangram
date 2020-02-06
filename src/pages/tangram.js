@@ -1,6 +1,6 @@
 import paper from "paper/dist/paper-core"
-
 import React, { useContext, useEffect, useLayoutEffect, useRef } from "react"
+import { ThemeContext } from "styled-components"
 import { GalleryContext } from "../components/gallery-provider"
 import { View } from "../components/view"
 
@@ -60,8 +60,9 @@ const getOffsettedPoints = (points, offset) => {
 }
 
 export const Tangram = () => {
+  const theme = useContext(ThemeContext)
   const canvasRef = useRef()
-  const piecesRef = useRef()
+  const groupsRef = useRef()
   const coumpoundPathRef = useRef()
   const { onSaveRequest, selectedTangram } = useContext(GalleryContext)
 
@@ -71,6 +72,66 @@ export const Tangram = () => {
       onSaveRequest(getCompoundPath())
     }
   }, [onSaveRequest])
+
+  function contains(item1, item2) {
+    return item2.segments.every(segment =>
+      item1.contains(item2.localToGlobal(segment))
+    )
+  }
+
+  function attachEvents(group) {
+    group.on("mousedown", () => group.bringToFront())
+    group.on("mousedrag", mdEvent => {
+      const parentRect = canvasRef.current.parentElement.getBoundingClientRect()
+      const newX = group.position.x + mdEvent.delta.x
+      const newY = group.position.y + mdEvent.delta.y
+
+      const isOutsideCanvas =
+        newX - group.bounds.width / 2 <= 0 ||
+        newY - group.bounds.height / 2 <= 0 ||
+        newX + group.bounds.width / 2 > parentRect.width ||
+        newY + group.bounds.height / 2 > parentRect.height
+
+      if (isOutsideCanvas) {
+        return
+      }
+
+      group.position.x = group.position.x + mdEvent.delta.x
+      group.position.y = group.position.y + mdEvent.delta.y
+
+      for (const group2 of groupsRef.current) {
+        if (group2 === group) {
+          continue
+        }
+
+        if (
+          group.lastChild.intersects(group2.lastChild) ||
+          contains(group.lastChild, group2.lastChild) ||
+          contains(group2.lastChild, group.lastChild)
+        ) {
+          group.data.collisions.add(group2.data.id)
+          group2.data.collisions.add(group.data.id)
+        } else {
+          group.data.collisions.delete(group2.data.id)
+          group2.data.collisions.delete(group.data.id)
+        }
+      }
+
+      for (const group2 of groupsRef.current) {
+        if (group2.data.collisions.size > 0) {
+          group2.children[0].fillColor = theme.colors.collision
+          group2.children[0].opacity = 0.3
+        } else {
+          group2.children[0].fillColor = theme.colors[group2.data.id]
+          group2.children[0].opacity = 1
+        }
+      }
+    })
+
+    group.on("doubleclick", mdEvent => {
+      group.rotation += 45
+    })
+  }
 
   function createRhombusGroup(size, id) {
     const points = [
@@ -83,36 +144,19 @@ export const Tangram = () => {
     const shape = new paper.Path({
       segments: points,
       closed: true,
-      fillColor: paper.Color.random(),
+      fillColor: theme.colors[id],
     })
 
     const inner = new paper.Path({
       segments: getOffsettedPoints(points, -10),
       closed: true,
-      fillColor: paper.Color.random(),
-      data: { id },
     })
 
     const group = new paper.Group({
       children: [shape, inner],
       position: paper.view.center,
-      data: { id },
-    })
-
-    group.on("mousedrag", mdEvent => {
-      group.position.x = group.position.x + mdEvent.delta.x
-      group.position.y = group.position.y + mdEvent.delta.y
-      const result = piecesRef.current.filter(piece => {
-        return (
-          piece !== group && inner.getIntersections(piece.lastChild).length > 0
-        )
-      })
-
-      console.log(result.map(r => r.data.id))
-    })
-
-    group.on("doubleclick", mdEvent => {
-      group.rotation += 45
+      data: { id, collisions: new Set() },
+      applyMatrix: true,
     })
 
     return group
@@ -122,37 +166,21 @@ export const Tangram = () => {
     const shape = new paper.Path.Rectangle({
       point: [0, 0],
       size: [size, size],
-      fillColor: paper.Color.random(),
+      fillColor: theme.colors[id],
     })
 
     const inner = new paper.Path.Rectangle({
       point: [10, 10],
       size: [size - 20, size - 20],
-      fillColor: paper.Color.random(),
-      data: { id },
     })
 
     const group = new paper.Group({
       children: [shape, inner],
       position: paper.view.center,
-      data: { id },
+      data: { id, collisions: new Set() },
+      applyMatrix: true,
     })
 
-    group.on("mousedrag", mdEvent => {
-      group.position.x = group.position.x + mdEvent.delta.x
-      group.position.y = group.position.y + mdEvent.delta.y
-
-      const result = piecesRef.current.filter(piece => {
-        return (
-          piece !== group && inner.getIntersections(piece.lastChild).length > 0
-        )
-      })
-
-      console.log(result.map(r => r.data.id))
-    })
-    group.on("doubleclick", mdEvent => {
-      group.rotation += 45
-    })
     return group
   }
 
@@ -166,18 +194,13 @@ export const Tangram = () => {
     const shape = new paper.Path({
       segments: points,
       closed: true,
-      fillColor: paper.Color.random(),
-      //applyMatrix: false,
-      data: { id },
+      fillColor: theme.colors[id],
     })
 
     const inner = new paper.Path({
       segments: getOffsettedPoints(points, -10),
       closed: true,
-      fillColor: paper.Color.random(),
-      //applyMatrix: false,
-      insert: false,
-      data: { id },
+      fillColor: "blue",
     })
 
     const d1 = getDistanceBetweenPoints(points[1], points[2])
@@ -192,53 +215,12 @@ export const Tangram = () => {
     const group = new paper.Group({
       children: [shape, inner],
       position: paper.view.center,
-      pivot: [triangleCenterX, triangleCenterY],
-      data: { id },
+      pivot: [
+        paper.view.center.x + triangleCenterX - shape.bounds.width / 2,
+        paper.view.center.y + triangleCenterY - shape.bounds.height / 2,
+      ],
+      data: { id, collisions: new Set() },
       applyMatrix: true,
-    })
-
-    group.on("mousedrag", mdEvent => {
-      group.position.x = group.position.x + mdEvent.delta.x
-      group.position.y = group.position.y + mdEvent.delta.y
-
-      // const globalInner = new paper.Path({
-      //   fillColor: paper.Color.random(),
-      //   closed: true,
-      //   segments: inner.segments.map(point => {
-      //     return inner.localToGlobal(point)
-      //   }),
-      //   insert: true,
-      // })
-
-      for (const piece of piecesRef.current) {
-        if (piece === group) {
-          continue
-        }
-
-        group.firstChild.intersects(piece.firstChild)
-        console.log(
-          "group.firstChild.intersects(piece.firstChild)",
-          group.firstChild.intersects(piece.firstChild)
-        )
-        console.log("djsghdfsj")
-        // const otherInner = piece.lastChild
-        // const otherGlobalInner = new paper.Path({
-        //   fillColor: "#000000",
-        //   closed: true,
-        //   segments: otherInner.segments.map(point => {
-        //     return otherInner.localToGlobal(point)
-        //   }),
-        //   insert: true,
-        // })
-        // otherGlobalInner.bringToFront()
-        // console.log(otherGlobalInner.segments)
-
-        // console.log(globalInner.intersects(otherGlobalInner))
-      }
-    })
-
-    group.on("doubleclick", mdEvent => {
-      group.matrix.rotate(45, group.pivot)
     })
 
     return group
@@ -284,7 +266,7 @@ export const Tangram = () => {
   const getCompoundPath = () => {
     let compoundPath
 
-    for (const group of piecesRef.current) {
+    for (const group of groupsRef.current) {
       const path = group.firstChild
       const offsettedPath = new paper.Path({
         segments: getOffsettedPoints(
@@ -346,7 +328,7 @@ export const Tangram = () => {
       }
       let newCoumpoundPath = coumpoundPathRef.current
 
-      for (const group of piecesRef.current) {
+      for (const group of groupsRef.current) {
         newCoumpoundPath = newCoumpoundPath.unite(group.lastChild, {
           insert: false,
         })
@@ -361,15 +343,19 @@ export const Tangram = () => {
       const mediumBase = Math.sqrt(Math.pow(smallBase, 2) * 2)
       const largeBase = Math.sqrt(Math.pow(mediumBase, 2) * 2)
 
-      piecesRef.current = [
+      groupsRef.current = [
         createTriangleGroup(smallBase, "st1"),
         createTriangleGroup(smallBase, "st2"),
-        // createTriangleGroup(mediumBase, "mt1"),
-        // createTriangleGroup(largeBase, "lt1"),
-        // createTriangleGroup(largeBase, "lt1"),
-        // createSquareGroup(mediumBase, "sq"),
-        // createRhombusGroup(smallBase, "rh"),
+        createTriangleGroup(mediumBase, "mt1"),
+        createTriangleGroup(largeBase, "lt1"),
+        createTriangleGroup(largeBase, "lt2"),
+        createSquareGroup(mediumBase, "sq"),
+        createRhombusGroup(smallBase, "rh"),
       ]
+
+      for (const group of groupsRef.current) {
+        attachEvents(group)
+      }
     }
 
     init()
