@@ -1,134 +1,14 @@
 import paper from "paper/dist/paper-core"
-
 import React, { useContext, useEffect, useLayoutEffect, useRef } from "react"
-import simplify from "simplify-js"
+import { ThemeContext } from "styled-components"
 import { GalleryContext } from "../components/gallery-provider"
 import { View } from "../components/view"
-
-const STROKE_WIDTH = 1
 
 const SMALL_TRIANGLE_BASE = 50
 const LENGTH_MIN = SMALL_TRIANGLE_BASE * 16.325
 const LENGTH_MAX = SMALL_TRIANGLE_BASE * 49.25
 const ERROR_MARGIN = 5
-const SIMPLIFY_TOLERANCE = 3
-const SHAPE_PADDING = 5
-
-function createRhombusGroup(size) {
-  const points = [
-    { x: 0, y: 0 },
-    { x: size * 2, y: 0 },
-    { x: size * 3, y: size },
-    { x: size, y: size },
-  ]
-  const shape = new paper.Path({
-    segments: points,
-    closed: true,
-    fillColor: paper.Color.random(),
-  })
-
-  const handle = new paper.Path.Circle({
-    center: shape.bounds.center,
-    radius: size / 2 - SHAPE_PADDING,
-    fillColor: paper.Color.random(),
-  })
-
-  const group = new paper.Group({
-    children: [shape, handle],
-    position: paper.view.center,
-  })
-
-  handle.on("mousedrag", mdEvent => {
-    group.position.x = group.position.x + mdEvent.delta.x
-    group.position.y = group.position.y + mdEvent.delta.y
-  })
-  shape.on("click", mdEvent => {
-    group.rotation += 45
-  })
-  return group
-}
-
-function createSquareGroup(size) {
-  const shape = new paper.Path.Rectangle({
-    point: [0, 0],
-    size: [size, size],
-    fillColor: paper.Color.random(),
-  })
-
-  const handle = new paper.Path.Circle({
-    center: [size / 2, size / 2],
-    radius: size / 2 - SHAPE_PADDING,
-    fillColor: paper.Color.random(),
-  })
-
-  const group = new paper.Group({
-    children: [shape, handle],
-    position: paper.view.center,
-  })
-
-  handle.on("mousedrag", mdEvent => {
-    group.position.x = group.position.x + mdEvent.delta.x
-    group.position.y = group.position.y + mdEvent.delta.y
-  })
-  shape.on("click", mdEvent => {
-    group.rotation += 45
-  })
-  return group
-}
-
-function createTriangleGroup(size) {
-  const points = [
-    { x: 0, y: 0 },
-    { x: size * 2, y: 0 },
-    { x: size, y: size },
-  ]
-
-  const shape = new paper.Path({
-    segments: points,
-    closed: true,
-    fillColor: paper.Color.random(),
-    applyMatrix: false,
-  })
-
-  const d1 = getDistanceBetweenPoints(points[1], points[2])
-  const d2 = getDistanceBetweenPoints(points[0], points[2])
-  const d3 = getDistanceBetweenPoints(points[0], points[1])
-
-  const triangleCenterX =
-    (points[0].x * d1 + points[1].x * d2 + points[2].x * d3) / shape.length
-  const triangleCenterY =
-    (points[0].y * d1 + points[1].y * d2 + points[2].y * d3) / shape.length
-
-  const radius = getDistanceBetweenPoints(
-    { x: triangleCenterX, y: triangleCenterY },
-    { x: size, y: 0 }
-  )
-
-  const handle = new paper.Path.Circle({
-    center: [triangleCenterX, triangleCenterY],
-    radius: radius - SHAPE_PADDING,
-    fillColor: paper.Color.random(),
-    applyMatrix: false,
-  })
-
-  const group = new paper.Group({
-    children: [shape, handle],
-    position: paper.view.center,
-    pivot: handle.bounds.center,
-    applyMatrix: false,
-  })
-
-  handle.on("mousedrag", mdEvent => {
-    group.position.x = group.position.x + mdEvent.delta.x
-    group.position.y = group.position.y + mdEvent.delta.y
-  })
-
-  shape.on("click", mdEvent => {
-    group.rotation += 45
-  })
-
-  return group
-}
+const OVERLAPING_OPACITY = 0.5
 
 const getDistanceBetweenPoints = (pointA, pointB) => {
   return Math.sqrt(
@@ -162,86 +42,145 @@ const getOffsettedPoints = (points, offset) => {
   }
 }
 
+function contains(item1, item2) {
+  return item2.segments.every(segment => item1.contains(segment.point))
+}
+
 export const Tangram = () => {
+  const theme = useContext(ThemeContext)
   const canvasRef = useRef()
-  const piecesRef = useRef()
+  const groupsRef = useRef()
   const coumpoundPathRef = useRef()
-  const { selectedTangram, addToTempGallery } = useContext(GalleryContext)
+  const { onSaveRequest, selectedTangram } = useContext(GalleryContext)
+
+  useEffect(() => {
+    if (onSaveRequest) {
+      onSaveRequest(getCompoundPath())
+    }
+  }, [onSaveRequest])
+
+  function createRhombusGroup(size, id) {
+    const points = [
+      { x: 0, y: 0 },
+      { x: size * 2, y: 0 },
+      { x: size * 3, y: size },
+      { x: size, y: size },
+    ]
+
+    const shape = new paper.Path({
+      segments: points,
+      closed: true,
+      fillColor: theme.colors[id],
+    })
+
+    const inner = new paper.Path({
+      segments: getOffsettedPoints(points, -ERROR_MARGIN),
+      closed: true,
+      strokeWidth: 2,
+      strokeColor: theme.colors[id],
+    })
+
+    const group = new paper.Group({
+      children: [shape, inner],
+      position: paper.view.center,
+      data: { id, collisions: new Set() },
+      applyMatrix: true,
+    })
+
+    return group
+  }
+
+  function createSquareGroup(size, id) {
+    const shape = new paper.Path.Rectangle({
+      point: [0, 0],
+      size: [size, size],
+      fillColor: theme.colors[id],
+    })
+
+    const inner = new paper.Path.Rectangle({
+      point: [ERROR_MARGIN, ERROR_MARGIN],
+      size: [size - ERROR_MARGIN * 2, size - ERROR_MARGIN * 2],
+      strokeWidth: 2,
+      strokeColor: theme.colors[id],
+    })
+
+    const group = new paper.Group({
+      children: [shape, inner],
+      position: paper.view.center,
+      data: { id, collisions: new Set() },
+      applyMatrix: true,
+    })
+
+    return group
+  }
+
+  function createTriangleGroup(size, id) {
+    const points = [
+      { x: 0, y: 0 },
+      { x: size * 2, y: 0 },
+      { x: size, y: size },
+    ]
+
+    const shape = new paper.Path({
+      segments: points,
+      closed: true,
+      fillColor: theme.colors[id],
+    })
+
+    const inner = new paper.Path({
+      segments: getOffsettedPoints(points, -ERROR_MARGIN),
+      closed: true,
+      strokeWidth: 2,
+      strokeColor: theme.colors[id],
+    })
+
+    const d1 = getDistanceBetweenPoints(points[1], points[2])
+    const d2 = getDistanceBetweenPoints(points[0], points[2])
+    const d3 = getDistanceBetweenPoints(points[0], points[1])
+
+    const triangleCenterX =
+      (points[0].x * d1 + points[1].x * d2 + points[2].x * d3) / shape.length
+    const triangleCenterY =
+      (points[0].y * d1 + points[1].y * d2 + points[2].y * d3) / shape.length
+
+    const group = new paper.Group({
+      children: [shape, inner],
+      position: paper.view.center,
+      pivot: [
+        paper.view.center.x + triangleCenterX - shape.bounds.width / 2,
+        paper.view.center.y + triangleCenterY - shape.bounds.height / 2,
+      ],
+      data: { id, collisions: new Set() },
+      applyMatrix: true,
+    })
+
+    return group
+  }
 
   useEffect(() => {
     if (!selectedTangram) {
       return
     }
 
-    const group = new paper.Group()
+    const item = paper.project.importSVG(selectedTangram, {})
+    item.sendToBack()
+    item.position = paper.view.center
+    item.fillRule = "evenodd"
+    item.fillColor = "black"
+    item.closed = true
 
-    const item = group.importSVG(selectedTangram, {})
-    group.fillColor = "black"
-    group.sendToBack()
-    group.position = paper.view.center
-
-    let paths
-
-    if (item instanceof paper.CompoundPath) {
-      paths = item.children
-    } else {
-      paths = [item]
-    }
-
-    const co = new window.ClipperLib.ClipperOffset() // constructor
-
-    const simplifiedClipperPaths = paths.map(path => {
-      const points = path.segments.map(({ point }) => point)
-
-      const simplifiedPoints = simplify(points, SIMPLIFY_TOLERANCE, true)
-
-      return simplifiedPoints.map(({ x, y }) => ({
-        X: x,
-        Y: y,
-      }))
-    })
-
-    const resultPaths = new window.ClipperLib.Paths() // empty solution
-
-    co.AddPaths(
-      simplifiedClipperPaths,
-      window.ClipperLib.JoinType.jtMiter,
-      window.ClipperLib.EndType.etClosedPolygon
-    )
-
-    co.MiterLimit = 2
-    co.ArcTolerance = 0.25
-
-    co.Execute(resultPaths, ERROR_MARGIN)
-
-    const coumpoundPath = new paper.CompoundPath({
-      children: resultPaths.map(resultPath => {
-        const offsettedPath = new paper.Path({
-          segments: resultPath.map(({ X, Y }) => new paper.Point(X, Y)),
-          insert: false,
-        })
-        return offsettedPath
-      }),
-      fillRule: "evenodd",
-      fillColor: "green",
-      closed: true,
-      opacity: 0.5,
-    })
-
-    coumpoundPath.sendToBack()
-
-    coumpoundPathRef.current = coumpoundPath
+    coumpoundPathRef.current = item
 
     return () => {
-      group.remove()
-      coumpoundPath.remove()
+      item.remove()
     }
   }, [selectedTangram])
 
   const getCompoundPath = () => {
     let compoundPath
 
-    for (const { path } of piecesRef.current) {
+    for (const group of groupsRef.current) {
+      const path = group.firstChild
       const offsettedPath = new paper.Path({
         segments: getOffsettedPoints(
           path.segments.map(segment => path.localToGlobal(segment.point)),
@@ -295,67 +234,80 @@ export const Tangram = () => {
       setupPieces()
     }
 
-    function createPiece(id, points, invertedPoints) {
-      const group = new paper.Group()
-      group.pivot = new paper.Point(0, 0)
-      group.position = paper.view.center
-
-      var path = new paper.Path(points)
-
-      const handle = new paper.Path.Circle(
-        path.bounds.center,
-        Math.min(path.bounds.width, path.bounds.height) / 3
-      )
-      handle.fillColor = paper.Color.random()
-      group.addChildren([path, handle])
-
-      const color = paper.Color.random()
-      path.strokeColor = color
-      path.strokeWidth = STROKE_WIDTH
-      path.fillColor = color
-      path.closed = true
-      path.applyMatrix = false
-
-      if (invertedPoints) {
-        let inverted = false
-
-        path.on("doubleclick", () => {
-          path.segments = inverted ? points : invertedPoints
-          inverted = !inverted
-        })
-      }
-
-      handle.on("mousedrag", mdEvent => {
-        console.log("position", path.position)
-        console.log("point", mdEvent.point)
-        console.log("delta", mdEvent.delta)
-        group.position.x = group.position.x + mdEvent.delta.x
-        group.position.y = group.position.y + mdEvent.delta.y
-      })
-
-      group.on("mousedown", function(mdEvent) {
-        group.bringToFront()
-
-        function handleMouseMove(mmEvent) {}
-
-        function handleMouseUp() {
-          paper.view.off("mousemove", handleMouseMove)
-          paper.view.off("mouseup", handleMouseUp)
-          //addToempGallery(getCompoundPath())
-          coumpoundPathRef.current && check()
+    const checkForIntersections = group => {
+      for (const group2 of groupsRef.current) {
+        if (group2 === group) {
+          continue
         }
 
-        paper.view.on("mousemove", handleMouseMove)
-        paper.view.on("mouseup", handleMouseUp)
+        if (
+          group.lastChild.intersects(group2.lastChild) ||
+          contains(group.lastChild, group2.lastChild) ||
+          contains(group2.lastChild, group.lastChild)
+        ) {
+          group.data.collisions.add(group2.data.id)
+          group2.data.collisions.add(group.data.id)
+        } else {
+          group.data.collisions.delete(group2.data.id)
+          group2.data.collisions.delete(group.data.id)
+        }
+      }
+
+      for (const otherGroup of groupsRef.current) {
+        if (otherGroup.data.collisions.size > 0) {
+          otherGroup.firstChild.fillColor = theme.colors.collision
+          otherGroup.firstChild.opacity = OVERLAPING_OPACITY
+        } else {
+          otherGroup.firstChild.fillColor = theme.colors[otherGroup.data.id]
+          otherGroup.firstChild.opacity = 1
+        }
+      }
+    }
+
+    function attachEvents(group) {
+      group.on("mousedown", () => group.bringToFront())
+
+      group.on("mouseup", check)
+
+      group.on("mousedrag", mdEvent => {
+        const newX = group.position.x + mdEvent.delta.x
+        const newY = group.position.y + mdEvent.delta.y
+
+        const isOutsideCanvas =
+          newX - group.bounds.width / 2 <= 0 ||
+          newY - group.bounds.height / 2 <= 0 ||
+          newX + group.bounds.width / 2 > canvasRef.current.offsetWidth ||
+          newY + group.bounds.height / 2 > canvasRef.current.offsetHeight
+
+        if (isOutsideCanvas) {
+          return
+        }
+
+        group.position.x = newX
+        group.position.y = newY
+
+        checkForIntersections(group)
       })
 
-      return { path, points, invertedPoints }
+      group.on("doubleclick", mdEvent => {
+        group.rotation += 45
+        checkForIntersections(group)
+      })
     }
 
     function check() {
+      if (!coumpoundPathRef.current) {
+        return
+      }
       let newCoumpoundPath = coumpoundPathRef.current
-      for (const { path } of piecesRef.current) {
-        newCoumpoundPath = newCoumpoundPath.unite(path, { insert: false })
+
+      for (const group of groupsRef.current) {
+        if (group.data.collisions.size > 0) {
+          return
+        }
+        newCoumpoundPath = newCoumpoundPath.unite(group.lastChild, {
+          insert: false,
+        })
       }
       if (newCoumpoundPath.length === coumpoundPathRef.current.length) {
         alert("YOU WIN MOTHERFUCKER")
@@ -366,30 +318,25 @@ export const Tangram = () => {
       const smallBase = SMALL_TRIANGLE_BASE
       const mediumBase = Math.sqrt(Math.pow(smallBase, 2) * 2)
       const largeBase = Math.sqrt(Math.pow(mediumBase, 2) * 2)
-      createTriangleGroup(smallBase)
-      createTriangleGroup(smallBase)
-      createTriangleGroup(mediumBase)
-      createTriangleGroup(largeBase)
-      createTriangleGroup(largeBase)
-      createSquareGroup(mediumBase)
-      createRhombusGroup(smallBase)
-      piecesRef.current = [
-        // createPiece("ts1", createTrianglePoints(smallBase)),
-        // createPiece("ts2", createTrianglePoints(smallBase)),
-        // createPiece("tm", createTrianglePoints(mediumBase)),
-        // createPiece("tl1", createTrianglePoints(largeBase)),
-        // createPiece("tl2", createTrianglePoints(largeBase)),
-        // createPiece("s", createSquarePoints(mediumBase)),
-        // createPiece(
-        //   "p",
-        //   createRhombusPoints(smallBase),
-        //   createInvertedRhombusPoints(smallBase)
-        // ),
+
+      groupsRef.current = [
+        createTriangleGroup(smallBase, "st1"),
+        createTriangleGroup(smallBase, "st2"),
+        createTriangleGroup(mediumBase, "mt1"),
+        createTriangleGroup(largeBase, "lt1"),
+        createTriangleGroup(largeBase, "lt2"),
+        createSquareGroup(mediumBase, "sq"),
+        createRhombusGroup(smallBase, "rh"),
       ]
+
+      for (const group of groupsRef.current) {
+        attachEvents(group)
+        checkForIntersections(group)
+      }
     }
 
     init()
-  }, [addToTempGallery])
+  }, [])
 
   return (
     <View
