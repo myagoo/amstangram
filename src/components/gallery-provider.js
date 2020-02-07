@@ -8,12 +8,10 @@ const GalleryProvider = ({ children }) => {
   const [requestId, setRequestId] = useState(0)
 
   const requestSave = useCallback(() => {
-    console.log("requestSave")
     setRequestId(prevRequestId => prevRequestId + 1)
   }, [])
 
   const onSaveRequest = useMemo(() => {
-    console.log("requestId", requestId)
     if (requestId) {
       return tangram => setTangrams(prevTangrams => [...prevTangrams, tangram])
     }

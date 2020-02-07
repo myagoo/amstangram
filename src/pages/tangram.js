@@ -1,52 +1,17 @@
 import paper from "paper/dist/paper-core"
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-} from "react"
+import React, { useContext, useEffect, useLayoutEffect, useRef } from "react"
 import { ThemeContext } from "styled-components"
 import { GalleryContext } from "../components/gallery-provider"
 import { View } from "../components/view"
-
-const SMALL_TRIANGLE_BASE = 50
-const LENGTH_MIN = SMALL_TRIANGLE_BASE * 16.325
-const LENGTH_MAX = SMALL_TRIANGLE_BASE * 49.25
-const ERROR_MARGIN = 5
-const OVERLAPING_OPACITY = 0.5
-
-const getDistanceBetweenPoints = (pointA, pointB) => {
-  return Math.sqrt(
-    Math.pow(pointA.x - pointB.x, 2) + Math.pow(pointA.y - pointB.y, 2)
-  )
-}
-
-const getOffsettedPoints = (points, offset) => {
-  const co = new window.ClipperLib.ClipperOffset() // constructor
-
-  const pathClipperPath = points.map(({ x, y }) => ({
-    X: x,
-    Y: y,
-  }))
-
-  const offsettedPaths = new window.ClipperLib.Paths() // empty solution
-
-  co.AddPaths(
-    [pathClipperPath],
-    window.ClipperLib.JoinType.jtMiter,
-    window.ClipperLib.EndType.etClosedPolygon
-  )
-
-  co.MiterLimit = 2
-  co.ArcTolerance = 0.25
-
-  co.Execute(offsettedPaths, offset)
-
-  if (offsettedPaths.length) {
-    return offsettedPaths[0].map(({ X, Y }) => new paper.Point(X, Y))
-  }
-}
+import {
+  LENGTH_MAX,
+  LENGTH_MIN,
+  OVERLAPING_OPACITY,
+  SMALL_TRIANGLE_BASE,
+} from "../constants"
+import { useCreateTan } from "../hooks/useCreateTan"
+import { useImportTan } from "../hooks/useImportTan"
+import { getOffsettedPoints } from "../utils/get-offsetted-points"
 
 function contains(item1, item2) {
   return item2.segments.every(segment => item1.contains(segment.point))
@@ -58,138 +23,18 @@ export const Tangram = () => {
   const groupsRef = useRef()
   const coumpoundPathRef = useRef()
   const { onSaveRequest, selectedTangram } = useContext(GalleryContext)
+  const {
+    createRhombusGroup,
+    createSquareGroup,
+    createTriangleGroup,
+  } = useCreateTan()
+  useImportTan(coumpoundPathRef, selectedTangram)
 
   useEffect(() => {
     if (onSaveRequest) {
       onSaveRequest(getCompoundPath())
     }
   }, [onSaveRequest])
-
-  const createRhombusGroup = useCallback(
-    (size, id) => {
-      const points = [
-        { x: 0, y: 0 },
-        { x: size * 2, y: 0 },
-        { x: size * 3, y: size },
-        { x: size, y: size },
-      ]
-
-      const shape = new paper.Path({
-        segments: points,
-        closed: true,
-        fillColor: theme.colors[id],
-      })
-
-      const inner = new paper.Path({
-        segments: getOffsettedPoints(points, -ERROR_MARGIN),
-        closed: true,
-        strokeWidth: 2,
-        strokeColor: theme.colors[id],
-      })
-
-      const group = new paper.Group({
-        children: [shape, inner],
-        position: paper.view.center,
-        data: { id, collisions: new Set() },
-        applyMatrix: true,
-      })
-
-      return group
-    },
-    [theme]
-  )
-
-  const createSquareGroup = useCallback(
-    (size, id) => {
-      const shape = new paper.Path.Rectangle({
-        point: [0, 0],
-        size: [size, size],
-        fillColor: theme.colors[id],
-      })
-
-      const inner = new paper.Path.Rectangle({
-        point: [ERROR_MARGIN, ERROR_MARGIN],
-        size: [size - ERROR_MARGIN * 2, size - ERROR_MARGIN * 2],
-        strokeWidth: 2,
-        strokeColor: theme.colors[id],
-      })
-
-      const group = new paper.Group({
-        children: [shape, inner],
-        position: paper.view.center,
-        data: { id, collisions: new Set() },
-        applyMatrix: true,
-      })
-
-      return group
-    },
-    [theme]
-  )
-
-  const createTriangleGroup = useCallback(
-    (size, id) => {
-      const points = [
-        { x: 0, y: 0 },
-        { x: size * 2, y: 0 },
-        { x: size, y: size },
-      ]
-
-      const shape = new paper.Path({
-        segments: points,
-        closed: true,
-        fillColor: theme.colors[id],
-      })
-
-      const inner = new paper.Path({
-        segments: getOffsettedPoints(points, -ERROR_MARGIN),
-        closed: true,
-        strokeWidth: 2,
-        strokeColor: theme.colors[id],
-      })
-
-      const d1 = getDistanceBetweenPoints(points[1], points[2])
-      const d2 = getDistanceBetweenPoints(points[0], points[2])
-      const d3 = getDistanceBetweenPoints(points[0], points[1])
-
-      const triangleCenterX =
-        (points[0].x * d1 + points[1].x * d2 + points[2].x * d3) / shape.length
-      const triangleCenterY =
-        (points[0].y * d1 + points[1].y * d2 + points[2].y * d3) / shape.length
-
-      const group = new paper.Group({
-        children: [shape, inner],
-        position: paper.view.center,
-        pivot: [
-          paper.view.center.x + triangleCenterX - shape.bounds.width / 2,
-          paper.view.center.y + triangleCenterY - shape.bounds.height / 2,
-        ],
-        data: { id, collisions: new Set() },
-        applyMatrix: true,
-      })
-
-      return group
-    },
-    [theme]
-  )
-
-  useEffect(() => {
-    if (!selectedTangram) {
-      return
-    }
-
-    const item = paper.project.importSVG(selectedTangram, {})
-    item.sendToBack()
-    item.position = paper.view.center
-    item.fillRule = "evenodd"
-    item.fillColor = "black"
-    item.closed = true
-
-    coumpoundPathRef.current = item
-
-    return () => {
-      item.remove()
-    }
-  }, [selectedTangram])
 
   const getCompoundPath = () => {
     let compoundPath
