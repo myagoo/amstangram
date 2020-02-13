@@ -9,5 +9,6 @@ export const theme = {
     sq: "#FF9FF3",
     rh: "#54A0FF",
     collision: "#bdc3c7",
+    background: "#b7efe0",
   },
 }

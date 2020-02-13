@@ -10,7 +10,7 @@ const getDistanceBetweenPoints = (pointA, pointB) => {
   )
 }
 
-export const useCreateTan = () => {
+export const useShapes = () => {
   const theme = useContext(ThemeContext)
   const createRhombusGroup = useCallback(
     (size, id) => {
