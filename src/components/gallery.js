@@ -1,17 +1,26 @@
 import React, { useContext } from "react"
-import { useHistory } from "react-router-dom"
-import { CardVerso } from "../components/card"
-import { GalleryContext } from "../components/gallery-provider"
-import { View } from "../components/view"
+import { HEADER_HEIGHT } from "../constants"
+import { CardVerso } from "./card"
+import { GalleryContext } from "./gallery-provider"
+import { View } from "./view"
 
 export const Gallery = () => {
-  const { tangrams, setSelectedTangram } = useContext(GalleryContext)
-  const history = useHistory()
+  const {
+    galleryOpened,
+    setGalleryOpened,
+    tangrams,
+    setSelectedTangram,
+  } = useContext(GalleryContext)
 
   return (
     <View
-      width="100%"
-      height="100%"
+      position="fixed"
+      left="0"
+      top={HEADER_HEIGHT}
+      transform={`translate3d(${galleryOpened ? 0 : "-100vw"}, 0, 0)`}
+      transition="transform .3s"
+      width="100vw"
+      height="100vh"
       background="#ecf0f1"
       display="flex"
       justifyContent="center"
@@ -37,8 +46,8 @@ export const Gallery = () => {
               width={128}
               height={178}
               onClick={() => {
-                history.push("/")
                 setSelectedTangram(tangram.svg)
+                setGalleryOpened(false)
               }}
               style={{
                 cursor: "pointer",

@@ -1,5 +1,6 @@
 import React, { useContext } from "react"
 import { FiSave } from "react-icons/fi"
+import { HEADER_HEIGHT } from "../constants"
 import { Button } from "./button"
 import { GalleryContext } from "./gallery-provider"
 import { Link } from "./link"
@@ -7,7 +8,7 @@ import { Logo } from "./logo"
 import { View } from "./view"
 
 export const Header = () => {
-  const { requestSave } = useContext(GalleryContext)
+  const { requestSave, setGalleryOpened } = useContext(GalleryContext)
   return (
     <View
       background="#fff"
@@ -17,6 +18,7 @@ export const Header = () => {
       justifyContent="center"
     >
       <View
+        height={HEADER_HEIGHT}
         maxWidth={1250}
         width="100%"
         alignSelf="center"
@@ -27,9 +29,13 @@ export const Header = () => {
           <Logo width={300} />
         </Link>
         <View display="flex" alignItems="center">
-          <Link to="/gallery" color="#fff" px={2}>
+          <View
+            onClick={() => setGalleryOpened(opened => !opened)}
+            cursor="pointer"
+            px={2}
+          >
             Gallery
-          </Link>
+          </View>
           <Button
             onClick={requestSave}
             ml={3}

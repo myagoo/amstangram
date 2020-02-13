@@ -4,6 +4,7 @@ const GalleryContext = createContext(null)
 
 const GalleryProvider = ({ children }) => {
   const [tangrams, setTangrams] = useState([])
+  const [galleryOpened, setGalleryOpened] = useState(false)
   const [selectedTangram, setSelectedTangram] = useState(null)
   const [requestId, setRequestId] = useState(0)
 
@@ -24,8 +25,17 @@ const GalleryProvider = ({ children }) => {
       setSelectedTangram,
       requestSave,
       onSaveRequest,
+      galleryOpened,
+      setGalleryOpened,
     }),
-    [tangrams, selectedTangram, requestSave, onSaveRequest]
+    [
+      tangrams,
+      selectedTangram,
+      requestSave,
+      onSaveRequest,
+      galleryOpened,
+      setGalleryOpened,
+    ]
   )
 
   return (
