@@ -1,8 +1,8 @@
 import paper from "paper/dist/paper-core"
 import { useCallback, useContext } from "react"
-import { ThemeContext } from "styled-components"
 import { ERROR_MARGIN } from "../constants"
 import { getOffsettedPoints } from "../utils/get-offsetted-points"
+import { ThemeContext } from "../Theme"
 
 const getDistanceBetweenPoints = (pointA, pointB) => {
   return Math.sqrt(

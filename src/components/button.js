@@ -1,26 +1,33 @@
-import styled from "styled-components"
-import { View } from "./view"
+import React, { useContext } from "react"
+import { useStyle } from "use-style"
+import { ThemeContext } from "../Theme"
 
-export const Button = styled(View).attrs({
-  as: "button",
-  background: "#48DBFB",
-  borderRadius: 5,
-  fontSize: 2,
-  color: "#fff",
-  px: 2,
-  py: 1,
-})`
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
+export const Button = ({ as: Component = "button", css, ...props }) => {
+  const theme = useContext(ThemeContext)
 
-  &:not(:disabled):hover {
-    opacity: 0.6;
-    cursor: pointer;
-  }
+  const className = useStyle(
+    {
+      background: "#48DBFB",
+      borderRadius: 5,
+      fontSize: 2,
+      color: "#fff",
+      px: 2,
+      py: 1,
+      "&:disabled": {
+        opacity: 0.5,
+        cursor: "not-allowed",
+      },
+      "&:not(:disabled):hover": {
+        opacity: 0.6,
+        cursor: "pointer",
+      },
+      "&:focus": {
+        outline: "none",
+      },
+      ...css,
+    },
+    theme
+  )
 
-  &:focus {
-    outline: none;
-  }
-`
+  return <Component className={className} {...props} />
+}
