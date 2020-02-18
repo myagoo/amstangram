@@ -883,6 +883,14 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
+"@css-system/use-css@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@css-system/use-css/-/use-css-0.1.0.tgz#b7d4d3e411d2a835b62ce2e166c000e48d87356c"
+  integrity sha512-+pRvllhsu7+Gbjf4PAnpOZ4VATcg7JZHB28rZVowndb5mcdhWlQxo5giRQ4JDnkgXcH7ozau+km50gf8te+//w==
+  dependencies:
+    hash-sum "^2.0.0"
+    styled-system "^5.1.4"
+
 "@csstools/convert-colors@^1.4.0":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@csstools/convert-colors/-/convert-colors-1.4.0.tgz#ad495dc41b12e75d588c6db8b9834f08fa131eb7"
@@ -10122,13 +10130,6 @@ url@^0.11.0:
   dependencies:
     punycode "1.3.2"
     querystring "0.2.0"
-
-use-style@myagoo/use-style#master:
-  version "0.1.0"
-  resolved "git+ssh://git@github.com/myagoo/use-style.git#e98772f2f0ef819616498629cd0ba0b5c0f45919"
-  dependencies:
-    hash-sum "^2.0.0"
-    styled-system "^5.1.4"
 
 use@^3.1.0:
   version "3.1.1"

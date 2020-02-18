@@ -1,11 +1,12 @@
 import React, { useContext } from "react"
-import { useStyle } from "use-style"
+import { useCss } from "@css-system/use-css"
+
 import { ThemeContext } from "../Theme"
 
 export const Button = ({ as: Component = "button", css, ...props }) => {
   const theme = useContext(ThemeContext)
 
-  const className = useStyle(
+  const className = useCss(
     {
       background: "#48DBFB",
       borderRadius: 5,

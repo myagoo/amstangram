@@ -1,6 +1,6 @@
 import React, { useContext } from "react"
 import { ThemeContext } from "../Theme"
-import { useStyle } from "use-style"
+import { useCss } from "@css-system/use-css"
 
 const createGapRules = (flexDirection, gap) => {
   if (!Array.isArray(flexDirection)) {
@@ -69,7 +69,7 @@ export const View = React.forwardRef(
 
     const theme = useContext(ThemeContext)
 
-    const className = useStyle(
+    const className = useCss(
       gap
         ? {
             ...otherCssProps,
