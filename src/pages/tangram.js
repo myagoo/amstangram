@@ -1,10 +1,10 @@
 import paper from "paper/dist/paper-core"
 import React, { useContext, useLayoutEffect, useRef } from "react"
-import { ThemeContext } from "styled-components"
 import { View } from "../components/view"
 import { OVERLAPING_OPACITY, SMALL_TRIANGLE_BASE } from "../constants"
 import { useGallery } from "../hooks/useGallery"
 import { useShapes } from "../hooks/useShapes"
+import { ThemeContext } from "../Theme"
 
 function contains(item1, item2) {
   return item2.segments.every(segment => item1.contains(segment.point))
@@ -139,14 +139,16 @@ export const Tangram = () => {
 
   return (
     <View
-      flex="1"
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      bg="background"
+      css={{
+        flex: "1",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        bg: "background",
+      }}
     >
-      <View width="50vw" height="80%" background="#fff">
-        <View as="canvas" ref={canvasRef} flex="1" />
+      <View css={{ width: "50vw", height: "80%", background: "#fff" }}>
+        <View as="canvas" ref={canvasRef} css={{ flex: "1" }} />
       </View>
     </View>
   )

@@ -1,16 +1,5 @@
 import React from "react"
-import styled from "styled-components"
 import { View } from "./view"
-
-const Card = styled(View).attrs({
-  borderRadius: 5,
-  boxShadow: "0px 0px 0px 1px rgba(0, 0, 0, 0.1)",
-})``
-
-Card.defaultProps = {
-  width: 200,
-  height: 275,
-}
 
 export const CardVerso = ({ tangram, ...props }) => {
   const difficulty =
@@ -22,39 +11,48 @@ export const CardVerso = ({ tangram, ...props }) => {
       ? "#2e86de"
       : "#ee5253"
   return (
-    <Card
-      background="#fff"
-      p={2}
-      display="flex"
-      flexDirection="column"
-      justifyContent="space-between"
-      textAlign="center"
-      position="relative"
+    <View
+      css={{
+        borderRadius: 5,
+        boxShadow: "0px 0px 0px 1px rgba(0, 0, 0, 0.1)",
+        background: "#fff",
+        p: 2,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        textAlign: "center",
+        position: "relative",
+        cursor: "pointer",
+        width: 128,
+        height: 178,
+      }}
       {...props}
     >
       <View
         as="svg"
-        flex="1"
+        css={{
+          flex: "1",
+        }}
         alt=""
         viewBox={`0 0 ${tangram.width} ${tangram.height}`}
         dangerouslySetInnerHTML={{ __html: tangram.svg }}
         fill={color}
       />
       <View
-        position="absolute"
-        top={0}
-        right="-10px"
-        background={color}
-        color="#fff"
-        borderRadius={10}
-        px={1}
-        py="4px"
-        style={{
+        css={{
+          position: "absolute",
+          top: 0,
+          right: "-10px",
+          background: color,
+          color: "#fff",
+          borderRadius: 10,
+          px: 1,
+          py: "4px",
           transform: "translateY(-50%)",
         }}
       >
         {difficulty}
       </View>
-    </Card>
+    </View>
   )
 }
