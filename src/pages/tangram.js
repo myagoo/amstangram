@@ -53,6 +53,9 @@ export const Tangram = () => {
       }
 
       for (const otherGroup of groupsRef.current) {
+        if (otherGroup === group) {
+          continue
+        }
         if (otherGroup.data.collisions.size > 0) {
           otherGroup.firstChild.fillColor = theme.colors.collision
           otherGroup.firstChild.opacity = OVERLAPING_OPACITY
@@ -63,27 +66,154 @@ export const Tangram = () => {
       }
     }
 
-    function attachEvents(group) {
-      group.on("mousedown", () => group.bringToFront())
+    let anchorPoint = null
+    let snappedToPoint = null
+    let ghostShape = null
+    let point = null
 
-      group.on("mouseup", check)
+    function attachEvents(group) {
+      group.on("mousedown", mdEvent => {
+        anchorPoint = new paper.Point({
+          x: mdEvent.point.x - group.firstChild.position.x,
+          y: mdEvent.point.y - group.firstChild.position.y,
+        })
+
+        point = new paper.Path.Circle({
+          center: mdEvent.point,
+          radius: 3,
+          fillColor: "red",
+        })
+
+        ghostShape = new paper.Path({
+          position: group.firstChild.position,
+          segments: group.firstChild.segments,
+          closed: true,
+          strokeColor: "black",
+          strokeWidth: 2,
+          applyMatrix: true,
+        })
+
+        group.bringToFront()
+      })
+
+      group.on("mouseup", () => {
+        anchorPoint = null
+        ghostShape.remove()
+        ghostShape = null
+        point.remove()
+        point = null
+        check()
+      })
 
       group.on("mousedrag", mdEvent => {
-        const newX = group.position.x + mdEvent.delta.x
-        const newY = group.position.y + mdEvent.delta.y
+        const newAnchorPoint = new paper.Point({
+          x: mdEvent.point.x - group.position.x,
+          y: mdEvent.point.y - group.position.y,
+        })
+        console.log(
+          group.firstChild.position,
+          group.localToGlobal(group.firstChild.position)
+        )
 
-        const isOutsideCanvas =
-          newX - group.bounds.width / 2 <= 0 ||
-          newY - group.bounds.height / 2 <= 0 ||
-          newX + group.bounds.width / 2 > canvasRef.current.offsetWidth ||
-          newY + group.bounds.height / 2 > canvasRef.current.offsetHeight
-
-        if (isOutsideCanvas) {
-          return
+        const vector = {
+          x: newAnchorPoint.x - anchorPoint.x,
+          y: newAnchorPoint.y - anchorPoint.y,
         }
 
-        group.position.x = newX
-        group.position.y = newY
+        // let newX = group.position.x + mdEvent.delta.x
+        // let newY = group.position.y + mdEvent.delta.y
+
+        if (snappedToPoint) {
+          if (newAnchorPoint.getDistance(anchorPoint) < 20) {
+            return
+          } else {
+            snappedToPoint = false
+            group.position.x = ghostShape.position.x
+            group.position.y = ghostShape.position.y
+            return
+          }
+        }
+
+        ghostShape.position = {
+          x: group.firstChild.position.x + vector.x,
+          y: group.firstChild.position.y + vector.y,
+        }
+
+        point.position = newAnchorPoint
+        // console.log(vector, group.position, group.firstChild.position)
+
+        // const isOutsideCanvas =
+        //   newX - group.bounds.width / 2 <= 0 ||
+        //   newY - group.bounds.height / 2 <= 0 ||
+        //   newX + group.bounds.width / 2 > canvasRef.current.offsetWidth ||
+        //   newY + group.bounds.height / 2 > canvasRef.current.offsetHeight
+
+        // if (isOutsideCanvas) {
+        //   return
+        // }
+
+        let smallestDistance = 10
+        let shouldSnapWithVector
+        for (const otherGroup of groupsRef.current) {
+          if (otherGroup === group) {
+            continue
+          }
+          const otherShape = otherGroup.firstChild
+          for (const { point: otherPoint } of otherShape.segments) {
+            for (const { point } of ghostShape.segments) {
+              const distance = point.getDistance(otherPoint)
+              if (distance < smallestDistance) {
+                smallestDistance = distance
+                shouldSnapWithVector = new paper.Point({
+                  x: otherPoint.x - point.x,
+                  y: otherPoint.y - point.y,
+                })
+                snappedToPoint = true
+              }
+            }
+          }
+        }
+
+        if (!shouldSnapWithVector) {
+          for (const otherGroup of groupsRef.current) {
+            if (otherGroup === group) {
+              continue
+            }
+            const otherShape = otherGroup.firstChild
+
+            for (const { point } of ghostShape.segments) {
+              const otherPoint = otherShape.getNearestPoint(point)
+              const distance = otherPoint.getDistance(point)
+              if (distance < smallestDistance) {
+                smallestDistance = distance
+                shouldSnapWithVector = new paper.Point({
+                  x: otherPoint.x - point.x,
+                  y: otherPoint.y - point.y,
+                })
+              }
+            }
+
+            for (const { point: otherPoint } of otherShape.segments) {
+              const point = ghostShape.getNearestPoint(otherPoint)
+              const distance = point.getDistance(otherPoint)
+              if (distance < smallestDistance) {
+                smallestDistance = distance
+                shouldSnapWithVector = new paper.Point({
+                  x: otherPoint.x - point.x,
+                  y: otherPoint.y - point.y,
+                })
+              }
+            }
+          }
+        }
+
+        if (shouldSnapWithVector) {
+          ghostShape.position.x += shouldSnapWithVector.x
+          ghostShape.position.y += shouldSnapWithVector.y
+        }
+
+        group.position.x = ghostShape.position.x
+        group.position.y = ghostShape.position.y
 
         checkForIntersections(group)
       })
@@ -122,10 +252,10 @@ export const Tangram = () => {
         createTriangleGroup(smallBase, "st1"),
         createTriangleGroup(smallBase, "st2"),
         createTriangleGroup(mediumBase, "mt1"),
-        createTriangleGroup(largeBase, "lt1"),
-        createTriangleGroup(largeBase, "lt2"),
-        createSquareGroup(mediumBase, "sq"),
-        createRhombusGroup(smallBase, "rh"),
+        // createTriangleGroup(largeBase, "lt1"),
+        // createTriangleGroup(largeBase, "lt2"),
+        // createSquareGroup(mediumBase, "sq"),
+        // createRhombusGroup(smallBase, "rh"),
       ]
 
       for (const group of groupsRef.current) {
