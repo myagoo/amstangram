@@ -12,7 +12,7 @@ export const useCompoundPath = groupsRef => {
       const offsettedPath = new paper.Path({
         segments: getOffsettedPoints(
           path.segments.map(segment => path.localToGlobal(segment.point)),
-          1
+          0
         ),
         closed: true,
         insert: false,
