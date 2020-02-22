@@ -53,9 +53,6 @@ export const Tangram = () => {
       }
 
       for (const otherGroup of groupsRef.current) {
-        if (otherGroup === group) {
-          continue
-        }
         if (otherGroup.data.collisions.size > 0) {
           otherGroup.firstChild.fillColor = theme.colors.collision
           otherGroup.firstChild.opacity = OVERLAPING_OPACITY
