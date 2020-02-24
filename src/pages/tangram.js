@@ -166,6 +166,55 @@ export const Tangram = () => {
           }
         }
 
+        if (coumpoundPathRef.current) {
+          const paths = coumpoundPathRef.current.children
+            ? coumpoundPathRef.current.children
+            : [coumpoundPathRef.current]
+
+          for (const path of paths) {
+            for (const { point: otherPoint } of path.segments) {
+              for (const { point } of ghostShape.segments) {
+                const distance = point.getDistance(otherPoint)
+                if (distance < smallestDistance) {
+                  smallestDistance = distance
+                  shouldSnapWithVector = new paper.Point({
+                    x: otherPoint.x - point.x,
+                    y: otherPoint.y - point.y,
+                  })
+                }
+              }
+            }
+          }
+
+          if (!shouldSnapWithVector) {
+            for (const path of paths) {
+              for (const { point } of ghostShape.segments) {
+                const otherPoint = path.getNearestPoint(point)
+                const distance = otherPoint.getDistance(point)
+                if (distance < smallestDistance) {
+                  smallestDistance = distance
+                  shouldSnapWithVector = new paper.Point({
+                    x: otherPoint.x - point.x,
+                    y: otherPoint.y - point.y,
+                  })
+                }
+              }
+
+              for (const { point: otherPoint } of path.segments) {
+                const point = ghostShape.getNearestPoint(otherPoint)
+                const distance = point.getDistance(otherPoint)
+                if (distance < smallestDistance) {
+                  smallestDistance = distance
+                  shouldSnapWithVector = new paper.Point({
+                    x: otherPoint.x - point.x,
+                    y: otherPoint.y - point.y,
+                  })
+                }
+              }
+            }
+          }
+        }
+
         if (shouldSnapWithVector) {
           ghostGroup.position.x += shouldSnapWithVector.x
           ghostGroup.position.y += shouldSnapWithVector.y
