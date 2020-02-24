@@ -1,8 +1,8 @@
 import paper from "paper/dist/paper-core"
 import { useCallback, useContext } from "react"
-import { ERROR_MARGIN } from "../constants"
-import { getOffsettedPoints } from "../utils/get-offsetted-points"
+import { ERROR_MARGIN, ERROR_STROKE } from "../constants"
 import { ThemeContext } from "../Theme"
+import { getOffsettedPoints } from "../utils/get-offsetted-points"
 
 const getDistanceBetweenPoints = (pointA, pointB) => {
   return Math.sqrt(
@@ -30,7 +30,7 @@ export const useShapes = () => {
       const inner = new paper.Path({
         segments: getOffsettedPoints(points, -ERROR_MARGIN),
         closed: true,
-        strokeWidth: 2,
+        strokeWidth: ERROR_STROKE,
         strokeColor: theme.colors[id],
       })
 
@@ -57,7 +57,7 @@ export const useShapes = () => {
       const inner = new paper.Path.Rectangle({
         point: [ERROR_MARGIN, ERROR_MARGIN],
         size: [size - ERROR_MARGIN * 2, size - ERROR_MARGIN * 2],
-        strokeWidth: 2,
+        strokeWidth: ERROR_STROKE,
         strokeColor: theme.colors[id],
       })
 
@@ -90,7 +90,7 @@ export const useShapes = () => {
       const inner = new paper.Path({
         segments: getOffsettedPoints(points, -ERROR_MARGIN),
         closed: true,
-        strokeWidth: 2,
+        strokeWidth: ERROR_STROKE,
         strokeColor: theme.colors[id],
       })
 
