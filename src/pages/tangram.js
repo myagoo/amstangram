@@ -112,6 +112,7 @@ export const Tangram = () => {
         // }
 
         let smallestDistance = 10
+
         let shouldSnapWithVector
         const ghostShape = ghostGroup.firstChild
         for (const otherGroup of groupsRef.current) {
