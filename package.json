@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "clean": "rm -rf .cache public images",
+    "build": "gatsby build",
+    "dev": "gatsby develop",
+    "serve": "gatsby serve"
   },
   "homepage": "http://myagoo.github.io/amstangram",
   "eslintConfig": {
@@ -25,12 +25,20 @@
     ]
   },
   "dependencies": {
-    "@css-system/use-css": "^0.1.0",
+    "@css-system/use-css": "^0.2.0",
+    "body-parser": "^1.19.0",
+    "gatsby": "^2.19.21",
+    "gatsby-plugin-manifest": "^2.2.42",
+    "gatsby-plugin-offline": "^3.0.35",
+    "gatsby-plugin-react-helmet": "^3.1.22",
+    "gatsby-source-filesystem": "^2.1.48",
+    "gatsby-transformer-svg": "^1.0.0",
     "paper": "^0.12.4",
+    "paper-jsdom": "^0.12.4",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "react-icons": "^3.8.0",
-    "react-router-dom": "^5.1.2",
-    "react-scripts": "3.3.0"
+    "react-helmet": "^5.2.1",
+    "react-icons": "^3.9.0",
+    "react-router-dom": "^5.1.2"
   }
 }

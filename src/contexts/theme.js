@@ -1,6 +1,6 @@
-import { createContext } from "react"
+import React, { createContext, useMemo } from "react"
 
-export const theme = {
+const theme = {
   space: [0, 8, 16, 32, 64, 128],
   colors: {
     st1: "#FECA57",
@@ -16,3 +16,11 @@ export const theme = {
 }
 
 export const ThemeContext = createContext(theme)
+export const ThemeProvider = ({ children }) => {
+  const contextValue = useMemo(() => theme, [])
+  return (
+    <ThemeContext.Provider value={contextValue}>
+      {children}
+    </ThemeContext.Provider>
+  )
+}

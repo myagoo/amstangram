@@ -1,5 +1,5 @@
 import React, { useContext } from "react"
-import { ThemeContext } from "../Theme"
+import { ThemeContext } from "../contexts/theme"
 
 export const Logo = props => {
   const theme = useContext(ThemeContext)

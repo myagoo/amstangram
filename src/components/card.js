@@ -1,15 +1,15 @@
 import React from "react"
 import { View } from "./view"
 
-export const CardVerso = ({ tangram, ...props }) => {
-  const difficulty =
-    tangram.percent > 50 ? "Easy" : tangram.percent > 20 ? "Medium" : "Hard"
+export const CardVerso = ({ svg, difficulty, ...props }) => {
   const color =
     difficulty === "Easy"
       ? "#10ac84"
       : difficulty === "Medium"
       ? "#2e86de"
-      : "#ee5253"
+      : difficulty === "Hard"
+      ? "#ee5253"
+      : "gray"
   return (
     <View
       css={{
@@ -29,14 +29,15 @@ export const CardVerso = ({ tangram, ...props }) => {
       {...props}
     >
       <View
-        as="svg"
         css={{
+          display: "flex",
           flex: "1",
+          "& > *": {
+            width: "100%",
+            fill: color,
+          },
         }}
-        alt=""
-        viewBox={`0 0 ${tangram.width} ${tangram.height}`}
-        dangerouslySetInnerHTML={{ __html: tangram.svg }}
-        fill={color}
+        dangerouslySetInnerHTML={{ __html: svg }}
       />
       <View
         css={{

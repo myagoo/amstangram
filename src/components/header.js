@@ -1,8 +1,8 @@
 import React, { useContext } from "react"
 import { FiSave } from "react-icons/fi"
 import { HEADER_HEIGHT } from "../constants"
+import { GalleryContext } from "../contexts/gallery"
 import { Button } from "./button"
-import { GalleryContext } from "./gallery-provider"
 import { Logo } from "./logo"
 import { View } from "./view"
 
@@ -46,21 +46,23 @@ export const Header = () => {
           >
             Gallery
           </View>
-          <Button
-            onClick={requestSave}
-            css={{
-              ml: 3,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <View
-              as={FiSave}
-              css={{ fontSize: "30px", display: "block", color: "#fff" }}
-            />
-            <View css={{ ml: 1 }}>Enregistrer dans la gallery</View>
-          </Button>
+          {process.env.NODE_ENV === "development" && (
+            <Button
+              onClick={requestSave}
+              css={{
+                ml: 3,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <View
+                as={FiSave}
+                css={{ fontSize: "30px", display: "block", color: "#fff" }}
+              />
+              <View css={{ ml: 1 }}>Enregistrer dans la gallery</View>
+            </Button>
+          )}
         </View>
       </View>
     </View>

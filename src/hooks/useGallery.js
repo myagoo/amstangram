@@ -1,11 +1,11 @@
 import paper from "paper/dist/paper-core"
 import { useContext, useEffect } from "react"
-import { GalleryContext } from "../components/gallery-provider"
-import { useCompoundPath } from "./useGetCompoundPath"
+import { GalleryContext } from "../contexts/gallery"
+import { getSvg } from "../utils/get-svg"
+import { isValidTangram } from "../utils/is-valid-tangram"
 
 export const useGallery = (coumpoundPathRef, groupsRef) => {
   const { onSaveRequest, selectedTangram } = useContext(GalleryContext)
-  const { getCompoundPath } = useCompoundPath(groupsRef)
 
   // Import
   useEffect(() => {
@@ -30,7 +30,15 @@ export const useGallery = (coumpoundPathRef, groupsRef) => {
   // Save
   useEffect(() => {
     if (onSaveRequest) {
-      onSaveRequest(getCompoundPath())
+      if (isValidTangram(groupsRef)) {
+        fetch(`/save`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ svg: getSvg(groupsRef) }),
+        })
+      } else {
+        alert("Tangram is not valid")
+      }
     }
-  }, [onSaveRequest, getCompoundPath])
+  }, [onSaveRequest, groupsRef])
 }

@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useMemo, useState } from "react"
 
-const GalleryContext = createContext(null)
+const GalleryContext = createContext({})
 
 const GalleryProvider = ({ children }) => {
   const [tangrams, setTangrams] = useState([])

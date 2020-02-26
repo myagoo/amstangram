@@ -2,24 +2,25 @@ import paper from "paper/dist/paper-core"
 import React, { useContext, useLayoutEffect, useRef } from "react"
 import { View } from "../components/view"
 import { OVERLAPING_OPACITY, SMALL_TRIANGLE_BASE } from "../constants"
+import { ThemeContext } from "../contexts/theme"
 import { useGallery } from "../hooks/useGallery"
-import { useShapes } from "../hooks/useShapes"
-import { ThemeContext } from "../Theme"
+import { Layout } from "../layouts"
+import {
+  createRhombus,
+  createSquare,
+  createTriangle,
+} from "../utils/create-tans"
 
 function contains(item1, item2) {
   return item2.segments.every(segment => item1.contains(segment.point))
 }
 
-export const Tangram = () => {
+export default () => {
   const theme = useContext(ThemeContext)
   const canvasRef = useRef()
   const groupsRef = useRef()
   const coumpoundPathRef = useRef()
-  const {
-    createRhombusGroup,
-    createSquareGroup,
-    createTriangleGroup,
-  } = useShapes()
+
   useGallery(coumpoundPathRef, groupsRef)
 
   useLayoutEffect(() => {
@@ -247,7 +248,7 @@ export const Tangram = () => {
         })
       }
       if (newCoumpoundPath.length === coumpoundPathRef.current.length) {
-        alert("YOU WIN MOTHERFUCKER")
+        alert("👏🏻VICTORY 💪🏻")
       }
     }
 
@@ -257,13 +258,13 @@ export const Tangram = () => {
       const largeBase = Math.sqrt(Math.pow(mediumBase, 2) * 2)
 
       groupsRef.current = [
-        createTriangleGroup(smallBase, "st1"),
-        createTriangleGroup(smallBase, "st2"),
-        createTriangleGroup(mediumBase, "mt1"),
-        createTriangleGroup(largeBase, "lt1"),
-        createTriangleGroup(largeBase, "lt2"),
-        createSquareGroup(mediumBase, "sq"),
-        createRhombusGroup(smallBase, "rh"),
+        createTriangle(smallBase, "st1", theme.colors["st1"]),
+        createTriangle(smallBase, "st2", theme.colors["st2"]),
+        createTriangle(mediumBase, "mt1", theme.colors["mt1"]),
+        createTriangle(largeBase, "lt1", theme.colors["lt1"]),
+        createTriangle(largeBase, "lt2", theme.colors["lt2"]),
+        createSquare(mediumBase, "sq", theme.colors["sq"]),
+        createRhombus(smallBase, "rh", theme.colors["rh"]),
       ]
 
       for (const group of groupsRef.current) {
@@ -273,21 +274,23 @@ export const Tangram = () => {
     }
 
     init()
-  }, [createRhombusGroup, createSquareGroup, createTriangleGroup, theme.colors])
+  }, [theme.colors])
 
   return (
-    <View
-      css={{
-        flex: "1",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        bg: "background",
-      }}
-    >
-      <View css={{ width: "50vw", height: "80%", background: "#fff" }}>
-        <View as="canvas" ref={canvasRef} css={{ flex: "1" }} />
+    <Layout>
+      <View
+        css={{
+          flex: "1",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          bg: "background",
+        }}
+      >
+        <View css={{ width: "50vw", height: "80%", background: "#fff" }}>
+          <View as="canvas" ref={canvasRef} css={{ flex: "1" }} />
+        </View>
       </View>
-    </View>
+    </Layout>
   )
 }
