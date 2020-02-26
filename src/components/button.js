@@ -1,7 +1,6 @@
-import React, { useContext } from "react"
 import { useCss } from "@css-system/use-css"
-
-import { ThemeContext } from "../Theme"
+import React, { useContext } from "react"
+import { ThemeContext } from "../contexts/theme"
 
 export const Button = ({ as: Component = "button", css, ...props }) => {
   const theme = useContext(ThemeContext)

@@ -1,6 +1,6 @@
-import React, { useContext } from "react"
-import { ThemeContext } from "../Theme"
 import { useCss } from "@css-system/use-css"
+import React, { useContext } from "react"
+import { ThemeContext } from "../contexts/theme"
 
 const createGapRules = (flexDirection, gap) => {
   if (!Array.isArray(flexDirection)) {
