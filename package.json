@@ -6,7 +6,8 @@
     "clean": "rm -rf .cache public images",
     "build": "gatsby build",
     "dev": "gatsby develop",
-    "serve": "gatsby serve"
+    "serve": "gatsby serve",
+    "deploy": "gh-pages -d public"
   },
   "homepage": "http://myagoo.github.io/amstangram",
   "eslintConfig": {
@@ -33,6 +34,7 @@
     "gatsby-plugin-react-helmet": "^3.1.22",
     "gatsby-source-filesystem": "^2.1.48",
     "gatsby-transformer-svg": "^1.0.0",
+    "gh-pages": "^2.2.0",
     "paper": "^0.12.4",
     "paper-jsdom": "^0.12.4",
     "react": "^16.12.0",
