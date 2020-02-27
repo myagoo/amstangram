@@ -1,10 +1,11 @@
 import paper from "paper/dist/paper-core"
 import React, { useContext, useLayoutEffect, useRef } from "react"
+import { Gallery } from "../components/gallery"
+import { Header } from "../components/header"
 import { View } from "../components/view"
 import { OVERLAPING_OPACITY, SMALL_TRIANGLE_BASE } from "../constants"
 import { ThemeContext } from "../contexts/theme"
 import { useGallery } from "../hooks/useGallery"
-import { Layout } from "../layouts"
 import {
   createRhombus,
   createSquare,
@@ -31,7 +32,22 @@ export default () => {
 
       // Create an empty project and a view for the canvas:
       paper.setup(canvasRef.current)
+
+      const minSize = Math.min(
+        canvasRef.current.width,
+        canvasRef.current.height
+      )
+
       setupPieces()
+      const scaleFactor = minSize / window.devicePixelRatio / 640
+
+      const newBounds = {
+        ...paper.project.view.bounds,
+        width: groupsRef.current[3].bounds.width * scaleFactor,
+        height: groupsRef.current[3].bounds.height * scaleFactor,
+      }
+
+      paper.project.activeLayer.fitBounds(newBounds)
     }
 
     const checkForIntersections = group => {
@@ -97,10 +113,8 @@ export default () => {
           y: newAnchorPoint.y - anchorPoint.y,
         })
 
-        ghostGroup.position = new paper.Point({
-          x: group.position.x + vector.x,
-          y: group.position.y + vector.y,
-        })
+        const newX = group.position.x + vector.x
+        const newY = group.position.y + vector.y
 
         // const isOutsideCanvas =
         //   newX - group.bounds.width / 2 <= 0 ||
@@ -111,6 +125,11 @@ export default () => {
         // if (isOutsideCanvas) {
         //   return
         // }
+
+        ghostGroup.position = new paper.Point({
+          x: newX,
+          y: newY,
+        })
 
         let smallestDistance = 10
 
@@ -277,20 +296,46 @@ export default () => {
   }, [theme.colors])
 
   return (
-    <Layout>
+    <View
+      css={{
+        display: "flex",
+        height: "100vh",
+        width: "100vw",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
+      <Header />
       <View
         css={{
-          flex: "1",
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          bg: "background",
+          flexDirection: "column",
+          flex: 1,
+          position: "relative",
         }}
       >
-        <View css={{ width: "50vw", height: "80%", background: "#fff" }}>
-          <View as="canvas" ref={canvasRef} css={{ flex: "1" }} />
+        <View
+          css={{
+            flex: "1",
+            bg: "background",
+            p: [0, 2],
+            alignItems: "center",
+          }}
+        >
+          <View
+            as="canvas"
+            ref={canvasRef}
+            css={{
+              width: "50vw",
+              flex: 1,
+              minWidth: ["100%", "40em"],
+              background: "#fff",
+            }}
+            resize="true"
+          />
         </View>
+        <Gallery />
       </View>
-    </Layout>
+    </View>
   )
 }

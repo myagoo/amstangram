@@ -7,12 +7,12 @@ export const Button = ({ as: Component = "button", css, ...props }) => {
 
   const className = useCss(
     {
-      background: "#48DBFB",
-      borderRadius: 5,
+      bg: "mt1",
+      border: 0,
+      borderRadius: "50%",
       fontSize: 2,
       color: "#fff",
-      px: 2,
-      py: 1,
+      p: 1,
       "&:disabled": {
         opacity: 0.5,
         cursor: "not-allowed",

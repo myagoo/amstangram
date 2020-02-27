@@ -23,7 +23,12 @@ export default function HTML(props) {
                   "Helvetica Neue", sans-serif;
                 -webkit-font-smoothing: antialiased;
                 -moz-osx-font-smoothing: grayscale;
-              }`,
+              }
+              
+              * {
+                box-sizing: border-box;
+              }
+            `,
           }}
         />
 
