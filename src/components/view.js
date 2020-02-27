@@ -56,14 +56,14 @@ const createGapRules = (flexDirection, gap) => {
 export const View = React.forwardRef(
   ({ as: Component = "div", css, deps, ...props }, ref) => {
     const { gap, ...otherCssProps } = {
-      // display: "flex",
-      // minWidth: 0,
-      // minHeight: 0,
-      // flex: "none",
-      // alignSelf: "auto",
-      // alignItems: "stretch",
-      // flexDirection: "column",
-      // justifyContent: "flex-start",
+      display: "flex",
+      minWidth: 0,
+      minHeight: 0,
+      flex: "none",
+      alignSelf: "auto",
+      alignItems: "stretch",
+      flexDirection: "column",
+      justifyContent: "flex-start",
       ...css,
     }
 

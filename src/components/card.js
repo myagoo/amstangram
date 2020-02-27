@@ -17,9 +17,6 @@ export const CardVerso = ({ svg, difficulty, ...props }) => {
         boxShadow: "0px 0px 0px 1px rgba(0, 0, 0, 0.1)",
         background: "#fff",
         p: 2,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
         textAlign: "center",
         position: "relative",
         cursor: "pointer",
@@ -30,8 +27,8 @@ export const CardVerso = ({ svg, difficulty, ...props }) => {
     >
       <View
         css={{
-          display: "flex",
           flex: "1",
+          justifyContent: "center",
           "& > *": {
             width: "100%",
             fill: color,

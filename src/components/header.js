@@ -13,9 +13,6 @@ export const Header = () => {
       css={{
         background: "#fff",
         borderTop: "10px solid #FF9FF3",
-        width: "100%",
-        display: "flex",
-        justifyContent: "center",
       }}
     >
       <View
@@ -24,16 +21,16 @@ export const Header = () => {
           maxWidth: 1250,
           width: "100%",
           alignSelf: "center",
-          display: "flex",
+          flexDirection: "row",
           justifyContent: "space-between",
         }}
       >
-        <View css={{ color: "#fff", py: 2 }}>
+        <View css={{ color: "#fff", py: 2, alignSelf: "center" }}>
           <Logo width={300} />
         </View>
         <View
           css={{
-            display: "flex",
+            flexDirection: "row",
             alignItems: "center",
           }}
         >
@@ -56,10 +53,7 @@ export const Header = () => {
                 justifyContent: "center",
               }}
             >
-              <View
-                as={FiSave}
-                css={{ fontSize: "30px", display: "block", color: "#fff" }}
-              />
+              <View as={FiSave} css={{ fontSize: "30px", color: "#fff" }} />
               <View css={{ ml: 1 }}>Enregistrer dans la gallery</View>
             </Button>
           )}
