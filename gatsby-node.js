@@ -10,6 +10,7 @@ exports.onCreateDevServer = ({ app }) => {
       path.join(process.cwd(), "tangrams", Date.now() + ".svg"),
       req.body.svg
     )
+    res.sendStatus(200)
   })
 }
 

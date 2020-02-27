@@ -319,7 +319,7 @@ export default () => {
           css={{
             flex: "1",
             bg: "background",
-            p: [0, 2],
+            p: { _: 0, s: 2 },
             alignItems: "center",
           }}
         >
@@ -329,7 +329,7 @@ export default () => {
             css={{
               width: "50vw",
               flex: 1,
-              minWidth: ["100%", "40em"],
+              minWidth: { _: "100%", s: "40em" },
               background: "#fff",
             }}
             resize="true"

@@ -946,12 +946,16 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@css-system/use-css@^0.2.0":
+"@css-system/gatsby-plugin-css-system@^0.2.0":
   version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@css-system/use-css/-/use-css-0.2.0.tgz#0016206aa3603477d93029cb8876a332a172a15c"
-  integrity sha512-U/4/wFa/Wuo4aMi8bw3rrFcKXj0VQfpbGFNghm4HhOts8Imssk0ZEU3uTpk+oed1CS6X2N8wPfdo/nMB4UsWwg==
+  resolved "https://registry.yarnpkg.com/@css-system/gatsby-plugin-css-system/-/gatsby-plugin-css-system-0.2.0.tgz#2ffc121bbfb4eb462a63083fd3637a90b2c52115"
+  integrity sha512-Rfb8WrE1J3mAAE3YLT8TjoKBxb7/dZC/GO8KdjQq54Avfh5VQ1dhmlMHJfsR7I1czD6u9FFftalrfEU3KPhyVQ==
+
+"@css-system/use-css@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@css-system/use-css/-/use-css-0.3.0.tgz#572d7ef85ea430e631d479421b11507d3570b161"
+  integrity sha512-0ALsEDnYOMgnn1QpyqzS2qnRj+zIwu3m+FaYH2o9h+U4EdEs5jBFcLYfpN6KecGyuA180GzQv2bKcFwSVVdapA==
   dependencies:
-    "@styled-system/css" "^5.1.4"
     hash-sum "^2.0.0"
 
 "@hapi/address@2.x.x":
@@ -1041,11 +1045,6 @@
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.7.0.tgz#9a06f4f137ee84d7df0460c1fdb1135ffa6c50fd"
   integrity sha512-ONhaKPIufzzrlNbqtWFFd+jlnemX6lJAgq9ZeiZtS7I1PIf/la7CW4m83rTXRnVnsMbW2k56pGYu7AUFJD9Pow==
-
-"@styled-system/css@^5.1.4":
-  version "5.1.4"
-  resolved "https://registry.yarnpkg.com/@styled-system/css/-/css-5.1.4.tgz#fc51d0789a69b3831e00e6f8daf9f1d345eebdc3"
-  integrity sha512-79IFT37Kxb6dlbx/0hwIGOakNHkK5oU3cMypGziShnEK8WMgK/+vuAi4MHO7uLI+FZ5U8MGYvGY9Gtk0mBzxSg==
 
 "@szmarczak/http-timer@^1.1.2":
   version "1.1.2"
@@ -4837,11 +4836,6 @@ gatsby-page-utils@^0.0.39:
     glob "^7.1.6"
     lodash "^4.17.15"
     micromatch "^3.1.10"
-
-gatsby-plugin-css-system@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/gatsby-plugin-css-system/-/gatsby-plugin-css-system-0.1.0.tgz#664a23f848a4c085cb2d213272fa21a77aa476a2"
-  integrity sha512-6LxaR8Kd8wV8DYUAGzGqey0RJ7MGdIuOn0AoqkLqSmWBeJE87WngbdCwqoZ9A/KwpcJ/t+9lvDSJ5ErerAp10A==
 
 gatsby-plugin-manifest@^2.2.42:
   version "2.2.42"

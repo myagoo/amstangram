@@ -8,7 +8,7 @@ module.exports = {
       },
     },
     "gatsby-transformer-svg",
-    "gatsby-plugin-css-system",
+    "@css-system/gatsby-plugin-css-system",
     {
       resolve: "gatsby-plugin-manifest",
       options: {
