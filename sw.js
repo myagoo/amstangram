@@ -12,7 +12,7 @@
  */
 
 importScripts("workbox-v4.3.1/workbox-sw.js");
-workbox.setConfig({modulePathPrefix: "workbox-v4.3.1"});
+workbox.setConfig({modulePathPrefix: "workbox-v4.3.1", debug: true});
 
 workbox.core.setCacheNameDetails({prefix: "gatsby-plugin-offline"});
 
@@ -27,20 +27,20 @@ workbox.core.clientsClaim();
  */
 self.__precacheManifest = [
   {
-    "url": "webpack-runtime-9877f218e3843e2737c7.js"
+    "url": "webpack-runtime-2f2a1795ec78b24f268e.js"
   },
   {
     "url": "commons-f663b04f50290ef7b486.js"
   },
   {
-    "url": "app-4bc8066439883e6e08a9.js"
+    "url": "app-31b75ba809aa8ee4f997.js"
   },
   {
     "url": "component---node-modules-gatsby-plugin-offline-app-shell-js-f3f35f6ef3789022665d.js"
   },
   {
     "url": "offline-plugin-app-shell-fallback/index.html",
-    "revision": "3593ef8448e10ccc611eb3c840666e87"
+    "revision": "eb890b96f0e9bfdd8c86045ed3c224ca"
   },
   {
     "url": "clipper_unminified.js"
@@ -140,7 +140,7 @@ const navigationRoute = new NavigationRoute(async ({ event }) => {
   // Check for resources + the app bundle
   // The latter may not exist if the SW is updating to a new version
   const resources = await idbKeyval.get(`resources:${pathname}`)
-  if (!resources || !(await caches.match(`/app-4bc8066439883e6e08a9.js`))) {
+  if (!resources || !(await caches.match(`/app-31b75ba809aa8ee4f997.js`))) {
     return await fetch(event.request)
   }
 
