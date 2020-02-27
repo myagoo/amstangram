@@ -7,9 +7,10 @@
     "build": "gatsby build",
     "dev": "gatsby develop",
     "serve": "gatsby serve",
+    "predeploy": "yarn build",
     "deploy": "gh-pages -d public"
   },
-  "homepage": "http://myagoo.github.io/amstangram",
+  "homepage": "https://www.amstangr.am/",
   "eslintConfig": {
     "extends": "react-app"
   },
@@ -29,6 +30,7 @@
     "@css-system/use-css": "^0.2.0",
     "body-parser": "^1.19.0",
     "gatsby": "^2.19.21",
+    "gatsby-plugin-css-system": "^0.1.0",
     "gatsby-plugin-manifest": "^2.2.42",
     "gatsby-plugin-offline": "^3.0.35",
     "gatsby-plugin-react-helmet": "^3.1.22",

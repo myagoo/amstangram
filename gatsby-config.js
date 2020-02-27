@@ -1,22 +1,23 @@
 module.exports = {
   plugins: [
     {
-      resolve: `gatsby-source-filesystem`,
+      resolve: "gatsby-source-filesystem",
       options: {
         path: `${__dirname}/tangrams`,
-        name: `tangrams`,
+        name: "tangrams",
       },
     },
-    `gatsby-transformer-svg`,
+    "gatsby-transformer-svg",
+    "gatsby-plugin-css-system",
     {
-      resolve: `gatsby-plugin-manifest`,
+      resolve: "gatsby-plugin-manifest",
       options: {
-        name: `Amstangram`,
-        short_name: `Amstangram`,
-        start_url: `/`,
-        background_color: `#ffffff`,
-        theme_color: `#1DD1A1`,
-        display: `standalone`,
+        name: "Amstangram",
+        short_name: "Amstangram",
+        start_url: "/",
+        background_color: "#ffffff",
+        theme_color: "#1DD1A1",
+        display: "standalone",
         icons: [
           {
             src: "icons/icon-72x72.png",
@@ -61,7 +62,7 @@ module.exports = {
         ],
       },
     },
-    `gatsby-plugin-offline`,
-    `gatsby-plugin-react-helmet`,
+    "gatsby-plugin-offline",
+    "gatsby-plugin-react-helmet",
   ],
 }
