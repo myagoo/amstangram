@@ -22,7 +22,7 @@ export default () => {
   const groupsRef = useRef()
   const coumpoundPathRef = useRef()
 
-  useGallery(coumpoundPathRef, groupsRef)
+  useGallery(canvasRef, coumpoundPathRef, groupsRef)
 
   useLayoutEffect(() => {
     function init() {
@@ -39,6 +39,7 @@ export default () => {
       )
 
       setupPieces()
+
       const scaleFactor = minSize / window.devicePixelRatio / 640
 
       const newBounds = {

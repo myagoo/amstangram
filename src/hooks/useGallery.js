@@ -4,7 +4,7 @@ import { GalleryContext } from "../contexts/gallery"
 import { getSvg } from "../utils/get-svg"
 import { isValidTangram } from "../utils/is-valid-tangram"
 
-export const useGallery = (coumpoundPathRef, groupsRef) => {
+export const useGallery = (canvasRef, coumpoundPathRef, groupsRef) => {
   const { onSaveRequest, selectedTangram } = useContext(GalleryContext)
 
   // Import
@@ -12,20 +12,26 @@ export const useGallery = (coumpoundPathRef, groupsRef) => {
     if (!selectedTangram) {
       return
     }
+    const minSize = Math.min(canvasRef.current.width, canvasRef.current.height)
 
-    const item = paper.project.importSVG(selectedTangram, {})
+    const scaleFactor = minSize / window.devicePixelRatio / 640
+
+    const item = paper.project.importSVG(selectedTangram, {
+      applyMatrix: true,
+    })
     item.sendToBack()
     item.position = paper.view.center
     item.fillRule = "evenodd"
     item.fillColor = "black"
     item.closed = true
+    item.scale(scaleFactor)
 
     coumpoundPathRef.current = item
 
     return () => {
       item.remove()
     }
-  }, [coumpoundPathRef, selectedTangram])
+  }, [canvasRef, coumpoundPathRef, selectedTangram])
 
   // Save
   useEffect(() => {
