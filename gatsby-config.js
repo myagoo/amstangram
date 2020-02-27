@@ -62,7 +62,12 @@ module.exports = {
         ],
       },
     },
-    "gatsby-plugin-offline",
+    {
+      resolve: "gatsby-plugin-offline",
+      options: {
+        debug: true,
+      },
+    },
     "gatsby-plugin-react-helmet",
   ],
 }

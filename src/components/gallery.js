@@ -1,6 +1,5 @@
 import { graphql, StaticQuery } from "gatsby"
 import React, { useContext } from "react"
-import { HEADER_HEIGHT } from "../constants"
 import { GalleryContext } from "../contexts/gallery"
 import { CardVerso } from "./card"
 import { View } from "./view"
@@ -27,7 +26,6 @@ export const Gallery = () => {
           css={{
             position: "fixed",
             left: "0",
-            top: HEADER_HEIGHT,
             transform: `translate3d(${galleryOpened ? 0 : "-100vw"}, 0, 0)`,
             transition: "transform .3s",
             width: "100vw",
