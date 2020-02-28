@@ -6,6 +6,7 @@
     "clean": "rm -rf .cache public images",
     "build": "gatsby build",
     "dev": "gatsby develop",
+    "preserve": "yarn build",
     "serve": "gatsby serve",
     "predeploy": "yarn build",
     "deploy": "gh-pages -d public"
