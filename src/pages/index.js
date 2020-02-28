@@ -1,10 +1,10 @@
+import { ThemeContext } from "@css-system/use-css"
 import paper from "paper/dist/paper-core"
 import React, { useContext, useLayoutEffect, useRef } from "react"
 import { Gallery } from "../components/gallery"
 import { Header } from "../components/header"
 import { View } from "../components/view"
 import { OVERLAPING_OPACITY, SMALL_TRIANGLE_BASE } from "../constants"
-import { ThemeContext } from "../contexts/theme"
 import { useGallery } from "../hooks/useGallery"
 import {
   createRhombus,

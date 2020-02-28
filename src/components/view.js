@@ -1,9 +1,8 @@
-import { useCss } from "@css-system/use-css"
-import React, { useContext } from "react"
-import { ThemeContext } from "../contexts/theme"
+import { useCss, ThemeContext } from "@css-system/use-css"
+import React, { useContext, useMemo } from "react"
 
-const createGapRules = (flexDirection, gap) => {
-  if (!Array.isArray(flexDirection)) {
+const createGapRules = (flexDirection, gap, theme) => {
+  if (typeof flexDirection === "string") {
     const isDirectionVertical =
       flexDirection === "column" || flexDirection === "column-reverse"
 
@@ -17,20 +16,32 @@ const createGapRules = (flexDirection, gap) => {
   let lastFlexDirection
   let lastGap
 
-  const gaps = Array.isArray(gap) ? gap : [gap]
+  const gaps = typeof gap === "object" ? gap : { _: gap }
   const flexDirections = flexDirection
+  const mergedBreakpointsSet = new Set([
+    ...Object.keys(flexDirections),
+    ...Object.keys(gaps),
+  ])
 
-  const breakpointsLength = Math.max(flexDirections.length, gaps.length)
+  const marginTops = {}
+  const marginLefts = {}
+  const themeBreakpoints = ["_", ...Object.keys(theme.breakpoints)]
 
-  const marginTops = new Array(breakpointsLength)
-  const marginLefts = new Array(breakpointsLength)
+  for (const themeBreakpoint of themeBreakpoints) {
+    if (mergedBreakpointsSet.has(themeBreakpoint) === false) {
+      continue
+    }
 
-  for (let index = 0; index < breakpointsLength; index++) {
+    const mergedBreakpoint = themeBreakpoint
+
     const directionForCurrentBreakPoint =
-      flexDirections[index] != null ? flexDirections[index] : lastFlexDirection
+      flexDirections[mergedBreakpoint] != null
+        ? flexDirections[mergedBreakpoint]
+        : lastFlexDirection
     lastFlexDirection = directionForCurrentBreakPoint
 
-    const gapForCurrentBreakpoint = gaps[index] != null ? gaps[index] : lastGap
+    const gapForCurrentBreakpoint =
+      gaps[mergedBreakpoint] != null ? gaps[mergedBreakpoint] : lastGap
     lastGap = gapForCurrentBreakpoint
 
     const isDirectionVertical =
@@ -38,13 +49,14 @@ const createGapRules = (flexDirection, gap) => {
       directionForCurrentBreakPoint === "column-reverse"
 
     if (isDirectionVertical) {
-      marginTops[index] = gapForCurrentBreakpoint
-      marginLefts[index] = 0
+      marginTops[mergedBreakpoint] = gapForCurrentBreakpoint
+      marginLefts[mergedBreakpoint] = 0
     } else {
-      marginTops[index] = 0
-      marginLefts[index] = gapForCurrentBreakpoint
+      marginLefts[mergedBreakpoint] = gapForCurrentBreakpoint
+      marginTops[mergedBreakpoint] = 0
     }
   }
+
   return {
     "& > * + *": {
       mt: marginTops,
@@ -54,7 +66,7 @@ const createGapRules = (flexDirection, gap) => {
 }
 
 export const View = React.forwardRef(
-  ({ as: Component = "div", css, deps, ...props }, ref) => {
+  ({ as: Component = "div", css, deps = [], ...props }, ref) => {
     const { gap, ...otherCssProps } = {
       display: "flex",
       minWidth: 0,
@@ -69,14 +81,19 @@ export const View = React.forwardRef(
 
     const theme = useContext(ThemeContext)
 
+    const gapCssProps = useMemo(() => {
+      if (gap) {
+        return createGapRules(otherCssProps.flexDirection, gap, theme)
+      }
+    }, [gap, otherCssProps.flexDirection, theme])
+
     const className = useCss(
       gap
         ? {
             ...otherCssProps,
-            ...createGapRules(otherCssProps.flexDirection, gap),
+            ...gapCssProps,
           }
         : otherCssProps,
-      theme,
       deps
     )
 
