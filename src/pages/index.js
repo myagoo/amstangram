@@ -117,16 +117,6 @@ export default () => {
         const newX = group.position.x + vector.x
         const newY = group.position.y + vector.y
 
-        // const isOutsideCanvas =
-        //   newX - group.bounds.width / 2 <= 0 ||
-        //   newY - group.bounds.height / 2 <= 0 ||
-        //   newX + group.bounds.width / 2 > canvasRef.current.offsetWidth ||
-        //   newY + group.bounds.height / 2 > canvasRef.current.offsetHeight
-
-        // if (isOutsideCanvas) {
-        //   return
-        // }
-
         ghostGroup.position = new paper.Point({
           x: newX,
           y: newY,
@@ -240,6 +230,29 @@ export default () => {
         if (shouldSnapWithVector) {
           ghostGroup.position.x += shouldSnapWithVector.x
           ghostGroup.position.y += shouldSnapWithVector.y
+        }
+
+        if (ghostGroup.bounds.x < 0) {
+          ghostGroup.position.x = ghostGroup.bounds.width / 2
+        }
+        if (ghostGroup.bounds.y < 0) {
+          ghostGroup.position.y = ghostGroup.bounds.height / 2
+        }
+
+        if (
+          ghostGroup.bounds.x + ghostGroup.bounds.width >
+          canvasRef.current.width
+        ) {
+          ghostGroup.position.x =
+            canvasRef.current.width - ghostGroup.bounds.width / 2
+        }
+
+        if (
+          ghostGroup.bounds.y + ghostGroup.bounds.height >
+          canvasRef.current.height
+        ) {
+          ghostGroup.position.y =
+            canvasRef.current.height - ghostGroup.bounds.height / 2
         }
 
         group.position = ghostGroup.position
