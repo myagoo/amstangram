@@ -946,10 +946,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@css-system/gatsby-plugin-css-system@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@css-system/gatsby-plugin-css-system/-/gatsby-plugin-css-system-0.3.0.tgz#3e6813c7b0360bc8967b338c1e234dc0d4471f84"
-  integrity sha512-NMoWME4wp3iYIflvzvUPDfIVarOB3PjRw/v5Wrehs9Bz8toqO9L4a/EG8I8dX+EqM+Mez7BhaovkVv9Se+fo7A==
+"@css-system/gatsby-plugin-css-system@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@css-system/gatsby-plugin-css-system/-/gatsby-plugin-css-system-0.4.0.tgz#5cb6716c6d4517fa53f01a60669ddc484c96d0d3"
+  integrity sha512-wBTXU0e9CjrtKRIkJXW4H6Mq0JIaQxmrvz0Mopayrv2lla35Ny9INCI5kf5KX+vqmFeelT5L/RbJ4q/vclPDXg==
 
 "@css-system/use-css@0.4.1":
   version "0.4.1"

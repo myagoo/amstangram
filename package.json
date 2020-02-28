@@ -28,7 +28,7 @@
     ]
   },
   "dependencies": {
-    "@css-system/gatsby-plugin-css-system": "^0.3.0",
+    "@css-system/gatsby-plugin-css-system": "^0.4.0",
     "@css-system/use-css": "0.4.1",
     "body-parser": "^1.19.0",
     "gatsby": "2.19.22",
