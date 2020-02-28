@@ -62,12 +62,7 @@ module.exports = {
         ],
       },
     },
-    {
-      resolve: "gatsby-plugin-offline",
-      options: {
-        debug: true,
-      },
-    },
+    "gatsby-plugin-remove-serviceworker",
     "gatsby-plugin-react-helmet",
   ],
 }

@@ -28,13 +28,13 @@
     ]
   },
   "dependencies": {
-    "@css-system/use-css": "^0.3.0",
     "@css-system/gatsby-plugin-css-system": "^0.2.0",
+    "@css-system/use-css": "^0.3.0",
     "body-parser": "^1.19.0",
     "gatsby": "^2.19.21",
     "gatsby-plugin-manifest": "^2.2.42",
-    "gatsby-plugin-offline": "^3.0.35",
     "gatsby-plugin-react-helmet": "^3.1.22",
+    "gatsby-plugin-remove-serviceworker": "^1.0.0",
     "gatsby-source-filesystem": "^2.1.48",
     "gatsby-transformer-svg": "^1.0.0",
     "gh-pages": "^2.2.0",
