@@ -946,15 +946,15 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@css-system/gatsby-plugin-css-system@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@css-system/gatsby-plugin-css-system/-/gatsby-plugin-css-system-0.2.0.tgz#2ffc121bbfb4eb462a63083fd3637a90b2c52115"
-  integrity sha512-Rfb8WrE1J3mAAE3YLT8TjoKBxb7/dZC/GO8KdjQq54Avfh5VQ1dhmlMHJfsR7I1czD6u9FFftalrfEU3KPhyVQ==
+"@css-system/gatsby-plugin-css-system@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@css-system/gatsby-plugin-css-system/-/gatsby-plugin-css-system-0.3.0.tgz#3e6813c7b0360bc8967b338c1e234dc0d4471f84"
+  integrity sha512-NMoWME4wp3iYIflvzvUPDfIVarOB3PjRw/v5Wrehs9Bz8toqO9L4a/EG8I8dX+EqM+Mez7BhaovkVv9Se+fo7A==
 
-"@css-system/use-css@0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@css-system/use-css/-/use-css-0.4.0.tgz#96e11b41e58863227986c823e753f4aae1a162f9"
-  integrity sha512-+BCFt/D7VsNZQzi8uomwgP9iSfLmRi8JW1vLNMT5FMCP8xbVEkm3/0qsnCStJIoq5S3KJEuIW7LiA2P0qAljoA==
+"@css-system/use-css@0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@css-system/use-css/-/use-css-0.4.1.tgz#666fff13736bbe273cc7de5f6a0802f336230f84"
+  integrity sha512-YKMTqfZtjmILGwPDdzfYfleAkGNNqncQSqfwMgXAyf8iWKjh4C7uaNLl/y2K389/6LpzBX+kgFWMFSHdaaXdEg==
   dependencies:
     hash-sum "^2.0.0"
 
