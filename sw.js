@@ -33,21 +33,21 @@ self.__precacheManifest = [
     "url": "commons-f9f1ac872bd74792144d.js"
   },
   {
-    "url": "app-97054d90be2cc17a9e28.js"
+    "url": "app-fbddb18c60a733bac51d.js"
   },
   {
     "url": "component---node-modules-gatsby-plugin-offline-app-shell-js-f3f35f6ef3789022665d.js"
   },
   {
     "url": "offline-plugin-app-shell-fallback/index.html",
-    "revision": "d5d9852b5ae9be6d656b5cde4756cdc6"
+    "revision": "8d3169d70d8e7edc7e0e9396ab50f502"
   },
   {
     "url": "clipper_unminified.js"
   },
   {
     "url": "manifest.webmanifest",
-    "revision": "012d38a99e8460af6ab782469b78a5af"
+    "revision": "adf2a14ca496380821f001e8a563af0d"
   }
 ].concat(self.__precacheManifest || []);
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
@@ -140,7 +140,7 @@ const navigationRoute = new NavigationRoute(async ({ event }) => {
   // Check for resources + the app bundle
   // The latter may not exist if the SW is updating to a new version
   const resources = await idbKeyval.get(`resources:${pathname}`)
-  if (!resources || !(await caches.match(`/app-97054d90be2cc17a9e28.js`))) {
+  if (!resources || !(await caches.match(`/app-fbddb18c60a733bac51d.js`))) {
     return await fetch(event.request)
   }
 
