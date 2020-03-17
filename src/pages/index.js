@@ -21,6 +21,8 @@ export default () => {
   const canvasRef = useRef()
   const groupsRef = useRef()
   const coumpoundPathRef = useRef()
+  const isSimpleClickRef = useRef(false)
+  // const [isSimpleClick, setIsSimpleClick] = useState(false)
 
   useGallery(canvasRef, coumpoundPathRef, groupsRef)
 
@@ -86,6 +88,8 @@ export default () => {
 
     function attachEvents(group) {
       group.on("mousedown", mdEvent => {
+        isSimpleClickRef.current = true
+
         anchorPoint = new paper.Point({
           x: mdEvent.point.x - group.position.x,
           y: mdEvent.point.y - group.position.y,
@@ -97,6 +101,12 @@ export default () => {
       })
 
       group.on("mouseup", () => {
+        if (isSimpleClickRef.current === true) {
+          group.rotation += 45
+          checkForIntersections(group)
+          isSimpleClickRef.current = false
+        }
+
         anchorPoint = null
         ghostGroup && ghostGroup.remove()
         ghostGroup = null
@@ -104,6 +114,8 @@ export default () => {
       })
 
       group.on("mousedrag", mdEvent => {
+        isSimpleClickRef.current = false
+
         const newAnchorPoint = new paper.Point({
           x: mdEvent.point.x - group.position.x,
           y: mdEvent.point.y - group.position.y,
@@ -260,10 +272,10 @@ export default () => {
         checkForIntersections(group)
       })
 
-      group.on("doubleclick", mdEvent => {
-        group.rotation += 45
-        checkForIntersections(group)
-      })
+      // group.on("click", mdEvent => {
+      //   group.rotation += 45
+      //   checkForIntersections(group)
+      // })
     }
 
     function check() {
