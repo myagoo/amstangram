@@ -120,7 +120,7 @@ export default () => {
             rotation = 0
 
             if (group.data.id === "rh") {
-              group.scale(-1, 1)
+              group.scale(-1, 1) // Horizontal flip
             }
           }
 
