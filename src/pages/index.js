@@ -88,6 +88,14 @@ export default () => {
     let rotation = 0
 
     function attachEvents(group) {
+      group.on("mouseenter", mdEvent => {
+        document.body.style.cursor = "pointer"
+      })
+
+      group.on("mouseleave", mdEvent => {
+        document.body.style.cursor = "default"
+      })
+
       group.on("mousedown", mdEvent => {
         isSimpleClickRef.current = true
 
@@ -102,6 +110,8 @@ export default () => {
       })
 
       group.on("mouseup", () => {
+        document.body.style.cursor = "pointer"
+
         if (isSimpleClickRef.current === true) {
           group.rotation += 45
           rotation += 45
@@ -125,6 +135,8 @@ export default () => {
       })
 
       group.on("mousedrag", mdEvent => {
+        document.body.style.cursor = "move"
+
         isSimpleClickRef.current = false
 
         const newAnchorPoint = new paper.Point({
