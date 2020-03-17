@@ -85,6 +85,7 @@ export default () => {
 
     let anchorPoint = null
     let ghostGroup = null
+    let rotation = 0
 
     function attachEvents(group) {
       group.on("mousedown", mdEvent => {
@@ -103,6 +104,16 @@ export default () => {
       group.on("mouseup", () => {
         if (isSimpleClickRef.current === true) {
           group.rotation += 45
+          rotation += 45
+
+          if (rotation === group.data.maxDegree) {
+            rotation = 0
+
+            if (group.data.id === "rh") {
+              group.scale(-1, 1)
+            }
+          }
+
           checkForIntersections(group)
           isSimpleClickRef.current = false
         }
@@ -271,11 +282,6 @@ export default () => {
 
         checkForIntersections(group)
       })
-
-      // group.on("click", mdEvent => {
-      //   group.rotation += 45
-      //   checkForIntersections(group)
-      // })
     }
 
     function check() {

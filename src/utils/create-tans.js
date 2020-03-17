@@ -39,7 +39,7 @@ export const createTriangle = (size, id, color) => {
       paper.view.center.x + triangleCenterX - shape.bounds.width / 2,
       paper.view.center.y + triangleCenterY - shape.bounds.height / 2,
     ],
-    data: { id, collisions: new Set() },
+    data: { id, collisions: new Set(), maxDegree: 360 },
     applyMatrix: true,
   })
 
@@ -70,7 +70,7 @@ export const createRhombus = (size, id, color) => {
   const group = new paper.Group({
     children: [shape, inner],
     position: paper.view.center,
-    data: { id, collisions: new Set() },
+    data: { id, collisions: new Set(), maxDegree: 180 },
     applyMatrix: true,
   })
 
@@ -94,7 +94,7 @@ export const createSquare = (size, id, color) => {
   const group = new paper.Group({
     children: [shape, inner],
     position: paper.view.center,
-    data: { id, collisions: new Set() },
+    data: { id, collisions: new Set(), maxDegree: 90 },
     applyMatrix: true,
   })
 
