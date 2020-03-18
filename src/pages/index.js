@@ -193,12 +193,12 @@ function boundShape(group, canvas) {
     group.position.y = group.bounds.height / 2
   }
 
-  if (group.bounds.x + group.bounds.width > canvas.current.width) {
-    group.position.x = canvas.current.width - group.bounds.width / 2
+  if (group.bounds.x + group.bounds.width > canvas.width) {
+    group.position.x = canvas.width - group.bounds.width / 2
   }
 
-  if (group.bounds.y + group.bounds.height > canvas.current.height) {
-    group.position.y = canvas.current.height - group.bounds.height / 2
+  if (group.bounds.y + group.bounds.height > canvas.height) {
+    group.position.y = canvas.height - group.bounds.height / 2
   }
 }
 
