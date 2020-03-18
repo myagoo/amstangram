@@ -3,6 +3,7 @@ import { useContext, useEffect } from "react"
 import { GalleryContext } from "../contexts/gallery"
 import { getSvg } from "../utils/get-svg"
 import { isValidTangram } from "../utils/is-valid-tangram"
+import { SCALE_BIAS } from "../constants"
 
 export const useGallery = (canvasRef, coumpoundPathRef, groupsRef) => {
   const { onSaveRequest, selectedTangram } = useContext(GalleryContext)
@@ -14,7 +15,7 @@ export const useGallery = (canvasRef, coumpoundPathRef, groupsRef) => {
     }
     const minSize = Math.min(canvasRef.current.width, canvasRef.current.height)
 
-    const scaleFactor = minSize / window.devicePixelRatio / 640
+    const scaleFactor = minSize / window.devicePixelRatio / SCALE_BIAS
 
     const item = paper.project.importSVG(selectedTangram, {
       applyMatrix: true,

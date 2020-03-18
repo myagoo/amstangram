@@ -4,7 +4,11 @@ import React, { useContext, useLayoutEffect, useRef } from "react"
 import { Gallery } from "../components/gallery"
 import { Header } from "../components/header"
 import { View } from "../components/view"
-import { OVERLAPING_OPACITY, SMALL_TRIANGLE_BASE } from "../constants"
+import {
+  OVERLAPING_OPACITY,
+  SMALL_TRIANGLE_BASE,
+  SCALE_BIAS,
+} from "../constants"
 import { useGallery } from "../hooks/useGallery"
 import {
   createRhombus,
@@ -193,12 +197,20 @@ function boundShape(group, canvas) {
     group.position.y = group.bounds.height / 2
   }
 
-  if (group.bounds.x + group.bounds.width > canvas.width) {
-    group.position.x = canvas.width - group.bounds.width / 2
+  if (
+    group.bounds.x + group.bounds.width >
+    canvas.width / window.devicePixelRatio
+  ) {
+    group.position.x =
+      canvas.width / window.devicePixelRatio - group.bounds.width / 2
   }
 
-  if (group.bounds.y + group.bounds.height > canvas.height) {
-    group.position.y = canvas.height - group.bounds.height / 2
+  if (
+    group.bounds.y + group.bounds.height >
+    canvas.height / window.devicePixelRatio
+  ) {
+    group.position.y =
+      canvas.height / window.devicePixelRatio - group.bounds.height / 2
   }
 }
 
@@ -228,7 +240,7 @@ export default () => {
 
       setupPieces()
 
-      const scaleFactor = minSize / window.devicePixelRatio / 640
+      const scaleFactor = minSize / window.devicePixelRatio / SCALE_BIAS
 
       const newBounds = {
         ...paper.project.view.bounds,
