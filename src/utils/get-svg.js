@@ -1,7 +1,7 @@
 import paper from "paper/dist/paper-core"
 import { LENGTH_MAX, LENGTH_MIN } from "../constants"
 
-export const getSvg = groupsRef => {
+export const getSvg = (groupsRef, scaleFactor) => {
   let compoundPath
 
   for (const group of groupsRef.current) {
@@ -13,6 +13,8 @@ export const getSvg = groupsRef => {
       compoundPath = compoundPath.unite(path, { insert: false })
     }
   }
+
+  compoundPath.scale(1 / scaleFactor)
 
   compoundPath.position = new paper.Point(
     compoundPath.bounds.width / 2,

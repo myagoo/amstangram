@@ -14,7 +14,6 @@ export const useGallery = (canvasRef, coumpoundPathRef, groupsRef) => {
       return
     }
     const minSize = Math.min(canvasRef.current.width, canvasRef.current.height)
-
     const scaleFactor = minSize / window.devicePixelRatio / SCALE_BIAS
 
     const item = paper.project.importSVG(selectedTangram, {
@@ -37,15 +36,22 @@ export const useGallery = (canvasRef, coumpoundPathRef, groupsRef) => {
   // Save
   useEffect(() => {
     if (onSaveRequest) {
+      const minSize = Math.min(
+        canvasRef.current.width,
+        canvasRef.current.height
+      )
+
+      const scaleFactor = minSize / window.devicePixelRatio / SCALE_BIAS
+
       if (isValidTangram(groupsRef)) {
         fetch(`/save`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ svg: getSvg(groupsRef) }),
+          body: JSON.stringify({ svg: getSvg(groupsRef, scaleFactor) }),
         })
       } else {
         alert("Tangram is not valid")
       }
     }
-  }, [onSaveRequest, groupsRef])
+  }, [canvasRef, onSaveRequest, groupsRef])
 }
