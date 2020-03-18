@@ -12,8 +12,194 @@ import {
   createTriangle,
 } from "../utils/create-tans"
 
+const DEV = process.env.NODE_ENV === "development"
+
+function getNearestPoint(p, a, b) {
+  var atob = { x: b.x - a.x, y: b.y - a.y }
+  var atop = { x: p.x - a.x, y: p.y - a.y }
+  var len = atob.x * atob.x + atob.y * atob.y
+  var dot = atop.x * atob.x + atop.y * atob.y
+  var t = Math.min(1, Math.max(0, dot / len))
+
+  dot = (b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x)
+
+  return new paper.Point(a.x + atob.x * t, a.y + atob.y * t)
+}
+
 function contains(item1, item2) {
   return item2.segments.every(segment => item1.contains(segment.point))
+}
+
+function getPrimarySnap(shape, otherShapes, snap) {
+  for (const otherShape of otherShapes) {
+    for (const { point: otherPoint } of otherShape.segments) {
+      for (const { point: ghostPoint } of shape.segments) {
+        const distance = ghostPoint.getDistance(otherPoint)
+        if (distance < snap.distance) {
+          snap.distance = distance
+          snap.shape = otherShape
+          snap.vector = otherPoint.subtract(ghostPoint)
+        }
+      }
+    }
+  }
+
+  if (!snap.vector) {
+    for (const otherShape of otherShapes) {
+      for (const { point } of shape.segments) {
+        for (const {
+          point: startPoint,
+          next: { point: endPoint },
+        } of otherShape.segments) {
+          const nearestPoint = getNearestPoint(point, startPoint, endPoint)
+          const distance = nearestPoint.getDistance(point)
+          if (distance < snap.distance) {
+            snap.distance = distance
+            snap.vector = nearestPoint.subtract(point)
+            snap.shape = otherShape
+            snap.segment = [startPoint, endPoint]
+            snap.point = point
+
+            if (DEV) {
+              new paper.Path.Circle({
+                center: nearestPoint,
+                radius: 2,
+                fillColor: "red",
+              }).removeOn({ drag: true, move: true })
+            }
+          }
+        }
+      }
+
+      for (const { point: otherPoint } of otherShape.segments) {
+        for (const {
+          point: startPoint,
+          next: { point: endPoint },
+        } of shape.segments) {
+          const nearestPoint = getNearestPoint(otherPoint, startPoint, endPoint)
+          const distance = nearestPoint.getDistance(otherPoint)
+          if (distance < snap.distance) {
+            snap.distance = distance
+            snap.vector = otherPoint.subtract(nearestPoint)
+            snap.shape = shape
+            snap.segment = [startPoint, endPoint]
+
+            if (DEV) {
+              new paper.Path.Circle({
+                center: nearestPoint,
+                radius: 2,
+                fillColor: "red",
+              }).removeOn({ drag: true, move: true })
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return snap
+}
+
+function getSecondarySnap(shape, otherShapes, snap) {
+  if (snap.segment) {
+    let bestNewVectorLenth = snap.maxDistance
+    let bestNewVector
+
+    const [startPoint, endPoint] = snap.segment
+
+    const angle1 = Math.atan2(
+      endPoint.y - startPoint.y,
+      endPoint.x - startPoint.x
+    )
+    const angle2 = Math.atan2(
+      startPoint.y - endPoint.y,
+      startPoint.x - endPoint.x
+    )
+
+    if (DEV) {
+      new paper.Path.Line({
+        from: startPoint,
+        to: endPoint,
+        strokeColor: "red",
+      }).removeOn({ drag: true, move: true })
+    }
+
+    for (const angle of [angle1, angle2]) {
+      for (const { point } of shape.segments) {
+        if (point === snap.point) {
+          //TODO snap.point should be an array of point when several points of the moved shape touch the snaped segment
+          continue
+        }
+        const startPoint = point.add(snap.vector)
+
+        const endPoint = new paper.Point(
+          startPoint.x + snap.maxDistance * Math.cos(angle),
+          startPoint.y + snap.maxDistance * Math.sin(angle)
+        )
+
+        const ray = new paper.Path.Line({
+          from: startPoint,
+          to: endPoint,
+          insert: false,
+        })
+
+        if (DEV) {
+          new paper.Path.Line({
+            from: startPoint,
+            to: endPoint,
+            strokeColor: "green",
+          }).removeOn({ drag: true, move: true })
+        }
+
+        for (const otherShape of otherShapes) {
+          const intersections = ray.getIntersections(otherShape)
+
+          for (const { point: intersectionPoint } of intersections) {
+            if (DEV) {
+              new paper.Path.Circle({
+                center: intersectionPoint,
+                radius: 5,
+                fillColor: "blue",
+              }).removeOn({ drag: true, move: true })
+            }
+
+            const newVector = intersectionPoint
+              .subtract(startPoint)
+              .add(snap.vector)
+
+            if (
+              newVector.length < snap.maxDistance &&
+              newVector.length <= bestNewVectorLenth
+            ) {
+              bestNewVectorLenth = newVector.length
+              bestNewVector = newVector
+            }
+          }
+        }
+      }
+    }
+
+    if (bestNewVector) {
+      snap.vector = bestNewVector
+    }
+  }
+}
+
+function boundShape(group, canvas) {
+  if (group.bounds.x < 0) {
+    group.position.x = group.bounds.width / 2
+  }
+  if (group.bounds.y < 0) {
+    group.position.y = group.bounds.height / 2
+  }
+
+  if (group.bounds.x + group.bounds.width > canvas.current.width) {
+    group.position.x = canvas.current.width - group.bounds.width / 2
+  }
+
+  if (group.bounds.y + group.bounds.height > canvas.current.height) {
+    group.position.y = canvas.current.height - group.bounds.height / 2
+  }
 }
 
 export default () => {
@@ -139,156 +325,50 @@ export default () => {
 
         isSimpleClickRef.current = false
 
-        const newAnchorPoint = new paper.Point({
-          x: mdEvent.point.x - group.position.x,
-          y: mdEvent.point.y - group.position.y,
-        })
+        const newAnchorPoint = mdEvent.point.subtract(group.position)
 
-        const vector = new paper.Point({
-          x: newAnchorPoint.x - anchorPoint.x,
-          y: newAnchorPoint.y - anchorPoint.y,
-        })
+        const vector = newAnchorPoint.subtract(anchorPoint)
 
-        const newX = group.position.x + vector.x
-        const newY = group.position.y + vector.y
+        ghostGroup.position = group.position.add(vector)
 
-        ghostGroup.position = new paper.Point({
-          x: newX,
-          y: newY,
-        })
-
-        let smallestDistance = 10
-
-        let shouldSnapWithVector
         const ghostShape = ghostGroup.firstChild
-        for (const otherGroup of groupsRef.current) {
-          if (otherGroup === group) {
-            continue
-          }
-          const otherShape = otherGroup.firstChild
-          for (const { point: otherPoint } of otherShape.segments) {
-            for (const { point } of ghostShape.segments) {
-              const distance = point.getDistance(otherPoint)
-              if (distance < smallestDistance) {
-                smallestDistance = distance
-                shouldSnapWithVector = new paper.Point({
-                  x: otherPoint.x - point.x,
-                  y: otherPoint.y - point.y,
-                })
-              }
-            }
-          }
+        const otherShapes = groupsRef.current
+          .filter(otherGroup => otherGroup !== group)
+          .map(({ firstChild }) => firstChild)
+
+        let snap = {
+          maxDistance: 10,
+          distance: 10,
         }
 
-        if (!shouldSnapWithVector) {
-          for (const otherGroup of groupsRef.current) {
-            if (otherGroup === group) {
-              continue
-            }
-            const otherShape = otherGroup.firstChild
-
-            for (const { point } of ghostShape.segments) {
-              const otherPoint = otherShape.getNearestPoint(point)
-              const distance = otherPoint.getDistance(point)
-              if (distance < smallestDistance) {
-                smallestDistance = distance
-                shouldSnapWithVector = new paper.Point({
-                  x: otherPoint.x - point.x,
-                  y: otherPoint.y - point.y,
-                })
-              }
-            }
-
-            for (const { point: otherPoint } of otherShape.segments) {
-              const point = ghostShape.getNearestPoint(otherPoint)
-              const distance = point.getDistance(otherPoint)
-              if (distance < smallestDistance) {
-                smallestDistance = distance
-                shouldSnapWithVector = new paper.Point({
-                  x: otherPoint.x - point.x,
-                  y: otherPoint.y - point.y,
-                })
-              }
-            }
-          }
-        }
-
-        if (coumpoundPathRef.current) {
-          const paths = coumpoundPathRef.current.children
+        const coumpoundShapes = coumpoundPathRef.current
+          ? coumpoundPathRef.current.children
             ? coumpoundPathRef.current.children
             : [coumpoundPathRef.current]
+          : null
 
-          for (const path of paths) {
-            for (const { point: otherPoint } of path.segments) {
-              for (const { point } of ghostShape.segments) {
-                const distance = point.getDistance(otherPoint)
-                if (distance < smallestDistance) {
-                  smallestDistance = distance
-                  shouldSnapWithVector = new paper.Point({
-                    x: otherPoint.x - point.x,
-                    y: otherPoint.y - point.y,
-                  })
-                }
-              }
-            }
-          }
+        getPrimarySnap(ghostShape, otherShapes, snap)
 
-          if (!shouldSnapWithVector) {
-            for (const path of paths) {
-              for (const { point } of ghostShape.segments) {
-                const otherPoint = path.getNearestPoint(point)
-                const distance = otherPoint.getDistance(point)
-                if (distance < smallestDistance) {
-                  smallestDistance = distance
-                  shouldSnapWithVector = new paper.Point({
-                    x: otherPoint.x - point.x,
-                    y: otherPoint.y - point.y,
-                  })
-                }
-              }
-
-              for (const { point: otherPoint } of path.segments) {
-                const point = ghostShape.getNearestPoint(otherPoint)
-                const distance = point.getDistance(otherPoint)
-                if (distance < smallestDistance) {
-                  smallestDistance = distance
-                  shouldSnapWithVector = new paper.Point({
-                    x: otherPoint.x - point.x,
-                    y: otherPoint.y - point.y,
-                  })
-                }
-              }
-            }
-          }
+        if (coumpoundShapes) {
+          getPrimarySnap(ghostShape, coumpoundShapes, snap)
         }
 
-        if (shouldSnapWithVector) {
-          ghostGroup.position.x += shouldSnapWithVector.x
-          ghostGroup.position.y += shouldSnapWithVector.y
+        getSecondarySnap(
+          ghostShape,
+          otherShapes.filter(otherShape => otherShape.shape !== snap.shape),
+          snap
+        )
+
+        if (coumpoundShapes) {
+          getSecondarySnap(ghostShape, coumpoundShapes, snap)
         }
 
-        if (ghostGroup.bounds.x < 0) {
-          ghostGroup.position.x = ghostGroup.bounds.width / 2
-        }
-        if (ghostGroup.bounds.y < 0) {
-          ghostGroup.position.y = ghostGroup.bounds.height / 2
+        if (snap.vector) {
+          ghostGroup.position.x += snap.vector.x
+          ghostGroup.position.y += snap.vector.y
         }
 
-        if (
-          ghostGroup.bounds.x + ghostGroup.bounds.width >
-          canvasRef.current.width
-        ) {
-          ghostGroup.position.x =
-            canvasRef.current.width - ghostGroup.bounds.width / 2
-        }
-
-        if (
-          ghostGroup.bounds.y + ghostGroup.bounds.height >
-          canvasRef.current.height
-        ) {
-          ghostGroup.position.y =
-            canvasRef.current.height - ghostGroup.bounds.height / 2
-        }
+        boundShape(ghostGroup, canvasRef.current)
 
         group.position = ghostGroup.position
 
