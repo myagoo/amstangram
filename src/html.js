@@ -29,6 +29,15 @@ export default function HTML(props) {
               * {
                 box-sizing: border-box;
               }
+
+              @keyframes fadeIn {
+                from {
+                  opacity: 0;
+                }
+                to {
+                  opacity: 1;
+                }
+              }
             `,
           }}
         />

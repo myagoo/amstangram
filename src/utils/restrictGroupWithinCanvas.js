@@ -1,11 +1,15 @@
-export const restrictGroupWithinCanvas = (group, canvas) => {
-  if (group.bounds.x < 0) {
-    console.log(group.bounds.width)
+import paper from "paper/dist/paper-core"
 
-    group.position.x = group.bounds.width / 2
+export const restrictGroupWithinCanvas = (group, canvas) => {
+  const correctionVector = group.pivot
+    ? group.pivot.subtract(group.bounds.center)
+    : new paper.Point()
+
+  if (group.bounds.x < 0) {
+    group.position.x = group.bounds.width / 2 + correctionVector.x
   }
   if (group.bounds.y < 0) {
-    group.position.y = group.bounds.height / 2
+    group.position.y = group.bounds.height / 2 + correctionVector.y
   }
 
   if (
@@ -13,7 +17,9 @@ export const restrictGroupWithinCanvas = (group, canvas) => {
     canvas.width / window.devicePixelRatio
   ) {
     group.position.x =
-      canvas.width / window.devicePixelRatio - group.bounds.width / 2
+      canvas.width / window.devicePixelRatio -
+      group.bounds.width / 2 +
+      correctionVector.x
   }
 
   if (
@@ -21,7 +27,8 @@ export const restrictGroupWithinCanvas = (group, canvas) => {
     canvas.height / window.devicePixelRatio
   ) {
     group.position.y =
-      canvas.height / group.bounds.height >
-      canvas.height / window.devicePixelRatio - group.bounds.height / 2
+      canvas.height / window.devicePixelRatio -
+      group.bounds.height / 2 +
+      correctionVector.y
   }
 }

@@ -1,17 +1,12 @@
 import paper from "paper/dist/paper-core"
-import { getScaleFactor } from "./getScaleFactor"
 
 export const scrambleGroups = (groups, canvas) => {
-  const scaleFactor = getScaleFactor(canvas)
-
-  const maxPoint = new paper.Point(canvas.width, canvas.height).multiply(
-    scaleFactor
+  const maxPoint = new paper.Point(canvas.width, canvas.height).divide(
+    window.devicePixelRatio
   )
 
   for (const group of groups) {
-    const randomPoint = paper.Point.random().multiply(maxPoint)
-
-    group.position = randomPoint
+    group.position = paper.Point.random().multiply(maxPoint)
 
     if (group.data.id === "rh") {
       const rotation = Math.round(Math.random() * 3) * 45

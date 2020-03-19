@@ -4,7 +4,7 @@ import React, { useContext, useLayoutEffect, useRef } from "react"
 import { Gallery } from "../components/gallery"
 import { Logo } from "../components/logo"
 import { View } from "../components/view"
-import { SNAP_DISTANCE } from "../constants"
+import { SNAP_DISTANCE, DEV } from "../constants"
 import { useGallery } from "../hooks/useGallery"
 import { checkTangramCompleteness } from "../utils/checkTangramCompleteness"
 import { createPieces } from "../utils/createGroups"
@@ -115,10 +115,12 @@ export default () => {
 
         restrictGroupWithinCanvas(ghostGroup, canvasRef.current)
 
-        new paper.Path.Rectangle({
-          rectangle: ghostGroup.bounds,
-          strokeColor: "black",
-        }).removeOn({ drag: true, move: true })
+        if (DEV) {
+          new paper.Path.Rectangle({
+            rectangle: ghostGroup.bounds,
+            strokeColor: "black",
+          }).removeOn({ drag: true, move: true })
+        }
 
         group.position = ghostGroup.position
 
@@ -148,7 +150,7 @@ export default () => {
 
       paper.project.activeLayer.fitBounds(newBounds)
 
-      // scrambleGroups(groupsRef.current, canvasRef.current)
+      scrambleGroups(groupsRef.current, canvasRef.current)
 
       for (const group of groupsRef.current) {
         restrictGroupWithinCanvas(group, canvasRef.current)
@@ -189,7 +191,7 @@ export default () => {
             alignSelf: "center",
             width: "100%",
             maxWidth: "300px",
-            opacity: 0.8,
+            animation: "1000ms fadeIn 0ms ease both",
           }}
         />
       </View>
@@ -198,6 +200,7 @@ export default () => {
         ref={canvasRef}
         css={{
           flex: 1,
+          animation: "1000ms fadeIn 500ms ease both",
         }}
         resize="true"
       />

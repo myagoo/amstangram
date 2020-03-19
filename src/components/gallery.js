@@ -4,7 +4,7 @@ import { GalleryContext } from "../contexts/gallery"
 import { CardVerso } from "./card"
 import { View } from "./view"
 import { Button } from "./button"
-import { FiGrid, FiSave } from "react-icons/fi"
+import { FiGrid, FiSave, FiX } from "react-icons/fi"
 import { DEV } from "../constants"
 
 export const Gallery = () => {
@@ -33,13 +33,12 @@ export const Gallery = () => {
               transform: `translate3d(${galleryOpened ? 0 : "-100vw"}, 0, 0)`,
               transition: "transform .3s",
               width: "100vw",
-              height: "calc(100vh - 70px)",
+              height: "100vh",
               background: "#ecf0f1",
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              overflow: "visible",
-              p: 3,
+              py: 3,
             }}
             deps={[galleryOpened]}
           >
@@ -52,8 +51,9 @@ export const Gallery = () => {
                   gridTemplateColumns: "repeat(auto-fill, 180px)",
                   gridColumnGap: 10,
                   gridRowGap: 15,
-                  justifyContent: "center",
-                  overflowY: "scroll",
+                  justifyItems: "center",
+                  alignItems: "center",
+                  overflow: "auto",
                 }}
               >
                 {tangrams.nodes.map(tangram => {
@@ -107,9 +107,13 @@ export const Gallery = () => {
           right: 10,
           bottom: 10,
           zIndex: 1,
+          animation: "1000ms fadeIn 1000ms ease both",
         }}
       >
-        <View as={FiGrid} css={{ fontSize: "30px", color: "#fff" }} />
+        <View
+          as={galleryOpened ? FiX : FiGrid}
+          css={{ fontSize: "30px", color: "#fff" }}
+        />
       </Button>
       {DEV && (
         <Button
@@ -119,6 +123,7 @@ export const Gallery = () => {
             right: 10,
             bottom: 70,
             zIndex: 1,
+            animation: "1000ms fadeIn 1000ms ease both",
           }}
         >
           <View as={FiSave} css={{ fontSize: "30px", color: "#fff" }} />

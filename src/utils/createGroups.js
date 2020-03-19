@@ -25,13 +25,15 @@ const createTriangle = (size, id, color) => {
 
   const triangleCenter = getTriangleCenter(points)
 
+  const center = new paper.Point(
+    paper.view.center.x + triangleCenter.x - shape.bounds.width / 2,
+    paper.view.center.y + triangleCenter.y - shape.bounds.height / 2
+  )
+
   const group = new paper.Group({
     children: [shape, inner],
     position: paper.view.center,
-    pivot: [
-      paper.view.center.x + triangleCenter.x - shape.bounds.width / 2,
-      paper.view.center.y + triangleCenter.y - shape.bounds.height / 2,
-    ],
+    pivot: center,
     data: { id, collisions: new Set() },
     applyMatrix: true,
   })
