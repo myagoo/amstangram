@@ -31,22 +31,17 @@ export const CardVerso = ({ svg, difficulty, ...props }) => {
           justifyContent: "center",
           "& > *": {
             width: "100%",
-            fill: color,
           },
         }}
         dangerouslySetInnerHTML={{ __html: svg }}
       />
       <View
         css={{
-          position: "absolute",
-          top: 0,
-          right: "-10px",
           background: color,
           color: "#fff",
           borderRadius: 10,
           px: 1,
           py: "4px",
-          transform: "translateY(-50%)",
         }}
       >
         {difficulty}

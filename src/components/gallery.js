@@ -29,12 +29,13 @@ export const Gallery = () => {
             transform: `translate3d(${galleryOpened ? 0 : "-100vw"}, 0, 0)`,
             transition: "transform .3s",
             width: "100vw",
-            height: "100vh",
+            height: "calc(100vh - 70px)",
             background: "#ecf0f1",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            overflowY: "scroll",
+            overflow: "visible",
+            p: 3,
           }}
           deps={[galleryOpened]}
         >
@@ -47,9 +48,8 @@ export const Gallery = () => {
                 gridTemplateColumns: "repeat(auto-fill, 180px)",
                 gridColumnGap: 10,
                 gridRowGap: 15,
-                gridAutoRows: 220,
                 justifyContent: "center",
-                alignContent: "center",
+                overflowY: "scroll",
               }}
             >
               {tangrams.nodes.map(tangram => {
