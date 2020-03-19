@@ -2,290 +2,32 @@ import { ThemeContext } from "@css-system/use-css"
 import paper from "paper/dist/paper-core"
 import React, { useContext, useLayoutEffect, useRef } from "react"
 import { Gallery } from "../components/gallery"
-import { Header } from "../components/header"
+import { Logo } from "../components/logo"
 import { View } from "../components/view"
-import {
-  OVERLAPING_OPACITY,
-  SMALL_TRIANGLE_BASE,
-  SCALE_BIAS,
-} from "../constants"
+import { SNAP_DISTANCE, DEV } from "../constants"
 import { useGallery } from "../hooks/useGallery"
-import {
-  createRhombus,
-  createSquare,
-  createTriangle,
-} from "../utils/create-tans"
-
-const DEV = process.env.NODE_ENV === "development"
-
-function getNearestPoint(p, a, b) {
-  var atob = { x: b.x - a.x, y: b.y - a.y }
-  var atop = { x: p.x - a.x, y: p.y - a.y }
-  var len = atob.x * atob.x + atob.y * atob.y
-  var dot = atop.x * atob.x + atop.y * atob.y
-  var t = Math.min(1, Math.max(0, dot / len))
-
-  dot = (b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x)
-
-  return new paper.Point(a.x + atob.x * t, a.y + atob.y * t)
-}
-
-function contains(item1, item2) {
-  return item2.segments.every(segment => item1.contains(segment.point))
-}
-
-function getPrimarySnap(shape, otherShapes, snap) {
-  for (const otherShape of otherShapes) {
-    for (const { point: otherPoint } of otherShape.segments) {
-      for (const { point: ghostPoint } of shape.segments) {
-        const distance = ghostPoint.getDistance(otherPoint)
-        if (distance < snap.distance) {
-          snap.distance = distance
-          snap.shape = otherShape
-          snap.vector = otherPoint.subtract(ghostPoint)
-        }
-      }
-    }
-  }
-
-  if (!snap.vector) {
-    for (const otherShape of otherShapes) {
-      for (const { point } of shape.segments) {
-        for (const {
-          point: startPoint,
-          next: { point: endPoint },
-        } of otherShape.segments) {
-          const nearestPoint = getNearestPoint(point, startPoint, endPoint)
-          const distance = nearestPoint.getDistance(point)
-          if (distance < snap.distance) {
-            snap.distance = distance
-            snap.vector = nearestPoint.subtract(point)
-            snap.shape = otherShape
-            snap.segment = [startPoint, endPoint]
-            snap.point = point
-
-            if (DEV) {
-              new paper.Path.Circle({
-                center: nearestPoint,
-                radius: 2,
-                fillColor: "red",
-              }).removeOn({ drag: true, move: true })
-            }
-          }
-        }
-      }
-
-      for (const { point: otherPoint } of otherShape.segments) {
-        for (const {
-          point: startPoint,
-          next: { point: endPoint },
-        } of shape.segments) {
-          const nearestPoint = getNearestPoint(otherPoint, startPoint, endPoint)
-          const distance = nearestPoint.getDistance(otherPoint)
-          if (distance < snap.distance) {
-            snap.distance = distance
-            snap.vector = otherPoint.subtract(nearestPoint)
-            snap.shape = shape
-            snap.segment = [startPoint, endPoint]
-
-            if (DEV) {
-              new paper.Path.Circle({
-                center: nearestPoint,
-                radius: 2,
-                fillColor: "red",
-              }).removeOn({ drag: true, move: true })
-            }
-          }
-        }
-      }
-    }
-  }
-
-  return snap
-}
-
-function getSecondarySnap(shape, otherShapes, snap) {
-  if (snap.segment) {
-    let bestNewVectorLenth = snap.maxDistance
-    let bestNewVector
-
-    const [startPoint, endPoint] = snap.segment
-
-    const angle1 = Math.atan2(
-      endPoint.y - startPoint.y,
-      endPoint.x - startPoint.x
-    )
-    const angle2 = Math.atan2(
-      startPoint.y - endPoint.y,
-      startPoint.x - endPoint.x
-    )
-
-    if (DEV) {
-      new paper.Path.Line({
-        from: startPoint,
-        to: endPoint,
-        strokeColor: "red",
-      }).removeOn({ drag: true, move: true })
-    }
-
-    for (const angle of [angle1, angle2]) {
-      for (const { point } of shape.segments) {
-        if (point === snap.point) {
-          //TODO snap.point should be an array of point when several points of the moved shape touch the snaped segment
-          continue
-        }
-        const startPoint = point.add(snap.vector)
-
-        const endPoint = new paper.Point(
-          startPoint.x + snap.maxDistance * Math.cos(angle),
-          startPoint.y + snap.maxDistance * Math.sin(angle)
-        )
-
-        const ray = new paper.Path.Line({
-          from: startPoint,
-          to: endPoint,
-          insert: false,
-        })
-
-        if (DEV) {
-          new paper.Path.Line({
-            from: startPoint,
-            to: endPoint,
-            strokeColor: "green",
-          }).removeOn({ drag: true, move: true })
-        }
-
-        for (const otherShape of otherShapes) {
-          const intersections = ray.getIntersections(otherShape)
-
-          for (const { point: intersectionPoint } of intersections) {
-            if (DEV) {
-              new paper.Path.Circle({
-                center: intersectionPoint,
-                radius: 5,
-                fillColor: "blue",
-              }).removeOn({ drag: true, move: true })
-            }
-
-            const newVector = intersectionPoint
-              .subtract(startPoint)
-              .add(snap.vector)
-
-            if (
-              newVector.length < snap.maxDistance &&
-              newVector.length <= bestNewVectorLenth
-            ) {
-              bestNewVectorLenth = newVector.length
-              bestNewVector = newVector
-            }
-          }
-        }
-      }
-    }
-
-    if (bestNewVector) {
-      snap.vector = bestNewVector
-    }
-  }
-}
-
-function boundShape(group, canvas) {
-  if (group.bounds.x < 0) {
-    group.position.x = group.bounds.width / 2
-  }
-  if (group.bounds.y < 0) {
-    group.position.y = group.bounds.height / 2
-  }
-
-  if (
-    group.bounds.x + group.bounds.width >
-    canvas.width / window.devicePixelRatio
-  ) {
-    group.position.x =
-      canvas.width / window.devicePixelRatio - group.bounds.width / 2
-  }
-
-  if (
-    group.bounds.y + group.bounds.height >
-    canvas.height / window.devicePixelRatio
-  ) {
-    group.position.y =
-      canvas.height / window.devicePixelRatio - group.bounds.height / 2
-  }
-}
+import { checkTangramCompleteness } from "../utils/checkTangramCompleteness"
+import { createPieces } from "../utils/createGroups"
+import { getScaleFactor } from "../utils/getScaleFactor"
+import { getSnapVector } from "../utils/getSnapVector"
+import { restrictGroupWithinCanvas } from "../utils/restrictGroupWithinCanvas"
+import { scrambleGroups } from "../utils/scrambleGroups"
+import { updateColisionState } from "../utils/updateColisionState"
 
 export default () => {
   const theme = useContext(ThemeContext)
   const canvasRef = useRef()
   const groupsRef = useRef()
   const coumpoundPathRef = useRef()
-  const isSimpleClickRef = useRef(false)
-  // const [isSimpleClick, setIsSimpleClick] = useState(false)
 
   useGallery(canvasRef, coumpoundPathRef, groupsRef)
 
   useLayoutEffect(() => {
-    function init() {
-      const parentRect = canvasRef.current.parentElement.getBoundingClientRect()
-      canvasRef.current.width = parentRect.width
-      canvasRef.current.height = parentRect.height
+    const attachGroupEvents = group => {
+      let anchorPoint = null
+      let ghostGroup = null
+      let isClick = false
 
-      // Create an empty project and a view for the canvas:
-      paper.setup(canvasRef.current)
-
-      const minSize = Math.min(
-        canvasRef.current.width,
-        canvasRef.current.height
-      )
-
-      setupPieces()
-
-      const scaleFactor = minSize / window.devicePixelRatio / SCALE_BIAS
-
-      const newBounds = {
-        ...paper.project.view.bounds,
-        width: groupsRef.current[3].bounds.width * scaleFactor,
-        height: groupsRef.current[3].bounds.height * scaleFactor,
-      }
-
-      paper.project.activeLayer.fitBounds(newBounds)
-    }
-
-    const checkForIntersections = group => {
-      for (const group2 of groupsRef.current) {
-        if (group2 === group) {
-          continue
-        }
-
-        if (
-          group.lastChild.intersects(group2.lastChild) ||
-          contains(group.lastChild, group2.lastChild) ||
-          contains(group2.lastChild, group.lastChild)
-        ) {
-          group.data.collisions.add(group2.data.id)
-          group2.data.collisions.add(group.data.id)
-        } else {
-          group.data.collisions.delete(group2.data.id)
-          group2.data.collisions.delete(group.data.id)
-        }
-      }
-
-      for (const otherGroup of groupsRef.current) {
-        if (otherGroup.data.collisions.size > 0) {
-          otherGroup.firstChild.fillColor = theme.colors.collision
-          otherGroup.firstChild.opacity = OVERLAPING_OPACITY
-        } else {
-          otherGroup.firstChild.fillColor = theme.colors[otherGroup.data.id]
-          otherGroup.firstChild.opacity = 1
-        }
-      }
-    }
-
-    let anchorPoint = null
-    let ghostGroup = null
-    let rotation = 0
-
-    function attachEvents(group) {
       group.on("mouseenter", mdEvent => {
         document.body.style.cursor = "pointer"
       })
@@ -295,7 +37,7 @@ export default () => {
       })
 
       group.on("mousedown", mdEvent => {
-        isSimpleClickRef.current = true
+        isClick = true
 
         anchorPoint = new paper.Point({
           x: mdEvent.point.x - group.position.x,
@@ -310,32 +52,36 @@ export default () => {
       group.on("mouseup", () => {
         document.body.style.cursor = "pointer"
 
-        if (isSimpleClickRef.current === true) {
+        if (isClick) {
           group.rotation += 45
-          rotation += 45
-
-          if (rotation === group.data.maxDegree) {
-            rotation = 0
-
-            if (group.data.id === "rh") {
+          if (group.data.id === "rh") {
+            group.data.rotation += 45
+            if (group.data.rotation === 180) {
+              group.data.rotation = 0
               group.scale(-1, 1) // Horizontal flip
             }
           }
 
-          checkForIntersections(group)
-          isSimpleClickRef.current = false
+          restrictGroupWithinCanvas(group, canvasRef.current)
+
+          updateColisionState(group, groupsRef.current, theme.colors)
+
+          isClick = false
         }
 
         anchorPoint = null
         ghostGroup && ghostGroup.remove()
         ghostGroup = null
-        check()
+
+        checkTangramCompleteness(coumpoundPathRef.current, groupsRef.current)
       })
 
       group.on("mousedrag", mdEvent => {
-        document.body.style.cursor = "move"
+        if (mdEvent.delta.length > 1) {
+          isClick = false
+        }
 
-        isSimpleClickRef.current = false
+        document.body.style.cursor = "move"
 
         const newAnchorPoint = mdEvent.point.subtract(group.position)
 
@@ -344,14 +90,10 @@ export default () => {
         ghostGroup.position = group.position.add(vector)
 
         const ghostShape = ghostGroup.firstChild
+
         const otherShapes = groupsRef.current
           .filter(otherGroup => otherGroup !== group)
           .map(({ firstChild }) => firstChild)
-
-        let snap = {
-          maxDistance: 10,
-          distance: 10,
-        }
 
         const coumpoundShapes = coumpoundPathRef.current
           ? coumpoundPathRef.current.children
@@ -359,72 +101,64 @@ export default () => {
             : [coumpoundPathRef.current]
           : null
 
-        getPrimarySnap(ghostShape, otherShapes, snap)
-
-        if (coumpoundShapes) {
-          getPrimarySnap(ghostShape, coumpoundShapes, snap)
-        }
-
-        getSecondarySnap(
+        const snapVector = getSnapVector(
+          SNAP_DISTANCE,
           ghostShape,
-          otherShapes.filter(otherShape => otherShape.shape !== snap.shape),
-          snap
+          otherShapes,
+          coumpoundShapes
         )
 
-        if (coumpoundShapes) {
-          getSecondarySnap(ghostShape, coumpoundShapes, snap)
+        if (snapVector) {
+          ghostGroup.position.x += snapVector.x
+          ghostGroup.position.y += snapVector.y
         }
 
-        if (snap.vector) {
-          ghostGroup.position.x += snap.vector.x
-          ghostGroup.position.y += snap.vector.y
-        }
+        restrictGroupWithinCanvas(ghostGroup, canvasRef.current)
 
-        boundShape(ghostGroup, canvasRef.current)
+        if (DEV) {
+          new paper.Path.Rectangle({
+            rectangle: ghostGroup.bounds,
+            strokeColor: "black",
+          }).removeOn({ drag: true, move: true })
+        }
 
         group.position = ghostGroup.position
 
-        checkForIntersections(group)
+        updateColisionState(group, groupsRef.current, theme.colors)
       })
     }
 
-    function check() {
-      if (!coumpoundPathRef.current) {
-        return
+    const init = () => {
+      const parentRect = canvasRef.current.parentElement.getBoundingClientRect()
+
+      canvasRef.current.width = parentRect.width
+      canvasRef.current.height = parentRect.height
+
+      paper.setup(canvasRef.current)
+
+      groupsRef.current = createPieces(theme.colors)
+
+      const largeTriangle = groupsRef.current[3]
+
+      const scaleFactor = getScaleFactor(canvasRef.current)
+
+      const newBounds = {
+        ...paper.project.view.bounds,
+        width: largeTriangle.bounds.width * scaleFactor,
+        height: largeTriangle.bounds.height * scaleFactor,
       }
-      let newCoumpoundPath = coumpoundPathRef.current
+
+      paper.project.activeLayer.fitBounds(newBounds)
+
+      scrambleGroups(groupsRef.current, canvasRef.current)
 
       for (const group of groupsRef.current) {
-        if (group.data.collisions.size > 0) {
-          return
-        }
-        newCoumpoundPath = newCoumpoundPath.unite(group.lastChild, {
-          insert: false,
-        })
+        restrictGroupWithinCanvas(group, canvasRef.current)
       }
-      if (newCoumpoundPath.length === coumpoundPathRef.current.length) {
-        alert("👏🏻VICTORY 💪🏻")
-      }
-    }
-
-    function setupPieces() {
-      const smallBase = SMALL_TRIANGLE_BASE
-      const mediumBase = Math.sqrt(Math.pow(smallBase, 2) * 2)
-      const largeBase = Math.sqrt(Math.pow(mediumBase, 2) * 2)
-
-      groupsRef.current = [
-        createTriangle(smallBase, "st1", theme.colors["st1"]),
-        createTriangle(smallBase, "st2", theme.colors["st2"]),
-        createTriangle(mediumBase, "mt1", theme.colors["mt1"]),
-        createTriangle(largeBase, "lt1", theme.colors["lt1"]),
-        createTriangle(largeBase, "lt2", theme.colors["lt2"]),
-        createSquare(mediumBase, "sq", theme.colors["sq"]),
-        createRhombus(smallBase, "rh", theme.colors["rh"]),
-      ]
 
       for (const group of groupsRef.current) {
-        attachEvents(group)
-        checkForIntersections(group)
+        attachGroupEvents(group)
+        updateColisionState(group, groupsRef.current, theme.colors)
       }
     }
 
@@ -441,37 +175,36 @@ export default () => {
         overflow: "hidden",
       }}
     >
-      <Header />
       <View
         css={{
-          display: "flex",
-          flexDirection: "column",
-          flex: 1,
-          position: "relative",
+          p: 2,
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: -1,
         }}
       >
         <View
+          as={Logo}
           css={{
-            flex: "1",
-            bg: "background",
-            p: { _: 0, s: 2 },
-            alignItems: "center",
+            alignSelf: "center",
+            width: "100%",
+            maxWidth: "300px",
+            animation: "1000ms fadeIn 0ms ease both",
           }}
-        >
-          <View
-            as="canvas"
-            ref={canvasRef}
-            css={{
-              width: "50vw",
-              flex: 1,
-              minWidth: { _: "100%", s: "40em" },
-              background: "#fff",
-            }}
-            resize="true"
-          />
-        </View>
-        <Gallery />
+        />
       </View>
+      <View
+        as="canvas"
+        ref={canvasRef}
+        css={{
+          flex: 1,
+          animation: "1000ms fadeIn 500ms ease both",
+        }}
+        resize="true"
+      />
+      <Gallery />
     </View>
   )
 }
