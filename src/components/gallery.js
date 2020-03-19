@@ -31,72 +31,59 @@ export const Gallery = () => {
               position: "fixed",
               left: "0",
               transform: `translate3d(${galleryOpened ? 0 : "-100vw"}, 0, 0)`,
-              transition: "transform .3s",
+              transition: "transform .3s ease",
               width: "100vw",
               height: "100vh",
               background: "#ecf0f1",
-              display: "flex",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, 128px)",
+              gridColumnGap: 3,
+              gridRowGap: 3,
               justifyContent: "center",
+              justifyItems: "center",
               alignItems: "center",
-              py: 3,
+              overflow: "auto",
+              p: 3,
             }}
             deps={[galleryOpened]}
           >
-            {tangrams.nodes.length > 0 ? (
-              <View
-                css={{
-                  width: "100%",
-                  height: "100%",
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, 180px)",
-                  gridColumnGap: 10,
-                  gridRowGap: 15,
-                  justifyItems: "center",
-                  alignItems: "center",
-                  overflow: "auto",
-                }}
-              >
-                {tangrams.nodes.map(tangram => {
-                  let difficulty
-                  let svgContent
+            {tangrams.nodes.map(tangram => {
+              let difficulty
+              let svgContent
 
-                  try {
-                    const parser = new DOMParser()
-                    const document = parser.parseFromString(
-                      tangram.content,
-                      "image/svg+xml"
-                    )
-                    const svg = document.firstElementChild
-                    const percent = svg.getAttribute("data-percent")
+              try {
+                const parser = new DOMParser()
+                const document = parser.parseFromString(
+                  tangram.content,
+                  "image/svg+xml"
+                )
+                const svg = document.firstElementChild
+                const percent = svg.getAttribute("data-percent")
 
-                    svgContent = svg.firstElementChild
+                svgContent = svg.firstElementChild
 
-                    difficulty =
-                      percent > 50 ? "Easy" : percent > 20 ? "Medium" : "Hard"
-                  } catch (e) {
-                    difficulty = null
-                  }
+                difficulty =
+                  percent > 50 ? "Easy" : percent > 20 ? "Medium" : "Hard"
+              } catch (e) {
+                difficulty = null
+              }
 
-                  if (!svgContent) {
-                    return null
-                  }
+              if (!svgContent) {
+                return null
+              }
 
-                  return (
-                    <CardVerso
-                      key={tangram.id}
-                      svg={tangram.content}
-                      difficulty={difficulty}
-                      onClick={() => {
-                        setSelectedTangram(svgContent)
-                        setGalleryOpened(false)
-                      }}
-                    />
-                  )
-                })}
-              </View>
-            ) : (
-              <View>{"Aucun tangram dans la galerie"}</View>
-            )}
+              return (
+                <CardVerso
+                  key={tangram.id}
+                  svg={tangram.content}
+                  difficulty={difficulty}
+                  onClick={() => {
+                    setSelectedTangram(svgContent)
+                    setGalleryOpened(false)
+                  }}
+                />
+              )
+            })}
           </View>
         )}
       />
