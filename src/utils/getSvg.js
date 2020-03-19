@@ -1,10 +1,10 @@
 import paper from "paper/dist/paper-core"
 import { LENGTH_MAX, LENGTH_MIN } from "../constants"
 
-export const getSvg = (groupsRef, scaleFactor) => {
+export const getSvg = (groups, scaleFactor) => {
   let compoundPath
 
-  for (const group of groupsRef.current) {
+  for (const group of groups) {
     const path = group.firstChild
 
     if (!compoundPath) {

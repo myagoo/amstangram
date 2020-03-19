@@ -1,57 +1,53 @@
 import paper from "paper/dist/paper-core"
 import { useContext, useEffect } from "react"
 import { GalleryContext } from "../contexts/gallery"
-import { getSvg } from "../utils/get-svg"
-import { isValidTangram } from "../utils/is-valid-tangram"
-import { SCALE_BIAS } from "../constants"
+import { getSvg } from "../utils/getSvg"
+import { isTangramValid } from "../utils/isTangramValid"
+import { getScaleFactor } from "../utils/getScaleFactor"
 
 export const useGallery = (canvasRef, coumpoundPathRef, groupsRef) => {
-  const { onSaveRequest, selectedTangram } = useContext(GalleryContext)
+  const { saveRequestId, selectedTangram } = useContext(GalleryContext)
 
   // Import
   useEffect(() => {
     if (!selectedTangram) {
       return
     }
-    const minSize = Math.min(canvasRef.current.width, canvasRef.current.height)
-    const scaleFactor = minSize / window.devicePixelRatio / SCALE_BIAS
 
-    const item = paper.project.importSVG(selectedTangram, {
+    const coumpoundPath = paper.project.importSVG(selectedTangram, {
       applyMatrix: true,
     })
-    item.sendToBack()
-    item.position = paper.view.center
-    item.fillRule = "evenodd"
-    item.fillColor = "black"
-    item.closed = true
-    item.scale(scaleFactor)
 
-    coumpoundPathRef.current = item
+    const scaleFactor = getScaleFactor(canvasRef.current)
+
+    coumpoundPath.sendToBack()
+    coumpoundPath.position = paper.view.center
+    coumpoundPath.fillRule = "evenodd"
+    coumpoundPath.fillColor = "black"
+    coumpoundPath.closed = true
+    coumpoundPath.scale(scaleFactor)
+
+    coumpoundPathRef.current = coumpoundPath
 
     return () => {
-      item.remove()
+      coumpoundPath.remove()
     }
   }, [canvasRef, coumpoundPathRef, selectedTangram])
 
   // Save
   useEffect(() => {
-    if (onSaveRequest) {
-      const minSize = Math.min(
-        canvasRef.current.width,
-        canvasRef.current.height
-      )
+    if (saveRequestId) {
+      if (isTangramValid(groupsRef.current)) {
+        const scaleFactor = getScaleFactor(canvasRef.current)
 
-      const scaleFactor = minSize / window.devicePixelRatio / SCALE_BIAS
-
-      if (isValidTangram(groupsRef)) {
         fetch(`/save`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ svg: getSvg(groupsRef, scaleFactor) }),
+          body: JSON.stringify({ svg: getSvg(groupsRef.current, scaleFactor) }),
         })
       } else {
         alert("Tangram is not valid")
       }
     }
-  }, [canvasRef, onSaveRequest, groupsRef])
+  }, [canvasRef, saveRequestId, groupsRef])
 }

@@ -5,3 +5,5 @@ export const OVERLAPING_OPACITY = 0.5
 export const ERROR_MARGIN = 1
 export const ERROR_STROKE = 2
 export const SCALE_BIAS = 500
+export const SNAP_DISTANCE = 10
+export const DEV = process.env.NODE_ENV === "development"
