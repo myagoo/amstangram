@@ -9,7 +9,7 @@ export default function HTML(props) {
         <meta httpEquiv="x-ua-compatible" content="ie=edge" />
         <meta
           name="viewport"
-          content="width=device-width, initial-scale=1, shrink-to-fit=no"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover"
         />
         <script src="/clipper_unminified.js"></script>
         <style
@@ -25,6 +25,18 @@ export default function HTML(props) {
                 -webkit-font-smoothing: antialiased;
                 -moz-osx-font-smoothing: grayscale;
               }
+
+              #gatsby-focus-wrapper{
+                width: 100vw;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                padding:
+                  env(safe-area-inset-top, 0)
+                  env(safe-area-inset-right, 0)
+                  env(safe-area-inset-bottom, 0)
+                  env(safe-area-inset-left, 0);
+              }
               
               * {
                 box-sizing: border-box;
@@ -38,6 +50,8 @@ export default function HTML(props) {
                   opacity: 1;
                 }
               }
+
+
             `,
           }}
         />

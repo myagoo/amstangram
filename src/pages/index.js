@@ -212,17 +212,14 @@ export default () => {
   return (
     <View
       css={{
-        display: "flex",
-        height: "100vh",
-        width: "100vw",
-        flexDirection: "column",
-        overflow: "hidden",
+        flex: "1",
+        position: "relative",
       }}
     >
       <View
         css={{
           p: 2,
-          position: "fixed",
+          position: "absolute",
           top: 0,
           left: 0,
           right: 0,
