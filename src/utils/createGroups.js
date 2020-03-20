@@ -1,29 +1,29 @@
 import paper from "paper/dist/paper-core"
 import { ERROR_MARGIN, ERROR_STROKE, SMALL_TRIANGLE_BASE } from "../constants"
-import { getOffsettedPoints } from "./getOffsettedPoints"
+import { getOffsettedPathsSegments } from "./getOffsettedPathsPoints"
 import { getTriangleCenter } from "./getTriangleCenter"
 
 const createTriangle = (size, id, color) => {
-  const points = [
-    new paper.Point(0, 0),
-    new paper.Point(size * 2, 0),
-    new paper.Point(size, size),
+  const segments = [
+    new paper.Segment(new paper.Point(0, 0)),
+    new paper.Segment(new paper.Point(size * 2, 0)),
+    new paper.Segment(new paper.Point(size, size)),
   ]
 
   const shape = new paper.Path({
-    segments: points,
+    segments,
     closed: true,
     fillColor: color,
   })
 
   const inner = new paper.Path({
-    segments: getOffsettedPoints(points, -ERROR_MARGIN),
+    segments: getOffsettedPathsSegments([segments], -ERROR_MARGIN)[0],
     closed: true,
     strokeWidth: ERROR_STROKE,
     strokeColor: color,
   })
 
-  const triangleCenter = getTriangleCenter(points)
+  const triangleCenter = getTriangleCenter(segments.map(({ point }) => point))
 
   const center = new paper.Point(
     paper.view.center.x + triangleCenter.x - shape.bounds.width / 2,
@@ -42,21 +42,21 @@ const createTriangle = (size, id, color) => {
 }
 
 const createRhombus = (size, id, color) => {
-  const points = [
-    new paper.Point(0, 0),
-    new paper.Point(size * 2, 0),
-    new paper.Point(size * 3, size),
-    new paper.Point(size, size),
+  const segments = [
+    new paper.Segment(new paper.Point(0, 0)),
+    new paper.Segment(new paper.Point(size * 2, 0)),
+    new paper.Segment(new paper.Point(size * 3, size)),
+    new paper.Segment(new paper.Point(size, size)),
   ]
 
   const shape = new paper.Path({
-    segments: points,
+    segments,
     closed: true,
     fillColor: color,
   })
 
   const inner = new paper.Path({
-    segments: getOffsettedPoints(points, -ERROR_MARGIN),
+    segments: getOffsettedPathsSegments([segments], -ERROR_MARGIN)[0],
     closed: true,
     strokeWidth: ERROR_STROKE,
     strokeColor: color,

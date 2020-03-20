@@ -26,9 +26,11 @@ export default function HTML(props) {
                 -moz-osx-font-smoothing: grayscale;
               }
 
+              body, html, #___gatsby, #gatsby-focus-wrapper {
+                height: 100%;
+              }
+
               #gatsby-focus-wrapper{
-                width: 100vw;
-                height: 100vh;
                 display: flex;
                 flex-direction: column;
                 padding:
