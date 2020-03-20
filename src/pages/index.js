@@ -77,7 +77,7 @@ export default () => {
       })
 
       group.on("mousedrag", mdEvent => {
-        if (mdEvent.delta.length > 1) {
+        if (mdEvent.delta.length > 2) {
           isClick = false
         }
 

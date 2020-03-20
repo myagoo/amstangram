@@ -4,6 +4,7 @@ import { GalleryContext } from "../contexts/gallery"
 import { getSvg } from "../utils/getSvg"
 import { isTangramValid } from "../utils/isTangramValid"
 import { getScaleFactor } from "../utils/getScaleFactor"
+import { DEV } from "../constants"
 
 export const useGallery = (canvasRef, coumpoundPathRef, groupsRef) => {
   const { saveRequestId, selectedTangram } = useContext(GalleryContext)
@@ -24,6 +25,12 @@ export const useGallery = (canvasRef, coumpoundPathRef, groupsRef) => {
     coumpoundPath.position = paper.view.center
     coumpoundPath.fillRule = "evenodd"
     coumpoundPath.fillColor = "black"
+
+    if (DEV) {
+      coumpoundPath.strokeWidth = 2
+      coumpoundPath.strokeColor = "red"
+    }
+
     coumpoundPath.closed = true
     coumpoundPath.scale(scaleFactor)
 
