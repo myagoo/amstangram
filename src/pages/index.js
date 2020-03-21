@@ -4,9 +4,12 @@ import React, {
   useContext,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from "react"
+import { FiPlay, FiSquare } from "react-icons/fi"
+import { Button } from "../components/button"
 import { Gallery } from "../components/gallery"
 import { Logo } from "../components/logo"
 import { View } from "../components/view"
@@ -31,7 +34,30 @@ import { updateColisionState } from "../utils/updateColisionState"
 
 export default () => {
   const theme = useContext(ThemeContext)
-  const { saveRequestId, selectedTangram } = useContext(GalleryContext)
+  const { saveRequestId, selectedTangrams, setSelectedTangrams } = useContext(
+    GalleryContext
+  )
+
+  const [currentTangramIndex, setCurrentTangramIndex] = useState(0)
+
+  useEffect(() => {
+    setCurrentTangramIndex(0)
+  }, [selectedTangrams])
+
+  const selectedTangram = useMemo(() => {
+    if (selectedTangrams.length === 0) {
+      return null
+    }
+    return selectedTangrams[currentTangramIndex]
+  }, [selectedTangrams, currentTangramIndex])
+
+  const handleNext = () => {
+    setCurrentTangramIndex(currentTangramIndex + 1)
+  }
+
+  const handleStop = () => {
+    setSelectedTangrams([])
+  }
 
   const [victoryEmoji, setVictoryEmoji] = useState(null)
 
@@ -62,6 +88,7 @@ export default () => {
     const handleResize = () => {
       if (canvasRef.current && groupsRef.current) {
         for (const group of groupsRef.current) {
+          // It seems that some android devices resize browser when switching activities
           restrictGroupWithinCanvas(group, canvasRef.current)
         }
       }
@@ -246,6 +273,10 @@ export default () => {
         ghostGroup = null
 
         if (isTangramComplete(coumpoundPathRef.current, groupsRef.current)) {
+          const emoji = getRandomEmoji()
+
+          localStorage.setItem(selectedTangram.id, emoji)
+
           for (const group of groupsRef.current) {
             group.data.removeListeners()
           }
@@ -264,10 +295,7 @@ export default () => {
               }
             )
           }
-          setTimeout(
-            () => setVictoryEmoji(getRandomEmoji()),
-            VICTORY_PARTICLES_DURATION
-          )
+          setTimeout(() => setVictoryEmoji(emoji), VICTORY_PARTICLES_DURATION)
         }
       }
 
@@ -314,16 +342,23 @@ export default () => {
       scrambleGroups(groupsRef.current, canvasRef.current)
 
       for (const group of groupsRef.current) {
+        attachGroupEvents(group)
         restrictGroupWithinCanvas(group, canvasRef.current)
       }
 
       for (const group of groupsRef.current) {
-        attachGroupEvents(group)
         updateColisionState(group, groupsRef.current, theme.colors)
       }
 
       if (selectedTangram) {
-        const coumpoundPath = paper.project.importSVG(selectedTangram, {
+        const parser = new DOMParser()
+        const document = parser.parseFromString(
+          selectedTangram.content,
+          "image/svg+xml"
+        )
+        const svg = document.firstElementChild
+
+        const coumpoundPath = paper.project.importSVG(svg.firstElementChild, {
           applyMatrix: true,
         })
 
@@ -401,6 +436,7 @@ export default () => {
             bottom: 0,
             alignItems: "center",
             justifyContent: "center",
+            gap: 3,
           }}
         >
           <View
@@ -409,6 +445,16 @@ export default () => {
             }}
           >
             {victoryEmoji}
+          </View>
+          <View css={{ flexDirection: "row", gap: 3 }}>
+            <Button onClick={handleStop}>
+              <View as={FiSquare}></View>
+            </Button>
+            {currentTangramIndex < selectedTangrams.length - 1 && (
+              <Button onClick={handleNext}>
+                <View as={FiPlay}></View>
+              </Button>
+            )}
           </View>
         </View>
       )}

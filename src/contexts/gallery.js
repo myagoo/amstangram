@@ -3,7 +3,7 @@ import React, { createContext, useCallback, useMemo, useState } from "react"
 const GalleryContext = createContext({})
 
 const GalleryProvider = ({ children }) => {
-  const [selectedTangram, setSelectedTangram] = useState(null)
+  const [selectedTangrams, setSelectedTangrams] = useState([])
   const [saveRequestId, setSaveRequestId] = useState(0)
 
   const requestSave = useCallback(() => {
@@ -12,12 +12,12 @@ const GalleryProvider = ({ children }) => {
 
   const contextValue = useMemo(
     () => ({
-      selectedTangram,
-      setSelectedTangram,
+      selectedTangrams,
+      setSelectedTangrams,
       requestSave,
       saveRequestId,
     }),
-    [selectedTangram, requestSave, saveRequestId]
+    [selectedTangrams, requestSave, saveRequestId]
   )
 
   return (

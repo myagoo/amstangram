@@ -44,6 +44,17 @@ export default function HTML(props) {
                 box-sizing: border-box;
               }
 
+              @keyframes gradient { 
+                0% { background-color: #8557e0; }
+                14% { background-color: #54a0ff; }
+                28% { background-color: #48dbfb; }
+                42% { background-color: #1dd1a1; }
+                57% { background-color: #feca57; }
+                71% { background-color: #ff6b6b; }
+                85% { background-color: #ff9ff3; }
+                100% { background-color: #8557e0 }
+              }
+
               @keyframes fadeIn {
                 from {
                   opacity: 0;

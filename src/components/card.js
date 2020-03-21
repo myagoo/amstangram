@@ -1,28 +1,31 @@
 import React from "react"
 import { View } from "./view"
 
-export const CardVerso = ({ svg, difficulty, ...props }) => {
+export const Card = ({ svg, difficulty, completed, selected, ...props }) => {
   const color =
-    difficulty === "Easy"
+    difficulty === 0
       ? "#10ac84"
-      : difficulty === "Medium"
+      : difficulty === 1
       ? "#2e86de"
-      : difficulty === "Hard"
+      : difficulty === 2
       ? "#ee5253"
       : "gray"
   return (
     <View
       css={{
         borderRadius: 5,
-        boxShadow: "0px 0px 0px 1px rgba(0, 0, 0, 0.1)",
+        boxShadow: selected
+          ? `0px 0px 0px 4px ${color}`
+          : "0px 0px 0px 1px rgba(0, 0, 0, 0.1)",
         background: "#fff",
-        p: 2,
+        p: 3,
         textAlign: "center",
         position: "relative",
         cursor: "pointer",
         width: 128,
         height: 178,
       }}
+      deps={[selected]}
       {...props}
     >
       <View
@@ -31,21 +34,16 @@ export const CardVerso = ({ svg, difficulty, ...props }) => {
           justifyContent: "center",
           "& > *": {
             width: "100%",
+            fill: color,
           },
         }}
         dangerouslySetInnerHTML={{ __html: svg }}
       />
-      <View
-        css={{
-          background: color,
-          color: "#fff",
-          borderRadius: 10,
-          px: 1,
-          py: "4px",
-        }}
-      >
-        {difficulty}
-      </View>
+      {completed && (
+        <View css={{ position: "absolute", top: 2, left: 2, fontSize: "30px" }}>
+          {completed}
+        </View>
+      )}
     </View>
   )
 }
