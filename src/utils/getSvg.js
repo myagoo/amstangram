@@ -1,50 +1,9 @@
 import paper from "paper/dist/paper-core"
 import { LENGTH_MAX, LENGTH_MIN } from "../constants"
-import { getOffsettedPathsSegments } from "./getOffsettedPathsPoints"
 
 export const getSvg = (groups, scaleFactor) => {
   let compoundPath
 
-  /**
-   * 1st algorythm
-   */
-  // for (const group of groups) {
-  //   const path = group.firstChild
-
-  //   const offsettedPath = path.clone({
-  //     insert: false,
-  //     segments: getOffsettedPathsSegments([path.segments], 1)[0],
-  //   })
-
-  //   if (!compoundPath) {
-  //     compoundPath = offsettedPath
-  //   } else {
-  //     compoundPath = compoundPath.unite(offsettedPath, {
-  //       insert: false,
-  //     })
-  //   }
-  // }
-
-  // const compoundPaths = compoundPath.children
-  //   ? compoundPath.children
-  //   : [compoundPath]
-
-  // const offsetedCompoundPathsSegments = compoundPaths.map(
-  //   ({ segments }) => segments
-  // )
-
-  // const unoffsettedCompoundPathsSegments = getOffsettedPathsSegments(
-  //   offsetedCompoundPathsSegments,
-  //   -1
-  // )
-
-  // compoundPaths.forEach((offsettedCompoundPath, index) => {
-  //   offsettedCompoundPath.segments = unoffsettedCompoundPathsSegments[index]
-  // })
-
-  /**
-   * 2nd algorythm
-   */
   for (const group of groups) {
     const path = group.firstChild
 

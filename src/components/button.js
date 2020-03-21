@@ -3,7 +3,7 @@ import React from "react"
 
 export const Button = ({ as: Component = "button", css, ...props }) => {
   const className = useCss({
-    bg: "mt1",
+    bg: "pieces.mt1",
     border: 0,
     borderRadius: "50%",
     fontSize: 2,

@@ -33,7 +33,7 @@ export const Gallery = () => {
               transform: `translate3d(${galleryOpened ? 0 : "-100vw"}, 0, 0)`,
               transition: "transform .3s ease",
               width: "100vw",
-              height: "100vh",
+              height: "100%",
               background: "#ecf0f1",
               display: "grid",
               gridTemplateColumns: "repeat(auto-fill, 128px)",

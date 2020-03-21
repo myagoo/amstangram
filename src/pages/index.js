@@ -1,29 +1,46 @@
 import { ThemeContext } from "@css-system/use-css"
 import paper from "paper/dist/paper-core"
-import React, { useContext, useLayoutEffect, useRef, useEffect } from "react"
+import React, {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react"
 import { Gallery } from "../components/gallery"
 import { Logo } from "../components/logo"
 import { View } from "../components/view"
-import { SNAP_DISTANCE, DEV, CLICK_TIMEOUT } from "../constants"
-import { checkTangramCompleteness } from "../utils/checkTangramCompleteness"
+import {
+  CLICK_TIMEOUT,
+  DEV,
+  SNAP_DISTANCE,
+  VICTORY_EMOJI_DURATION,
+  VICTORY_PARTICLES_DURATION,
+} from "../constants"
+import { GalleryContext } from "../contexts/gallery"
+import { isTangramComplete } from "../utils/checkTangramCompleteness"
 import { createPieces } from "../utils/createGroups"
+import { getRandomEmoji } from "../utils/getRandomEmoji"
 import { getScaleFactor } from "../utils/getScaleFactor"
 import { getSnapVector } from "../utils/getSnapVector"
+import { getSvg } from "../utils/getSvg"
+import { isTangramValid } from "../utils/isTangramValid"
 import { restrictGroupWithinCanvas } from "../utils/restrictGroupWithinCanvas"
 import { scrambleGroups } from "../utils/scrambleGroups"
 import { updateColisionState } from "../utils/updateColisionState"
-import { GalleryContext } from "../contexts/gallery"
-import { isTangramValid } from "../utils/isTangramValid"
-import { getSvg } from "../utils/getSvg"
 
 export default () => {
   const theme = useContext(ThemeContext)
   const { saveRequestId, selectedTangram } = useContext(GalleryContext)
 
+  const [victoryEmoji, setVictoryEmoji] = useState(null)
+
   const canvasRef = useRef()
   const groupsRef = useRef()
+  const particlesRef = useRef()
   const coumpoundPathRef = useRef()
 
+  // Handle save tangram request
   useEffect(() => {
     if (saveRequestId) {
       if (isTangramValid(groupsRef.current)) {
@@ -40,22 +57,109 @@ export default () => {
     }
   }, [canvasRef, saveRequestId, groupsRef])
 
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (canvasRef.current && groupsRef.current) {
+        for (const group of groupsRef.current) {
+          restrictGroupWithinCanvas(group, canvasRef.current)
+        }
+      }
+    }
+
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  useEffect(() => {
+    setVictoryEmoji(null)
+  }, [selectedTangram])
+
+  // Init a game
   useLayoutEffect(() => {
+    const initParticles = () => {
+      const particleGroup = new paper.Group()
+
+      particleGroup.sendToBack()
+
+      const PARTICLES_COUNT = 60
+      const MAX_PARTICLE_SIZE = 5
+      const MIN_PARTICLE_SIZE = 2
+      const MIN_OPACITY = 0.1
+      const MAX_OPACITY = 0.5
+
+      const maxPoint = new paper.Point(
+        canvasRef.current.width,
+        canvasRef.current.height
+      ).divide(window.devicePixelRatio)
+
+      const colors = Object.values(theme.colors.pieces)
+
+      const getRandomRadius = () =>
+        Math.random() * (MAX_PARTICLE_SIZE - MIN_PARTICLE_SIZE) +
+        MIN_PARTICLE_SIZE
+
+      const getRandomFillColor = () =>
+        colors[Math.floor(Math.random() * colors.length)]
+
+      const getRandomOpacity = () =>
+        Math.random() * (MAX_OPACITY - MIN_OPACITY) + MIN_OPACITY
+
+      particlesRef.current = new Array(PARTICLES_COUNT)
+
+      for (let i = 0; i < PARTICLES_COUNT; i++) {
+        const particle = new paper.Path.Circle({
+          center: paper.Point.random().multiply(maxPoint),
+          radius: getRandomRadius(),
+          fillColor: getRandomFillColor(),
+          opacity: getRandomOpacity(),
+          parent: particleGroup,
+          data: { index: i },
+        })
+
+        const randomize = () => {
+          const values = {
+            radius: getRandomRadius(),
+            opacity: getRandomOpacity(),
+            "position.x": Math.min(
+              canvasRef.current.width / window.devicePixelRatio,
+              Math.max(0, particle.position.x + Math.random() * 200 - 100)
+            ),
+            "position.y": Math.min(
+              canvasRef.current.height / window.devicePixelRatio,
+              Math.max(0, particle.position.y + Math.random() * 200 - 100)
+            ),
+          }
+
+          particle.data.animation = particle
+            .tween(values, {
+              duration: Math.random() * 10000 + 5000,
+              easing: "easeInOutQuad",
+            })
+            .then(randomize)
+        }
+
+        randomize()
+
+        particlesRef.current[i] = particle
+      }
+    }
+
     const attachGroupEvents = group => {
       let anchorPoint = null
       let ghostGroup = null
       let mouseDownTimestamp = null
       let mouseDownPoint = null
 
-      group.on("mouseenter", mdEvent => {
+      const handleMouseEnter = mdEvent => {
         document.body.style.cursor = "pointer"
-      })
+      }
 
-      group.on("mouseleave", mdEvent => {
+      const handleMouseLeave = mdEvent => {
         document.body.style.cursor = "default"
-      })
+      }
 
-      group.on("mousedown", mdEvent => {
+      const handleMouseDown = mdEvent => {
         mouseDownTimestamp = Date.now()
         mouseDownPoint = mdEvent.point
 
@@ -64,40 +168,9 @@ export default () => {
         ghostGroup = group.clone({ insert: false, deep: true })
 
         group.bringToFront()
-      })
+      }
 
-      group.on("mouseup", muEvent => {
-        document.body.style.cursor = "pointer"
-
-        if (
-          muEvent.point.subtract(mouseDownPoint).length < SNAP_DISTANCE &&
-          Date.now() - mouseDownTimestamp < CLICK_TIMEOUT
-        ) {
-          group.rotation += 45
-          if (group.data.id === "rh") {
-            group.data.rotation += 45
-            if (group.data.rotation === 180) {
-              group.data.rotation = 0
-              group.scale(-1, 1) // Horizontal flip
-            }
-          }
-
-          restrictGroupWithinCanvas(group, canvasRef.current)
-
-          updateColisionState(group, groupsRef.current, theme.colors)
-
-          mouseDownTimestamp = null
-          mouseDownPoint = null
-        }
-
-        anchorPoint = null
-        ghostGroup && ghostGroup.remove()
-        ghostGroup = null
-
-        checkTangramCompleteness(coumpoundPathRef.current, groupsRef.current)
-      })
-
-      group.on("mousedrag", mdEvent => {
+      const handleMouseDrag = mdEvent => {
         document.body.style.cursor = "move"
 
         const newAnchorPoint = mdEvent.point.subtract(group.position)
@@ -142,7 +215,78 @@ export default () => {
         group.position = ghostGroup.position
 
         updateColisionState(group, groupsRef.current, theme.colors)
+      }
+
+      const handleMouseUp = muEvent => {
+        document.body.style.cursor = "pointer"
+
+        if (
+          muEvent.point.subtract(mouseDownPoint).length < SNAP_DISTANCE &&
+          Date.now() - mouseDownTimestamp < CLICK_TIMEOUT
+        ) {
+          group.rotation += 45
+          if (group.data.id === "rh") {
+            group.data.rotation += 45
+            if (group.data.rotation === 180) {
+              group.data.rotation = 0
+              group.scale(-1, 1) // Horizontal flip
+            }
+          }
+
+          restrictGroupWithinCanvas(group, canvasRef.current)
+
+          updateColisionState(group, groupsRef.current, theme.colors)
+
+          mouseDownTimestamp = null
+          mouseDownPoint = null
+        }
+
+        anchorPoint = null
+        ghostGroup && ghostGroup.remove()
+        ghostGroup = null
+
+        if (isTangramComplete(coumpoundPathRef.current, groupsRef.current)) {
+          for (const group of groupsRef.current) {
+            group.data.removeListeners()
+          }
+          for (const particle of particlesRef.current) {
+            particle.data.animation.stop()
+            particle.tween(
+              {
+                "position.x": paper.view.center.x,
+                "position.y": paper.view.center.y,
+                opacity: 0,
+                radius: 0,
+              },
+              {
+                duration: VICTORY_PARTICLES_DURATION,
+                easing: "easeInCubic",
+              }
+            )
+          }
+          setTimeout(
+            () => setVictoryEmoji(getRandomEmoji()),
+            VICTORY_PARTICLES_DURATION
+          )
+        }
+      }
+
+      group.on({
+        mouseenter: handleMouseEnter,
+        mouseleave: handleMouseLeave,
+        mousedown: handleMouseDown,
+        mousedrag: handleMouseDrag,
+        mouseup: handleMouseUp,
       })
+
+      group.data.removeListeners = () =>
+        group.off({
+          mouseenter: handleMouseEnter,
+          mouseleave: handleMouseLeave,
+          mousedown: handleMouseDown,
+          mousedrag: handleMouseDrag,
+          mouseup: handleMouseUp,
+        })
     }
 
     const init = () => {
@@ -153,7 +297,7 @@ export default () => {
 
       paper.setup(canvasRef.current)
 
-      groupsRef.current = createPieces(theme.colors)
+      groupsRef.current = createPieces(theme.colors.pieces)
 
       const largeTriangle = groupsRef.current[3]
 
@@ -200,12 +344,14 @@ export default () => {
 
         coumpoundPathRef.current = coumpoundPath
       }
+
+      initParticles()
     }
 
     init()
 
     return () => {
-      paper.project.clear()
+      paper.project.remove()
     }
   }, [theme.colors, selectedTangram])
 
@@ -218,7 +364,7 @@ export default () => {
     >
       <View
         css={{
-          p: 2,
+          p: 3,
           position: "absolute",
           top: 0,
           left: 0,
@@ -231,7 +377,7 @@ export default () => {
           css={{
             alignSelf: "center",
             width: "100%",
-            maxWidth: "300px",
+            maxWidth: "400px",
             animation: "1000ms fadeIn 0ms ease both",
           }}
         />
@@ -245,6 +391,27 @@ export default () => {
         }}
         resize="true"
       />
+      {victoryEmoji && (
+        <View
+          css={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <View
+            css={{
+              animation: `${VICTORY_EMOJI_DURATION}ms spinAndGrow cubic-bezier(0, 0.8, 0.2, 1) forwards`,
+            }}
+          >
+            {victoryEmoji}
+          </View>
+        </View>
+      )}
       <Gallery />
     </View>
   )

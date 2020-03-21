@@ -53,7 +53,28 @@ export default function HTML(props) {
                 }
               }
 
-
+              @keyframes spinAndGrow {
+                0% {
+                  opacity: 0;
+                  font-size: 0;
+                  transform: rotate(0);
+                }
+                33% {
+                  opacity: 1;
+                  font-size: 30vmin;
+                  transform: rotate(3645deg);
+                }
+                66% {
+                  opacity: 1;
+                  font-size: 30vmin;
+                  transform: rotate(3600deg);
+                }
+                100% {
+                  opacity: 0;
+                  font-size: 30vmin;
+                  transform: rotate(3600deg);
+                }
+              }
             `,
           }}
         />

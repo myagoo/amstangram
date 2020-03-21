@@ -1,4 +1,4 @@
-export const checkTangramCompleteness = (coumpoundPath, groups) => {
+export const isTangramComplete = (coumpoundPath, groups) => {
   if (!coumpoundPath) {
     return
   }
@@ -13,7 +13,5 @@ export const checkTangramCompleteness = (coumpoundPath, groups) => {
       insert: false,
     })
   }
-  if (newCoumpoundPath.length === coumpoundPath.length) {
-    alert("👏🏻VICTORY 💪🏻")
-  }
+  return newCoumpoundPath.length === coumpoundPath.length
 }

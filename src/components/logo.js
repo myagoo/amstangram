@@ -3,7 +3,7 @@ import { ThemeContext } from "@css-system/use-css"
 
 export const Logo = props => {
   const theme = useContext(ThemeContext)
-  const { st1, st2, mt1, lt1, lt2, sq, rh } = theme.colors
+  const { st1, st2, mt1, lt1, lt2, sq, rh } = theme.colors.pieces
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

@@ -25,7 +25,7 @@ export const updateColisionState = (group, allGroups, themeColors) => {
       otherGroup.firstChild.fillColor = themeColors.collision
       otherGroup.firstChild.opacity = OVERLAPING_OPACITY
     } else {
-      otherGroup.firstChild.fillColor = themeColors[otherGroup.data.id]
+      otherGroup.firstChild.fillColor = themeColors.pieces[otherGroup.data.id]
       otherGroup.firstChild.opacity = 1
     }
   }

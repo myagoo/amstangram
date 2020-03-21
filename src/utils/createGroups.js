@@ -1,29 +1,29 @@
 import paper from "paper/dist/paper-core"
 import { ERROR_MARGIN, ERROR_STROKE, SMALL_TRIANGLE_BASE } from "../constants"
-import { getOffsettedPathsSegments } from "./getOffsettedPathsPoints"
+import { getOffsettedPathPoints } from "./getOffsettedPathPoints"
 import { getTriangleCenter } from "./getTriangleCenter"
 
 const createTriangle = (size, id, color) => {
-  const segments = [
-    new paper.Segment(new paper.Point(0, 0)),
-    new paper.Segment(new paper.Point(size * 2, 0)),
-    new paper.Segment(new paper.Point(size, size)),
+  const points = [
+    new paper.Point(0, 0),
+    new paper.Point(size * 2, 0),
+    new paper.Point(size, size),
   ]
 
   const shape = new paper.Path({
-    segments,
+    segments: points,
     closed: true,
     fillColor: color,
   })
 
   const inner = new paper.Path({
-    segments: getOffsettedPathsSegments([segments], -ERROR_MARGIN)[0],
+    segments: getOffsettedPathPoints(points, -ERROR_MARGIN),
     closed: true,
     strokeWidth: ERROR_STROKE,
     strokeColor: color,
   })
 
-  const triangleCenter = getTriangleCenter(segments.map(({ point }) => point))
+  const triangleCenter = getTriangleCenter(points)
 
   const center = new paper.Point(
     paper.view.center.x + triangleCenter.x - shape.bounds.width / 2,
@@ -42,21 +42,21 @@ const createTriangle = (size, id, color) => {
 }
 
 const createRhombus = (size, id, color) => {
-  const segments = [
-    new paper.Segment(new paper.Point(0, 0)),
-    new paper.Segment(new paper.Point(size * 2, 0)),
-    new paper.Segment(new paper.Point(size * 3, size)),
-    new paper.Segment(new paper.Point(size, size)),
+  const points = [
+    new paper.Point(0, 0),
+    new paper.Point(size * 2, 0),
+    new paper.Point(size * 3, size),
+    new paper.Point(size, size),
   ]
 
   const shape = new paper.Path({
-    segments,
+    segments: points,
     closed: true,
     fillColor: color,
   })
 
   const inner = new paper.Path({
-    segments: getOffsettedPathsSegments([segments], -ERROR_MARGIN)[0],
+    segments: getOffsettedPathPoints(points, -ERROR_MARGIN),
     closed: true,
     strokeWidth: ERROR_STROKE,
     strokeColor: color,
