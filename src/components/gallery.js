@@ -1,19 +1,23 @@
-import { graphql, useStaticQuery, StaticQuery } from "gatsby"
-import React, { useContext, useMemo, useState } from "react"
+import React, { useContext, useState } from "react"
 import { FiGrid, FiPlay, FiSave, FiShuffle, FiX } from "react-icons/fi"
 import { DEV } from "../constants"
-import { GalleryContext } from "../contexts/gallery"
+import { TangramsContext } from "../contexts/tangrams"
 import { shuffle } from "../utils/shuffle"
 import { Button } from "./button"
 import { Card } from "./card"
 import { View } from "./view"
 
-const GalleryContent = ({ svgs }) => {
+export const Gallery = () => {
+  const {
+    tangrams,
+    completedTangramsEmoji,
+    requestSave,
+    setSelectedTangrams,
+  } = useContext(TangramsContext)
+
   const [pendingSelectedTangrams, setPendingSelectedTangrams] = useState([])
 
   const [galleryOpened, setGalleryOpened] = useState(false)
-
-  const { requestSave, setSelectedTangrams } = useContext(GalleryContext)
 
   const handleTangramClick = svgContent => {
     setPendingSelectedTangrams(prevPendingSelectedTangrams => {
@@ -23,22 +27,6 @@ const GalleryContent = ({ svgs }) => {
       return [...pendingSelectedTangrams, svgContent]
     })
   }
-
-  const tangrams = useMemo(() => {
-    return svgs
-      .map(({ id, content }) => {
-        const percent = content.match(/data-percent="(-?\d\d?\d?)"/)[1]
-        const difficulty = percent > 50 ? 0 : percent > 20 ? 1 : 2
-        return {
-          id,
-          difficulty,
-          content,
-        }
-      })
-      .sort(({ difficulty: difficultyA }, { difficulty: difficultyB }) => {
-        return difficultyA - difficultyB
-      })
-  }, [svgs])
 
   const handleGalleryToggle = () => {
     setGalleryOpened(!galleryOpened)
@@ -84,7 +72,7 @@ const GalleryContent = ({ svgs }) => {
               key={tangram.id}
               svg={tangram.content}
               difficulty={tangram.difficulty}
-              completed={localStorage.getItem(tangram.id)}
+              completedEmoji={completedTangramsEmoji[tangram.id]}
               selected={pendingSelectedTangrams.includes(tangram)}
               onClick={() => handleTangramClick(tangram)}
             />
@@ -117,23 +105,5 @@ const GalleryContent = ({ svgs }) => {
         </Button>
       </View>
     </>
-  )
-}
-
-export const Gallery = () => {
-  return (
-    <StaticQuery
-      query={graphql`
-        query GalleryQuery {
-          svgs: allSvg {
-            nodes {
-              content
-              id
-            }
-          }
-        }
-      `}
-      render={({ svgs }) => <GalleryContent svgs={svgs.nodes} />}
-    />
   )
 }

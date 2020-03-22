@@ -20,7 +20,7 @@ import {
   VICTORY_EMOJI_DURATION,
   VICTORY_PARTICLES_DURATION,
 } from "../constants"
-import { GalleryContext } from "../contexts/gallery"
+import { TangramsContext } from "../contexts/tangrams"
 import { isTangramComplete } from "../utils/checkTangramCompleteness"
 import { createPieces } from "../utils/createGroups"
 import { getRandomEmoji } from "../utils/getRandomEmoji"
@@ -34,15 +34,20 @@ import { updateColisionState } from "../utils/updateColisionState"
 
 export default () => {
   const theme = useContext(ThemeContext)
-  const { saveRequestId, selectedTangrams, setSelectedTangrams } = useContext(
-    GalleryContext
-  )
+  const {
+    setCompletedTangramEmoji,
+    saveRequestId,
+    selectedTangrams,
+    setSelectedTangrams,
+  } = useContext(TangramsContext)
 
   const [currentTangramIndex, setCurrentTangramIndex] = useState(0)
+  const [victoryEmoji, setVictoryEmoji] = useState(null)
 
-  useEffect(() => {
-    setCurrentTangramIndex(0)
-  }, [selectedTangrams])
+  const canvasRef = useRef()
+  const groupsRef = useRef()
+  const particlesRef = useRef()
+  const coumpoundPathRef = useRef()
 
   const selectedTangram = useMemo(() => {
     if (selectedTangrams.length === 0) {
@@ -59,12 +64,9 @@ export default () => {
     setSelectedTangrams([])
   }
 
-  const [victoryEmoji, setVictoryEmoji] = useState(null)
-
-  const canvasRef = useRef()
-  const groupsRef = useRef()
-  const particlesRef = useRef()
-  const coumpoundPathRef = useRef()
+  useEffect(() => {
+    setCurrentTangramIndex(0)
+  }, [selectedTangrams])
 
   // Handle save tangram request
   useEffect(() => {
@@ -275,7 +277,7 @@ export default () => {
         if (isTangramComplete(coumpoundPathRef.current, groupsRef.current)) {
           const emoji = getRandomEmoji()
 
-          localStorage.setItem(selectedTangram.id, emoji)
+          setCompletedTangramEmoji(selectedTangram, emoji)
 
           for (const group of groupsRef.current) {
             group.data.removeListeners()
@@ -388,7 +390,7 @@ export default () => {
     return () => {
       paper.project.remove()
     }
-  }, [theme.colors, selectedTangram])
+  }, [theme.colors, selectedTangram, setCompletedTangramEmoji])
 
   return (
     <View

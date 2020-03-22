@@ -1,6 +1,6 @@
 const React = require("react")
-const { GalleryProvider } = require("./src/contexts/gallery")
+const { TangramsProvider } = require("./src/contexts/tangrams")
 
 exports.wrapPageElement = ({ element }) => {
-  return <GalleryProvider>{element}</GalleryProvider>
+  return <TangramsProvider>{element}</TangramsProvider>
 }

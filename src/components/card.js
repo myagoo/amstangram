@@ -1,7 +1,13 @@
 import React from "react"
 import { View } from "./view"
 
-export const Card = ({ svg, difficulty, completed, selected, ...props }) => {
+export const Card = ({
+  svg,
+  difficulty,
+  completedEmoji,
+  selected,
+  ...props
+}) => {
   const color =
     difficulty === 0
       ? "#10ac84"
@@ -39,9 +45,9 @@ export const Card = ({ svg, difficulty, completed, selected, ...props }) => {
         }}
         dangerouslySetInnerHTML={{ __html: svg }}
       />
-      {completed && (
+      {completedEmoji && (
         <View css={{ position: "absolute", top: 2, left: 2, fontSize: "30px" }}>
-          {completed}
+          {completedEmoji}
         </View>
       )}
     </View>
