@@ -13,6 +13,5 @@ export const isTangramComplete = (coumpoundPath, groups) => {
       insert: false,
     })
   }
-  console.log(newCoumpoundPath.length, coumpoundPath.length)
   return newCoumpoundPath.length === coumpoundPath.length
 }
