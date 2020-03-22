@@ -92,16 +92,19 @@ export const Gallery = () => {
       >
         {DEV && (
           <Button onClick={requestSave}>
-            <View as={FiSave} />
+            <View as={FiSave} css={{ m: "auto" }} />
           </Button>
         )}
         {galleryOpened && (
           <Button onClick={handleStartPlaylist}>
-            <View as={pendingSelectedTangrams.length ? FiPlay : FiShuffle} />
+            <View
+              as={pendingSelectedTangrams.length ? FiPlay : FiShuffle}
+              css={{ m: "auto" }}
+            />
           </Button>
         )}
         <Button onClick={handleGalleryToggle}>
-          <View as={galleryOpened ? FiX : FiGrid} />
+          <View as={galleryOpened ? FiX : FiGrid} css={{ m: "auto" }} />
         </Button>
       </View>
     </>

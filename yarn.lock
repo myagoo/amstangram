@@ -946,17 +946,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@css-system/gatsby-plugin-css-system@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@css-system/gatsby-plugin-css-system/-/gatsby-plugin-css-system-0.4.0.tgz#5cb6716c6d4517fa53f01a60669ddc484c96d0d3"
-  integrity sha512-wBTXU0e9CjrtKRIkJXW4H6Mq0JIaQxmrvz0Mopayrv2lla35Ny9INCI5kf5KX+vqmFeelT5L/RbJ4q/vclPDXg==
-
-"@css-system/use-css@0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@css-system/use-css/-/use-css-0.4.1.tgz#666fff13736bbe273cc7de5f6a0802f336230f84"
-  integrity sha512-YKMTqfZtjmILGwPDdzfYfleAkGNNqncQSqfwMgXAyf8iWKjh4C7uaNLl/y2K389/6LpzBX+kgFWMFSHdaaXdEg==
-  dependencies:
-    hash-sum "^2.0.0"
+"@css-system/gatsby-plugin-css-system@0.4.3":
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/@css-system/gatsby-plugin-css-system/-/gatsby-plugin-css-system-0.4.3.tgz#0afdc2b28c1d05b20c9c13125d4d008bb563a6b2"
+  integrity sha512-mK/lhIo758zvFSsqGyDf6mJohCpwCexWNfMPa15DXPd3tX802tpbHItkkl0Sj2SQm1NLmiZ4N03O7N5KvjXIpA==
 
 "@hapi/address@2.x.x":
   version "2.1.4"
@@ -3169,6 +3162,13 @@ css-selector-tokenizer@^0.7.0:
     cssesc "^0.1.0"
     fastparse "^1.1.1"
     regexpu-core "^1.0.0"
+
+css-system@0.5.1:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/css-system/-/css-system-0.5.1.tgz#c9f5f459fcb5791b81a7b9224cb90d331fcbba0b"
+  integrity sha512-FjuAy/UCrWasFWq4eDUF2lC2/ruSmg1UHJiVfgN300KO+CczMAsZXwA/Wh3W981gK9OawpoHWjptdNRbOYxQ2A==
+  dependencies:
+    hash-sum "^2.0.0"
 
 css-tree@1.0.0-alpha.37:
   version "1.0.0-alpha.37"

@@ -28,8 +28,8 @@
     ]
   },
   "dependencies": {
-    "@css-system/gatsby-plugin-css-system": "^0.4.0",
-    "@css-system/use-css": "0.4.1",
+    "@css-system/gatsby-plugin-css-system": "0.4.3",
+    "css-system": "0.5.1",
     "body-parser": "^1.19.0",
     "gatsby": "2.19.22",
     "gatsby-plugin-manifest": "^2.2.42",

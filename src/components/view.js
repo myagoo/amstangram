@@ -1,4 +1,4 @@
-import { useCss, ThemeContext } from "@css-system/use-css"
+import { useCss, ThemeContext } from "css-system"
 import React, { useContext, useMemo } from "react"
 
 const createGapRules = (flexDirection, gap, theme) => {
@@ -66,7 +66,7 @@ const createGapRules = (flexDirection, gap, theme) => {
 }
 
 export const View = React.forwardRef(
-  ({ as: Component = "div", css, deps = [], ...props }, ref) => {
+  ({ as: Component = "div", css, deps, ...props }, ref) => {
     const { gap, ...otherCssProps } = {
       display: "flex",
       minWidth: 0,
