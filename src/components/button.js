@@ -23,6 +23,7 @@ export const Button = ({ as: Component = "button", css, ...props }) => {
     color: "#fff",
     size: "button",
     cursor: "pointer",
+    p: 0,
     "&:disabled": {
       opacity: 0.5,
       cursor: "not-allowed",
