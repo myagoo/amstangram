@@ -16,12 +16,13 @@ export const TangramsProvider = ({ children }) => {
 
   const { tangrams } = useStaticQuery(graphql`
     fragment TangramFragment on TangramsJson {
-      path
       id
+      emoji
+      height
+      order
+      path
       percent
       width
-      height
-      emoji
     }
 
     query GalleryQuery {
