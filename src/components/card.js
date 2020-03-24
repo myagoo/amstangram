@@ -1,8 +1,9 @@
 import React from "react"
 import { View } from "./view"
+import { DEV } from "../constants"
 
 export const Card = ({
-  tangram: { difficulty, path, width, height },
+  tangram: { parent, difficulty, path, width, height },
   completedEmoji,
   selected,
   ...props
@@ -17,6 +18,7 @@ export const Card = ({
       : "gray"
   return (
     <View
+      className="card"
       css={{
         borderRadius: 5,
         boxShadow: selected
@@ -49,6 +51,7 @@ export const Card = ({
           {completedEmoji}
         </View>
       )}
+      {DEV && parent.name}
     </View>
   )
 }

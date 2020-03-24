@@ -23,6 +23,11 @@ export const TangramsProvider = ({ children }) => {
       path
       percent
       width
+      parent {
+        ... on File {
+          name
+        }
+      }
     }
 
     query GalleryQuery {

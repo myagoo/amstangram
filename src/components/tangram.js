@@ -68,13 +68,13 @@ export const Tangram = () => {
 
   // Handle save tangram request
   useEffect(() => {
-    if (saveRequestId) {
+    if (saveRequestId && DEV) {
       if (isTangramValid(groupsRef.current)) {
         const scaleFactor = getScaleFactor(canvasRef.current)
         const category =
           prompt("Categorie:\n" + categories.join("\n")) || "misc"
         const name = prompt("Name:") || Date.now()
-        const emoji = prompt("Emoji:") || getRandomEmoji()
+        const emoji = prompt("Emoji:") || undefined
 
         fetch(`/save`, {
           method: "POST",

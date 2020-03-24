@@ -52,6 +52,7 @@ export const Gallery = () => {
   return (
     <>
       <View
+        className="gallery"
         css={{
           position: "fixed",
           left: "0",
@@ -59,48 +60,61 @@ export const Gallery = () => {
           transition: "transform .3s ease",
           width: "100vw",
           height: "100%",
-          background: "#ecf0f1",
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, 128px)",
-          gridColumnGap: 3,
-          gridRowGap: 3,
-          justifyContent: "center",
-          justifyItems: "center",
-          alignItems: "center",
           overflow: "auto",
           p: 3,
+          gap: 4,
         }}
         deps={[galleryOpened]}
       >
         {tangrams.group.map(({ fieldValue, nodes }) => (
-          <React.Fragment key={fieldValue}>
-            {fieldValue}
-            {nodes
-              .map(({ percent, ...node }) => {
-                const difficulty = percent > 50 ? 0 : percent > 20 ? 1 : 2
-                return {
-                  ...node,
-                  difficulty,
-                }
-              })
-              .sort((tangramA, tangramB) => {
-                return tangramA.order && tangramB.order
-                  ? tangramA.order - tangramB.order
-                  : tangramA.difficulty - tangramB.difficulty
-              })
-              .map(tangram => (
-                <Card
-                  key={tangram.id}
-                  tangram={tangram}
-                  completedEmoji={completedTangramsEmoji[tangram.id]}
-                  selected={pendingSelectedTangrams.some(
-                    pendingSelectedTangram =>
-                      pendingSelectedTangram.id === tangram.id
-                  )}
-                  onClick={() => handleTangramClick(tangram)}
-                />
-              ))}
-          </React.Fragment>
+          <View key={fieldValue} css={{ gap: 3 }}>
+            <View
+              css={{
+                px: 4,
+                fontSize: 5,
+                textTransform: "uppercase",
+              }}
+            >
+              {fieldValue}
+            </View>
+            <View
+              css={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, 128px)",
+                gridColumnGap: 3,
+                gridRowGap: 3,
+                justifyContent: "center",
+                justifyItems: "center",
+                alignItems: "center",
+              }}
+            >
+              {nodes
+                .map(({ percent, ...node }) => {
+                  const difficulty = percent > 50 ? 0 : percent > 20 ? 1 : 2
+                  return {
+                    ...node,
+                    difficulty,
+                  }
+                })
+                .sort((tangramA, tangramB) => {
+                  return tangramA.order && tangramB.order
+                    ? tangramA.order - tangramB.order
+                    : tangramA.difficulty - tangramB.difficulty
+                })
+                .map(tangram => (
+                  <Card
+                    key={tangram.id}
+                    tangram={tangram}
+                    completedEmoji={completedTangramsEmoji[tangram.id]}
+                    selected={pendingSelectedTangrams.some(
+                      pendingSelectedTangram =>
+                        pendingSelectedTangram.id === tangram.id
+                    )}
+                    onClick={() => handleTangramClick(tangram)}
+                  />
+                ))}
+            </View>
+          </View>
         ))}
       </View>
       <View

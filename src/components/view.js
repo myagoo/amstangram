@@ -97,6 +97,14 @@ export const View = React.forwardRef(
       deps
     )
 
-    return <Component ref={ref} className={className} {...props} />
+    return (
+      <Component
+        ref={ref}
+        {...props}
+        className={`${className}${
+          props.className ? ` ${props.className}` : ""
+        }`}
+      />
+    )
   }
 )

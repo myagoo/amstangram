@@ -26,6 +26,24 @@ export default () => {
       height: "100%",
     },
 
+    ".gallery": {
+      color: "galleryTextLight",
+      bg: "galleryBackgroundLight",
+      transition: "background 200ms, color 200ms",
+    },
+    "body.dark .gallery": {
+      color: "galleryTextDark",
+      bg: "galleryBackgroundDark",
+    },
+
+    ".card": {
+      bg: "backgroundLight",
+      transition: "background 200ms",
+    },
+    "body.dark .card": {
+      bg: "backgroundDark",
+    },
+
     "#gatsby-focus-wrapper": {
       display: "flex",
       flexDirection: "column",
