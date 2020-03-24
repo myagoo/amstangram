@@ -42,7 +42,7 @@ export const Card = ({
           fill: color,
         }}
         viewBox={`0 0 ${width} ${height}`}
-        dangerouslySetInnerHTML={{ __html: path }}
+        dangerouslySetInnerHTML={{ __html: `<path d="${path}" />` }}
       />
       {completedEmoji && (
         <View css={{ position: "absolute", top: 2, left: 2, fontSize: "30px" }}>

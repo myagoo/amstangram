@@ -2,5 +2,5 @@
   "width": 400,
   "height": 200,
   "percent": 9,
-  "path": "<path xmlns=\"http://www.w3.org/2000/svg\" d=\"M200,0l200,200l-400,0z\"          font-family=\"none\" font-weight=\"none\" font-size=\"none\" text-anchor=\"none\" style=\"mix-blend-mode: normal\"/>"
+  "path": "M200,0l200,200l-400,0z"
 }

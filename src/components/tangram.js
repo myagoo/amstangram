@@ -350,9 +350,12 @@ export const Tangram = () => {
       }
 
       if (selectedTangram) {
-        const coumpoundPath = paper.project.importSVG(selectedTangram.path, {
-          applyMatrix: true,
-        })
+        const coumpoundPath = paper.project.importSVG(
+          `<path d="${selectedTangram.path}" />`,
+          {
+            applyMatrix: true,
+          }
+        )
 
         const scaleFactor = getScaleFactor(canvasRef.current)
 

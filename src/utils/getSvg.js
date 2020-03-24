@@ -23,10 +23,7 @@ export const getSvg = (groups, scaleFactor) => {
     compoundPath.bounds.height / 2
   )
 
-  const path = compoundPath
-    .exportSVG({ asString: true })
-    .replace(/fill-?[^']*?="[^']*?"/g, "")
-    .replace(/stroke-?[^']*?="[^']*?"/g, "")
+  const path = compoundPath.exportSVG().getAttribute("d")
   const width = compoundPath.bounds.width
   const height = compoundPath.bounds.height
   const length = Math.ceil(compoundPath.length)
