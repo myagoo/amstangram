@@ -32,7 +32,9 @@ import { Victory } from "./victory"
 export const Tangram = () => {
   const theme = useContext(ThemeContext)
   const {
+    tangrams,
     setCompletedTangramEmoji,
+    finishSave,
     saveRequestId,
     selectedTangrams,
     setSelectedTangrams,
@@ -70,20 +72,25 @@ export const Tangram = () => {
     if (saveRequestId) {
       if (isTangramValid(groupsRef.current)) {
         const scaleFactor = getScaleFactor(canvasRef.current)
+        const categories = tangrams.group.map(group => group.fieldValue)
+        const category = prompt("Categorie:\n" + categories.join("\n"))
 
-        fetch(`/save`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...getSvg(groupsRef.current, scaleFactor),
-            category: "misc",
-          }),
-        })
+        if (category) {
+          fetch(`/save`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              ...getSvg(groupsRef.current, scaleFactor),
+              category,
+            }),
+          })
+        }
       } else {
         alert("Tangram is not valid")
       }
+      finishSave()
     }
-  }, [canvasRef, saveRequestId, groupsRef])
+  }, [canvasRef, groupsRef, saveRequestId, finishSave, tangrams.group])
 
   // Handle window resize
   useEffect(() => {
