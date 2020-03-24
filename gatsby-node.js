@@ -7,7 +7,11 @@ exports.onCreateDevServer = ({ app }) => {
   app.use(bodyParser.json())
   app.post("/save", function(req, res) {
     fs.writeFileSync(
-      path.join(process.cwd(), "tangrams", Date.now() + ".json"),
+      path.join(
+        process.cwd(),
+        "tangrams",
+        req.body.category + "-" + req.body.name + ".json"
+      ),
       JSON.stringify(req.body)
     )
     res.sendStatus(200)

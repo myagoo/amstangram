@@ -3,5 +3,7 @@
   "height": 249.9999999999999,
   "percent": 1,
   "path": "M150,250l-150,-150l100,-100l50,50l50,-50l100,100z",
-  "category": "misc"
+  "category": "objects",
+  "emoji": "💚",
+  "name": "heart"
 }

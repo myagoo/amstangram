@@ -71,18 +71,21 @@ export const Tangram = () => {
     if (saveRequestId) {
       if (isTangramValid(groupsRef.current)) {
         const scaleFactor = getScaleFactor(canvasRef.current)
-        const category = prompt("Categorie:\n" + categories.join("\n"))
+        const category =
+          prompt("Categorie:\n" + categories.join("\n")) || "misc"
+        const name = prompt("Name:") || Date.now()
+        const emoji = prompt("Emoji:") || getRandomEmoji()
 
-        if (category) {
-          fetch(`/save`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              ...getSvg(groupsRef.current, scaleFactor),
-              category,
-            }),
-          })
-        }
+        fetch(`/save`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...getSvg(groupsRef.current, scaleFactor),
+            category,
+            emoji,
+            name,
+          }),
+        })
       } else {
         alert("Tangram is not valid")
       }
