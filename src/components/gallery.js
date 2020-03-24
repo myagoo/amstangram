@@ -73,7 +73,7 @@ export const Gallery = () => {
         deps={[galleryOpened]}
       >
         {tangrams.group.map(({ fieldValue, nodes }) => (
-          <>
+          <React.Fragment key={fieldValue}>
             {fieldValue}
             {nodes
               .map(({ percent, ...node }) => {
@@ -100,7 +100,7 @@ export const Gallery = () => {
                   onClick={() => handleTangramClick(tangram)}
                 />
               ))}
-          </>
+          </React.Fragment>
         ))}
       </View>
 

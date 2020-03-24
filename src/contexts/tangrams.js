@@ -21,6 +21,7 @@ export const TangramsProvider = ({ children }) => {
       percent
       width
       height
+      emoji
     }
 
     query GalleryQuery {

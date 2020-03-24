@@ -275,7 +275,9 @@ export const Tangram = () => {
         ghostGroup = null
 
         if (isTangramComplete(coumpoundPathRef.current, groupsRef.current)) {
-          const emoji = getRandomEmoji()
+          const emoji = selectedTangram.emoji
+            ? selectedTangram.emoji
+            : getRandomEmoji()
 
           setCompletedTangramEmoji(selectedTangram, emoji)
 
