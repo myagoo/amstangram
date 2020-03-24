@@ -83,11 +83,11 @@ export const Gallery = () => {
                   difficulty,
                 }
               })
-              .sort(
-                ({ difficulty: difficultyA }, { difficulty: difficultyB }) => {
-                  return difficultyA - difficultyB
-                }
-              )
+              .sort((tangramA, tangramB) => {
+                return tangramA.order && tangramB.order
+                  ? tangramA.order - tangramB.order
+                  : tangramA.difficulty - tangramB.difficulty
+              })
               .map(tangram => (
                 <Card
                   key={tangram.id}

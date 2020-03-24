@@ -4,5 +4,6 @@
   "percent": 33,
   "path": "M100,350l-50,-50v0h100zM0,250l50,-50l50,50l0,-200l-50,-50l200,0l-50,50l0,200l-50,50h-100z",
   "category": "letters",
-  "emoji": "🅹"
+  "emoji": "🅹",
+  "order": 10
 }
