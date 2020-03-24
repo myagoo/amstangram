@@ -34,7 +34,6 @@ export const Tangram = () => {
   const {
     tangrams,
     setCompletedTangramEmoji,
-    finishSave,
     saveRequestId,
     selectedTangrams,
     setSelectedTangrams,
@@ -88,9 +87,10 @@ export const Tangram = () => {
       } else {
         alert("Tangram is not valid")
       }
-      finishSave()
     }
-  }, [canvasRef, groupsRef, saveRequestId, finishSave, tangrams.group])
+    // Do not add tangrams.group to deps because it change when a tangram is created
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canvasRef, groupsRef, saveRequestId])
 
   // Handle window resize
   useEffect(() => {

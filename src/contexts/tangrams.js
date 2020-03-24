@@ -43,10 +43,6 @@ export const TangramsProvider = ({ children }) => {
     setSaveRequestId(prevRequestId => prevRequestId + 1)
   }, [])
 
-  const finishSave = useCallback(() => {
-    setSaveRequestId(prevRequestId => prevRequestId - 1)
-  }, [])
-
   useEffect(() => {
     const newCompletedTangramsEmoji = {}
     for (const { id } of tangrams.nodes) {
@@ -66,7 +62,6 @@ export const TangramsProvider = ({ children }) => {
   const contextValue = useMemo(() => {
     return {
       completedTangramsEmoji,
-      finishSave,
       requestSave,
       saveRequestId,
       selectedTangrams,
@@ -76,7 +71,6 @@ export const TangramsProvider = ({ children }) => {
     }
   }, [
     completedTangramsEmoji,
-    finishSave,
     requestSave,
     saveRequestId,
     selectedTangrams,
