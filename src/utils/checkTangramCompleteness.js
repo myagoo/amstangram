@@ -13,5 +13,8 @@ export const isTangramComplete = (coumpoundPath, groups) => {
       insert: false,
     })
   }
-  return newCoumpoundPath.length === coumpoundPath.length
+  return (
+    Math.round(newCoumpoundPath.length * 1000) ===
+    Math.round(coumpoundPath.length * 1000)
+  )
 }
