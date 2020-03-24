@@ -74,7 +74,10 @@ export const Tangram = () => {
         fetch(`/save`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(getSvg(groupsRef.current, scaleFactor)),
+          body: JSON.stringify({
+            ...getSvg(groupsRef.current, scaleFactor),
+            category: "misc",
+          }),
         })
       } else {
         alert("Tangram is not valid")

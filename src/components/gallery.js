@@ -16,15 +16,21 @@ export const Gallery = () => {
   } = useContext(TangramsContext)
 
   const [pendingSelectedTangrams, setPendingSelectedTangrams] = useState([])
-
   const [galleryOpened, setGalleryOpened] = useState(false)
 
-  const handleTangramClick = svgContent => {
+  const handleTangramClick = clickedTangram => {
     setPendingSelectedTangrams(prevPendingSelectedTangrams => {
-      if (prevPendingSelectedTangrams.includes(svgContent)) {
-        return pendingSelectedTangrams.filter(tangram => tangram !== svgContent)
+      if (
+        prevPendingSelectedTangrams.some(
+          pendingSelectedTangram =>
+            pendingSelectedTangram.id === clickedTangram.id
+        )
+      ) {
+        return pendingSelectedTangrams.filter(
+          tangram => tangram.id !== clickedTangram.id
+        )
       }
-      return [...pendingSelectedTangrams, svgContent]
+      return [...pendingSelectedTangrams, clickedTangram]
     })
   }
 
@@ -37,7 +43,7 @@ export const Gallery = () => {
     if (pendingSelectedTangrams.length) {
       setSelectedTangrams(pendingSelectedTangrams)
     } else {
-      setSelectedTangrams(shuffle(tangrams))
+      setSelectedTangrams(shuffle(tangrams.nodes))
     }
     setPendingSelectedTangrams([])
     setGalleryOpened(false)
@@ -66,17 +72,36 @@ export const Gallery = () => {
         }}
         deps={[galleryOpened]}
       >
-        {tangrams.map(tangram => {
-          return (
-            <Card
-              key={tangram.id}
-              tangram={tangram}
-              completedEmoji={completedTangramsEmoji[tangram.id]}
-              selected={pendingSelectedTangrams.includes(tangram)}
-              onClick={() => handleTangramClick(tangram)}
-            />
-          )
-        })}
+        {tangrams.group.map(({ fieldValue, nodes }) => (
+          <>
+            {fieldValue}
+            {nodes
+              .map(({ percent, ...node }) => {
+                const difficulty = percent > 50 ? 0 : percent > 20 ? 1 : 2
+                return {
+                  ...node,
+                  difficulty,
+                }
+              })
+              .sort(
+                ({ difficulty: difficultyA }, { difficulty: difficultyB }) => {
+                  return difficultyA - difficultyB
+                }
+              )
+              .map(tangram => (
+                <Card
+                  key={tangram.id}
+                  tangram={tangram}
+                  completedEmoji={completedTangramsEmoji[tangram.id]}
+                  selected={pendingSelectedTangrams.some(
+                    pendingSelectedTangram =>
+                      pendingSelectedTangram.id === tangram.id
+                  )}
+                  onClick={() => handleTangramClick(tangram)}
+                />
+              ))}
+          </>
+        ))}
       </View>
 
       <View

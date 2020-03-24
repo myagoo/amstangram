@@ -14,33 +14,29 @@ export const TangramsProvider = ({ children }) => {
   const [saveRequestId, setSaveRequestId] = useState(0)
   const [completedTangramsEmoji, setCompletedTangramsEmoji] = useState({})
 
-  const { tangramsJson } = useStaticQuery(graphql`
+  const { tangrams } = useStaticQuery(graphql`
+    fragment TangramFragment on TangramsJson {
+      path
+      id
+      percent
+      width
+      height
+    }
+
     query GalleryQuery {
-      tangramsJson: allTangramsJson {
+      tangrams: allTangramsJson {
+        group(field: category) {
+          fieldValue
+          nodes {
+            ...TangramFragment
+          }
+        }
         nodes {
-          path
-          id
-          percent
-          width
-          height
+          ...TangramFragment
         }
       }
     }
   `)
-
-  const tangrams = useMemo(() => {
-    return tangramsJson.nodes
-      .map(({ percent, ...node }) => {
-        const difficulty = percent > 50 ? 0 : percent > 20 ? 1 : 2
-        return {
-          ...node,
-          difficulty,
-        }
-      })
-      .sort(({ difficulty: difficultyA }, { difficulty: difficultyB }) => {
-        return difficultyA - difficultyB
-      })
-  }, [tangramsJson])
 
   const requestSave = useCallback(() => {
     setSaveRequestId(prevRequestId => prevRequestId + 1)
@@ -48,11 +44,11 @@ export const TangramsProvider = ({ children }) => {
 
   useEffect(() => {
     const newCompletedTangramsEmoji = {}
-    for (const { id } of tangrams) {
+    for (const { id } of tangrams.nodes) {
       newCompletedTangramsEmoji[id] = localStorage.getItem(id)
     }
     setCompletedTangramsEmoji(newCompletedTangramsEmoji)
-  }, [tangrams])
+  }, [tangrams.nodes])
 
   const setCompletedTangramEmoji = useCallback((tangram, emoji) => {
     localStorage.setItem(tangram.id, emoji)
