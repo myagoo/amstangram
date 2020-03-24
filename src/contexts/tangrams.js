@@ -39,6 +39,13 @@ export const TangramsProvider = ({ children }) => {
     }
   `)
 
+  const categories = useMemo(
+    () => tangrams.group.map(group => group.fieldValue),
+    // Do not add tangrams.group to deps because it change when a tangram is created
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
+
   const requestSave = useCallback(() => {
     setSaveRequestId(prevRequestId => prevRequestId + 1)
   }, [])
@@ -68,6 +75,7 @@ export const TangramsProvider = ({ children }) => {
       setCompletedTangramEmoji,
       setSelectedTangrams,
       tangrams,
+      categories,
     }
   }, [
     completedTangramsEmoji,
@@ -76,6 +84,7 @@ export const TangramsProvider = ({ children }) => {
     selectedTangrams,
     setCompletedTangramEmoji,
     tangrams,
+    categories,
   ])
 
   return (

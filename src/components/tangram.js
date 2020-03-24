@@ -32,7 +32,7 @@ import { Victory } from "./victory"
 export const Tangram = () => {
   const theme = useContext(ThemeContext)
   const {
-    tangrams,
+    categories,
     setCompletedTangramEmoji,
     saveRequestId,
     selectedTangrams,
@@ -71,7 +71,6 @@ export const Tangram = () => {
     if (saveRequestId) {
       if (isTangramValid(groupsRef.current)) {
         const scaleFactor = getScaleFactor(canvasRef.current)
-        const categories = tangrams.group.map(group => group.fieldValue)
         const category = prompt("Categorie:\n" + categories.join("\n"))
 
         if (category) {
@@ -88,9 +87,7 @@ export const Tangram = () => {
         alert("Tangram is not valid")
       }
     }
-    // Do not add tangrams.group to deps because it change when a tangram is created
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [canvasRef, groupsRef, saveRequestId])
+  }, [canvasRef, groupsRef, saveRequestId, categories])
 
   // Handle window resize
   useEffect(() => {
