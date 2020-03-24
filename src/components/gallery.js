@@ -103,7 +103,6 @@ export const Gallery = () => {
           </React.Fragment>
         ))}
       </View>
-
       <View
         css={{
           gap: 3,

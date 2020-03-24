@@ -8,6 +8,7 @@ module.exports = {
       },
     },
     "gatsby-transformer-json",
+    "gatsby-plugin-dark-mode",
     {
       resolve: "@css-system/gatsby-plugin-css-system",
       options: {
@@ -33,7 +34,8 @@ module.exports = {
               rh: "#54A0FF",
             },
             collision: "#bdc3c7",
-            background: "#b7efe0",
+            backgroundLight: "#fff",
+            backgroundDark: "#232129",
           },
         },
       },
