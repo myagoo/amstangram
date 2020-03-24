@@ -29,14 +29,14 @@
   },
   "dependencies": {
     "@css-system/gatsby-plugin-css-system": "0.4.3",
-    "css-system": "0.5.1",
     "body-parser": "^1.19.0",
+    "css-system": "0.5.1",
     "gatsby": "2.19.22",
     "gatsby-plugin-manifest": "^2.2.42",
     "gatsby-plugin-offline": "^3.0.35",
     "gatsby-plugin-remove-serviceworker": "^1.0.0",
     "gatsby-source-filesystem": "^2.1.48",
-    "gatsby-transformer-svg": "^1.0.0",
+    "gatsby-transformer-json": "^2.3.1",
     "gh-pages": "^2.2.0",
     "paper": "^0.12.4",
     "paper-jsdom": "^0.12.4",
@@ -44,6 +44,7 @@
     "react-dom": "16.13.0",
     "react-helmet": "^5.2.1",
     "react-icons": "^3.9.0",
-    "react-router-dom": "^5.1.2"
+    "react-router-dom": "^5.1.2",
+    "sharp": "^0.25.2"
   }
 }

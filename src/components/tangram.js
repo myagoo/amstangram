@@ -74,7 +74,7 @@ export const Tangram = () => {
         fetch(`/save`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ svg: getSvg(groupsRef.current, scaleFactor) }),
+          body: JSON.stringify(getSvg(groupsRef.current, scaleFactor)),
         })
       } else {
         alert("Tangram is not valid")
@@ -350,14 +350,7 @@ export const Tangram = () => {
       }
 
       if (selectedTangram) {
-        const parser = new DOMParser()
-        const document = parser.parseFromString(
-          selectedTangram.content,
-          "image/svg+xml"
-        )
-        const svg = document.firstElementChild
-
-        const coumpoundPath = paper.project.importSVG(svg.firstElementChild, {
+        const coumpoundPath = paper.project.importSVG(selectedTangram.path, {
           applyMatrix: true,
         })
 

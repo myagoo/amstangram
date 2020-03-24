@@ -1,11 +1,11 @@
+import { graphql, useStaticQuery } from "gatsby"
 import React, {
   createContext,
   useCallback,
+  useEffect,
   useMemo,
   useState,
-  useEffect,
 } from "react"
-import { useStaticQuery, graphql } from "gatsby"
 
 export const TangramsContext = createContext({})
 
@@ -14,32 +14,33 @@ export const TangramsProvider = ({ children }) => {
   const [saveRequestId, setSaveRequestId] = useState(0)
   const [completedTangramsEmoji, setCompletedTangramsEmoji] = useState({})
 
-  const { svgs } = useStaticQuery(graphql`
+  const { tangramsJson } = useStaticQuery(graphql`
     query GalleryQuery {
-      svgs: allSvg {
+      tangramsJson: allTangramsJson {
         nodes {
-          content
+          path
           id
+          percent
+          width
+          height
         }
       }
     }
   `)
 
   const tangrams = useMemo(() => {
-    return svgs.nodes
-      .map(({ id, content }) => {
-        const percent = content.match(/data-percent="(-?\d\d?\d?)"/)[1]
+    return tangramsJson.nodes
+      .map(({ percent, ...node }) => {
         const difficulty = percent > 50 ? 0 : percent > 20 ? 1 : 2
         return {
-          id,
+          ...node,
           difficulty,
-          content,
         }
       })
       .sort(({ difficulty: difficultyA }, { difficulty: difficultyB }) => {
         return difficultyA - difficultyB
       })
-  }, [svgs])
+  }, [tangramsJson])
 
   const requestSave = useCallback(() => {
     setSaveRequestId(prevRequestId => prevRequestId + 1)

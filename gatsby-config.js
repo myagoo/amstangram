@@ -7,7 +7,7 @@ module.exports = {
         name: "tangrams",
       },
     },
-    "gatsby-transformer-svg",
+    "gatsby-transformer-json",
     {
       resolve: "@css-system/gatsby-plugin-css-system",
       options: {

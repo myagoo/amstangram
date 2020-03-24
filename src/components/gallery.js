@@ -70,8 +70,7 @@ export const Gallery = () => {
           return (
             <Card
               key={tangram.id}
-              svg={tangram.content}
-              difficulty={tangram.difficulty}
+              tangram={tangram}
               completedEmoji={completedTangramsEmoji[tangram.id]}
               selected={pendingSelectedTangrams.includes(tangram)}
               onClick={() => handleTangramClick(tangram)}

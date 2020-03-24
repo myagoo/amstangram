@@ -2,8 +2,7 @@ import React from "react"
 import { View } from "./view"
 
 export const Card = ({
-  svg,
-  difficulty,
+  tangram: { difficulty, path, width, height },
   completedEmoji,
   selected,
   ...props
@@ -35,15 +34,15 @@ export const Card = ({
       {...props}
     >
       <View
+        as="svg"
         css={{
           flex: "1",
           justifyContent: "center",
-          "& > *": {
-            width: "100%",
-            fill: color,
-          },
+          width: "100%",
+          fill: color,
         }}
-        dangerouslySetInnerHTML={{ __html: svg }}
+        viewBox={`0 0 ${width} ${height}`}
+        dangerouslySetInnerHTML={{ __html: path }}
       />
       {completedEmoji && (
         <View css={{ position: "absolute", top: 2, left: 2, fontSize: "30px" }}>

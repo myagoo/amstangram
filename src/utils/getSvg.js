@@ -23,7 +23,7 @@ export const getSvg = (groups, scaleFactor) => {
     compoundPath.bounds.height / 2
   )
 
-  const svg = compoundPath
+  const path = compoundPath
     .exportSVG({ asString: true })
     .replace(/fill-?[^']*?="[^']*?"/g, "")
     .replace(/stroke-?[^']*?="[^']*?"/g, "")
@@ -34,5 +34,10 @@ export const getSvg = (groups, scaleFactor) => {
     ((length - LENGTH_MIN) / (LENGTH_MAX - LENGTH_MIN)) * 100
   )
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" data-percent="${percent}">${svg}</svg>`
+  return {
+    width,
+    height,
+    percent,
+    path,
+  }
 }
