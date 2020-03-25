@@ -13,6 +13,7 @@ import { View } from "../components/view"
 import {
   CLICK_TIMEOUT,
   DEV,
+  SCALE_PADDING,
   SNAP_DISTANCE,
   VICTORY_PARTICLES_DURATION,
 } from "../constants"
@@ -20,12 +21,11 @@ import { TangramsContext } from "../contexts/tangrams"
 import { isTangramComplete } from "../utils/checkTangramCompleteness"
 import { createPieces } from "../utils/createGroups"
 import { getRandomEmoji } from "../utils/getRandomEmoji"
-import { getScaleFactor } from "../utils/getScaleFactor"
 import { getSnapVector } from "../utils/getSnapVector"
 import { getSvg } from "../utils/getSvg"
 import { isTangramValid } from "../utils/isTangramValid"
 import { restrictGroupWithinCanvas } from "../utils/restrictGroupWithinCanvas"
-import { scrambleGroups } from "../utils/scrambleGroups"
+import { scrambleGroup } from "../utils/scrambleGroup"
 import { updateColisionState } from "../utils/updateColisionState"
 import { Victory } from "./victory"
 
@@ -43,6 +43,7 @@ export const Tangram = () => {
   const [victoryEmoji, setVictoryEmoji] = useState(null)
 
   const canvasRef = useRef()
+  const scaleFactorRef = useRef()
   const groupsRef = useRef()
   const particlesRef = useRef()
   const coumpoundPathRef = useRef()
@@ -70,7 +71,6 @@ export const Tangram = () => {
   useEffect(() => {
     if (saveRequestId && DEV) {
       if (isTangramValid(groupsRef.current)) {
-        const scaleFactor = getScaleFactor(canvasRef.current)
         const category =
           prompt("Categorie:\n" + categories.join("\n")) || "misc"
         const name = prompt("Name:") || Date.now()
@@ -80,7 +80,7 @@ export const Tangram = () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            ...getSvg(groupsRef.current, scaleFactor),
+            ...getSvg(groupsRef.current, scaleFactorRef.current),
             category,
             emoji,
             name,
@@ -90,7 +90,7 @@ export const Tangram = () => {
         alert("Tangram is not valid")
       }
     }
-  }, [canvasRef, groupsRef, saveRequestId, categories])
+  }, [groupsRef, saveRequestId, categories])
 
   // Handle window resize
   useEffect(() => {
@@ -329,62 +329,59 @@ export const Tangram = () => {
     }
 
     const init = () => {
-      const parentRect = canvasRef.current.parentElement.getBoundingClientRect()
-
-      canvasRef.current.width = parentRect.width
-      canvasRef.current.height = parentRect.height
-
       paper.setup(canvasRef.current)
 
       groupsRef.current = createPieces(theme.colors.pieces)
 
-      const largeTriangle = groupsRef.current[3]
-
-      const scaleFactor = getScaleFactor(canvasRef.current)
-
-      const newBounds = {
-        ...paper.project.view.bounds,
-        width: largeTriangle.bounds.width * scaleFactor,
-        height: largeTriangle.bounds.height * scaleFactor,
-      }
-
-      paper.project.activeLayer.fitBounds(newBounds)
-
-      scrambleGroups(groupsRef.current, canvasRef.current)
-
-      for (const group of groupsRef.current) {
-        attachGroupEvents(group)
-        restrictGroupWithinCanvas(group, canvasRef.current)
-      }
-
-      for (const group of groupsRef.current) {
-        updateColisionState(group, groupsRef.current, theme.colors)
-      }
-
       if (selectedTangram) {
-        const coumpoundPath = paper.project.importSVG(
+        coumpoundPathRef.current = paper.project.importSVG(
           `<path d="${selectedTangram.path}" />`,
           {
             applyMatrix: true,
           }
         )
 
-        const scaleFactor = getScaleFactor(canvasRef.current)
-
-        coumpoundPath.sendToBack()
-        coumpoundPath.position = paper.view.center
-        coumpoundPath.fillRule = "evenodd"
-        coumpoundPath.fillColor = "black"
+        coumpoundPathRef.current.sendToBack()
+        coumpoundPathRef.current.fillRule = "evenodd"
+        coumpoundPathRef.current.fillColor = "black"
 
         if (DEV) {
-          coumpoundPath.strokeWidth = 2
-          coumpoundPath.strokeColor = "red"
+          coumpoundPathRef.current.strokeWidth = 2
+          coumpoundPathRef.current.strokeColor = "red"
         }
 
-        coumpoundPath.closed = true
-        coumpoundPath.scale(scaleFactor)
+        coumpoundPathRef.current.closed = true
+      }
 
-        coumpoundPathRef.current = coumpoundPath
+      const outerBounds = paper.project.view.bounds
+      const innerBounds = coumpoundPathRef.current
+        ? coumpoundPathRef.current.bounds
+        : groupsRef.current[3].bounds.scale(2.5)
+
+      scaleFactorRef.current = Math.min(
+        outerBounds.width / innerBounds.width,
+        outerBounds.height / innerBounds.height
+      )
+
+      console.log(scaleFactorRef.current)
+
+      if (coumpoundPathRef.current) {
+        coumpoundPathRef.current.scale(scaleFactorRef.current)
+
+        paper.project.activeLayer.fitBounds(
+          coumpoundPathRef.current.bounds.expand(-SCALE_PADDING),
+          1
+        )
+
+        coumpoundPathRef.current.position = paper.view.center
+      }
+
+      for (const group of groupsRef.current) {
+        group.scale(scaleFactorRef.current)
+        scrambleGroup(group, canvasRef.current)
+        attachGroupEvents(group)
+        restrictGroupWithinCanvas(group, canvasRef.current)
+        updateColisionState(group, groupsRef.current, theme.colors)
       }
 
       initParticles()
@@ -394,6 +391,7 @@ export const Tangram = () => {
 
     return () => {
       paper.project.remove()
+      coumpoundPathRef.current = null
     }
   }, [theme.colors, selectedTangram, setCompletedTangramEmoji])
 

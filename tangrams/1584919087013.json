@@ -3,5 +3,5 @@
   "height": 249.99999999999994,
   "percent": 26,
   "path": "M200,0l100,100l-100,0l50,50l-50,50l50,50h-200l50,-50l-50,-50l50,-50l-100,0l100,-100l50,50v0l0,0z",
-  "category": "misc"
+  "category": "geometric"
 }

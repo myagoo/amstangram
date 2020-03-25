@@ -70,9 +70,9 @@ export const Gallery = () => {
           <View key={fieldValue} css={{ gap: 3 }}>
             <View
               css={{
-                px: 4,
                 fontSize: 5,
                 textTransform: "uppercase",
+                alignItems: "center",
               }}
             >
               {fieldValue}
