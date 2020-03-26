@@ -10,3 +10,4 @@ export const DEV = process.env.NODE_ENV === "development"
 export const CLICK_TIMEOUT = 300
 export const VICTORY_PARTICLES_DURATION = 1500
 export const VICTORY_EMOJI_DURATION = 5000
+export const SCRAMBLE_PADDING = 100

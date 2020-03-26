@@ -28,6 +28,8 @@ import { restrictGroupWithinCanvas } from "../utils/restrictGroupWithinCanvas"
 import { scrambleGroup } from "../utils/scrambleGroup"
 import { updateColisionState } from "../utils/updateColisionState"
 import { Victory } from "./victory"
+import { Button } from "./button"
+import { FiPlay } from "react-icons/fi"
 
 export const Tangram = () => {
   const theme = useContext(ThemeContext)
@@ -359,11 +361,9 @@ export const Tangram = () => {
         : groupsRef.current[3].bounds.scale(2.5)
 
       scaleFactorRef.current = Math.min(
-        outerBounds.width / innerBounds.width,
-        outerBounds.height / innerBounds.height
+        Math.min(outerBounds.width, 600) / innerBounds.width,
+        Math.min(outerBounds.height, 600) / innerBounds.height
       )
-
-      console.log(scaleFactorRef.current)
 
       if (coumpoundPathRef.current) {
         coumpoundPathRef.current.scale(scaleFactorRef.current)
@@ -431,7 +431,16 @@ export const Tangram = () => {
         }}
         resize="true"
       />
-
+      {DEV &&
+        selectedTangrams.length &&
+        currentTangramIndex < selectedTangrams.length - 1 && (
+          <Button
+            css={{ position: "fixed", right: 3, top: 3 }}
+            onClick={handleNext}
+          >
+            <View as={FiPlay} css={{ m: "auto" }}></View>
+          </Button>
+        )}
       {victoryEmoji && (
         <Victory
           emoji={victoryEmoji}
