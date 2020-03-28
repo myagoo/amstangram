@@ -3,7 +3,7 @@ import { ERROR_MARGIN, ERROR_STROKE, SMALL_TRIANGLE_BASE } from "../constants"
 import { getOffsettedPathPoints } from "./getOffsettedPathPoints"
 import { getTriangleCenter } from "./getTriangleCenter"
 
-const createTriangle = (size, id, color) => {
+const createTriangle = (size, id) => {
   const points = [
     new paper.Point(0, 0),
     new paper.Point(size * 2, 0),
@@ -13,14 +13,12 @@ const createTriangle = (size, id, color) => {
   const shape = new paper.Path({
     segments: points,
     closed: true,
-    fillColor: color,
   })
 
   const inner = new paper.Path({
     segments: getOffsettedPathPoints(points, -ERROR_MARGIN),
     closed: true,
     strokeWidth: ERROR_STROKE,
-    strokeColor: color,
   })
 
   const triangleCenter = getTriangleCenter(points)
@@ -41,7 +39,7 @@ const createTriangle = (size, id, color) => {
   return group
 }
 
-const createRhombus = (size, id, color) => {
+const createRhombus = (size, id) => {
   const points = [
     new paper.Point(0, 0),
     new paper.Point(size * 2, 0),
@@ -52,14 +50,12 @@ const createRhombus = (size, id, color) => {
   const shape = new paper.Path({
     segments: points,
     closed: true,
-    fillColor: color,
   })
 
   const inner = new paper.Path({
     segments: getOffsettedPathPoints(points, -ERROR_MARGIN),
     closed: true,
     strokeWidth: ERROR_STROKE,
-    strokeColor: color,
   })
 
   const group = new paper.Group({
@@ -72,18 +68,16 @@ const createRhombus = (size, id, color) => {
   return group
 }
 
-const createSquare = (size, id, color) => {
+const createSquare = (size, id) => {
   const shape = new paper.Path.Rectangle({
     point: [0, 0],
     size: [size, size],
-    fillColor: color,
   })
 
   const inner = new paper.Path.Rectangle({
     point: [ERROR_MARGIN, ERROR_MARGIN],
     size: [size - ERROR_MARGIN * 2, size - ERROR_MARGIN * 2],
     strokeWidth: ERROR_STROKE,
-    strokeColor: color,
   })
 
   const group = new paper.Group({
@@ -97,18 +91,18 @@ const createSquare = (size, id, color) => {
   return group
 }
 
-export const createPieces = themeColors => {
+export const createPiecesGroup = () => {
   const smallBase = SMALL_TRIANGLE_BASE
   const mediumBase = Math.sqrt(Math.pow(smallBase, 2) * 2)
   const largeBase = Math.sqrt(Math.pow(mediumBase, 2) * 2)
 
-  return [
-    createTriangle(smallBase, "st1", themeColors["st1"]),
-    createTriangle(smallBase, "st2", themeColors["st2"]),
-    createTriangle(mediumBase, "mt1", themeColors["mt1"]),
-    createTriangle(largeBase, "lt1", themeColors["lt1"]),
-    createTriangle(largeBase, "lt2", themeColors["lt2"]),
-    createSquare(mediumBase, "sq", themeColors["sq"]),
-    createRhombus(smallBase, "rh", themeColors["rh"]),
-  ]
+  return new paper.Group([
+    createTriangle(smallBase, "st1"),
+    createTriangle(smallBase, "st2"),
+    createTriangle(mediumBase, "mt1"),
+    createTriangle(largeBase, "lt1"),
+    createTriangle(largeBase, "lt2"),
+    createSquare(mediumBase, "sq"),
+    createRhombus(smallBase, "rh"),
+  ])
 }

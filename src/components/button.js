@@ -20,7 +20,7 @@ export const Button = ({ as: Component = "button", css, ...props }) => {
     border: 0,
     borderRadius: "50%",
     fontSize: 5,
-    color: "#fff",
+    color: "#FFFFFFCC",
     size: "button",
     cursor: "pointer",
     p: 0,

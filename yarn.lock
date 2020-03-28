@@ -953,10 +953,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@css-system/gatsby-plugin-css-system@0.4.3":
-  version "0.4.3"
-  resolved "https://registry.yarnpkg.com/@css-system/gatsby-plugin-css-system/-/gatsby-plugin-css-system-0.4.3.tgz#0afdc2b28c1d05b20c9c13125d4d008bb563a6b2"
-  integrity sha512-mK/lhIo758zvFSsqGyDf6mJohCpwCexWNfMPa15DXPd3tX802tpbHItkkl0Sj2SQm1NLmiZ4N03O7N5KvjXIpA==
+"@css-system/gatsby-plugin-css-system@0.5.6":
+  version "0.5.6"
+  resolved "https://registry.yarnpkg.com/@css-system/gatsby-plugin-css-system/-/gatsby-plugin-css-system-0.5.6.tgz#f22c9428826c26418a9a794b74b6bd68e6187091"
+  integrity sha512-k9lck2F04EFT5Xk2ZcAlaZbKa1r1G/7tFFi5w/gl5AVEb9NFDT+vzShPgunwStzI/7sbcRbg6INTnf9WEO0PxA==
 
 "@hapi/address@2.x.x":
   version "2.1.4"
@@ -4843,13 +4843,6 @@ gatsby-page-utils@^0.0.39:
     glob "^7.1.6"
     lodash "^4.17.15"
     micromatch "^3.1.10"
-
-gatsby-plugin-dark-mode@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/gatsby-plugin-dark-mode/-/gatsby-plugin-dark-mode-1.1.1.tgz#134040b50c0c01287ef5ab5fbbffc4669efd4c6c"
-  integrity sha512-cjQbcSpNLMJ6J8w6Fd8pTraa8aBxiDrrMR6SrpYQTDvrrUxj6xdk5OeugB0RKBtSb956J7gQBtSrsUCc3dy43w==
-  dependencies:
-    prop-types "^15.5.7"
 
 gatsby-plugin-google-analytics@^2.2.2:
   version "2.2.2"
@@ -8785,7 +8778,7 @@ prompts@^2.3.0:
     kleur "^3.0.3"
     sisteransi "^1.0.4"
 
-prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.7, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==

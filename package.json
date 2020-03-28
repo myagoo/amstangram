@@ -28,11 +28,10 @@
     ]
   },
   "dependencies": {
-    "@css-system/gatsby-plugin-css-system": "0.4.3",
+    "@css-system/gatsby-plugin-css-system": "0.5.6",
     "body-parser": "^1.19.0",
     "css-system": "0.5.1",
     "gatsby": "2.19.22",
-    "gatsby-plugin-dark-mode": "^1.1.1",
     "gatsby-plugin-google-analytics": "^2.2.2",
     "gatsby-plugin-manifest": "^2.2.42",
     "gatsby-plugin-offline": "^3.0.35",

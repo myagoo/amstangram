@@ -1,6 +1,6 @@
 import React from "react"
 import { View } from "./view"
-import { DEV } from "../constants"
+import { DEV, COLOR_TRANSITION_DURATION } from "../constants"
 
 export const Card = ({
   tangram: { parent, difficulty, path, width, height },
@@ -24,7 +24,8 @@ export const Card = ({
         boxShadow: selected
           ? `0px 0px 0px 4px ${color}`
           : "0px 0px 0px 1px rgba(0, 0, 0, 0.1)",
-        background: "#fff",
+        bg: "background",
+        transition: `background-color ${COLOR_TRANSITION_DURATION}ms`,
         p: 3,
         textAlign: "center",
         position: "relative",

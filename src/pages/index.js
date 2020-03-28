@@ -1,49 +1,32 @@
 import { useGlobalCss } from "css-system"
-import { ThemeToggler } from "gatsby-plugin-dark-mode"
+import { useSwitchTheme } from "@css-system/gatsby-plugin-css-system"
 import React from "react"
 import { FiMoon, FiSun } from "react-icons/fi"
 import { Button } from "../components/button"
 import { Gallery } from "../components/gallery"
 import { Tangram } from "../components/tangram"
 import { View } from "../components/view"
+import {
+  FADEIN_TRANSITION_DURATION,
+  COLOR_TRANSITION_DURATION,
+  FADEIN_STAGGER_DURATION,
+} from "../constants"
 
 export default () => {
   useGlobalCss({
     body: {
       m: 0,
-      bg: "backgroundLight",
+      bg: "background",
       fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
         "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
         "Helvetica Neue", sans-serif`,
       "-webkit-font-smoothing": "antialiased",
       "-moz-osx-font-smoothing": "grayscale",
-      transition: "background 200ms",
-    },
-    "body.dark": {
-      bg: "backgroundDark",
+      transition: `background-color ${COLOR_TRANSITION_DURATION}ms`,
     },
     "body, html, #___gatsby, #gatsby-focus-wrapper": {
       height: "100%",
     },
-
-    ".gallery": {
-      color: "galleryTextLight",
-      bg: "galleryBackgroundLight",
-      transition: "background 200ms, color 200ms",
-    },
-    "body.dark .gallery": {
-      color: "galleryTextDark",
-      bg: "galleryBackgroundDark",
-    },
-
-    ".card": {
-      bg: "backgroundLight",
-      transition: "background 200ms",
-    },
-    "body.dark .card": {
-      bg: "backgroundDark",
-    },
-
     "#gatsby-focus-wrapper": {
       display: "flex",
       flexDirection: "column",
@@ -56,27 +39,37 @@ export default () => {
     },
     "*": {
       boxSizing: "border-box",
+      userSelect: "none",
+      "-webkit-tap-highlight-color": "rgba(0,0,0,0)",
     },
   })
+
+  const [themeKey, switchTheme] = useSwitchTheme()
 
   return (
     <>
       <Tangram />
       <Gallery />
-      <ThemeToggler>
-        {({ theme, toggleTheme }) => (
-          <Button
-            css={{
-              position: "fixed",
-              left: 3,
-              bottom: 3,
-            }}
-            onClick={() => toggleTheme(theme === "dark" ? "light" : "dark")}
-          >
-            <View as={theme === "dark" ? FiSun : FiMoon} css={{ m: "auto" }} />
-          </Button>
-        )}
-      </ThemeToggler>
+      <View
+        css={{
+          position: "fixed",
+          left: 3,
+          bottom: 3,
+          animation: `${FADEIN_TRANSITION_DURATION}ms fadeIn ${FADEIN_STAGGER_DURATION *
+            2}ms ease both`,
+        }}
+      >
+        <Button
+          css={{
+            position: "fixed",
+            left: 3,
+            bottom: 3,
+          }}
+          onClick={() => switchTheme(themeKey === "dark" ? "light" : "dark")}
+        >
+          <View as={themeKey === "dark" ? FiSun : FiMoon} css={{ m: "auto" }} />
+        </Button>
+      </View>
     </>
   )
 }

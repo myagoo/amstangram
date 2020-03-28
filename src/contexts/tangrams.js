@@ -14,7 +14,9 @@ export const TangramsProvider = ({ children }) => {
   const [saveRequestId, setSaveRequestId] = useState(0)
   const [completedTangramsEmoji, setCompletedTangramsEmoji] = useState({})
 
-  const { tangrams } = useStaticQuery(graphql`
+  const {
+    data: { group: groups },
+  } = useStaticQuery(graphql`
     fragment TangramFragment on TangramsJson {
       id
       emoji
@@ -31,22 +33,44 @@ export const TangramsProvider = ({ children }) => {
     }
 
     query GalleryQuery {
-      tangrams: allTangramsJson {
+      data: allTangramsJson {
         group(field: category) {
           fieldValue
           nodes {
             ...TangramFragment
           }
         }
-        nodes {
-          ...TangramFragment
-        }
       }
     }
   `)
 
+  const tangramsByGroup = useMemo(() => {
+    const tangramsByGroup = {}
+
+    for (const { fieldValue, nodes } of groups) {
+      tangramsByGroup[fieldValue] = []
+
+      for (const { percent, ...node } of nodes) {
+        const difficulty = percent > 50 ? 0 : percent > 20 ? 1 : 2
+
+        const tangram = {
+          ...node,
+          difficulty,
+        }
+        tangramsByGroup[fieldValue].push(tangram)
+      }
+
+      tangramsByGroup[fieldValue].sort((tangramA, tangramB) => {
+        return tangramA.order && tangramB.order
+          ? tangramA.order - tangramB.order
+          : tangramA.difficulty - tangramB.difficulty
+      })
+    }
+    return tangramsByGroup
+  }, [groups])
+
   const categories = useMemo(
-    () => tangrams.group.map(group => group.fieldValue),
+    () => Object.keys(tangramsByGroup),
     // Do not add tangrams.group to deps because it change when a tangram is created
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -58,11 +82,14 @@ export const TangramsProvider = ({ children }) => {
 
   useEffect(() => {
     const newCompletedTangramsEmoji = {}
-    for (const { id } of tangrams.nodes) {
-      newCompletedTangramsEmoji[id] = localStorage.getItem(id)
+    for (const category in tangramsByGroup) {
+      const tangrams = tangramsByGroup[category]
+      for (const { id } of tangrams) {
+        newCompletedTangramsEmoji[id] = localStorage.getItem(id)
+      }
     }
     setCompletedTangramsEmoji(newCompletedTangramsEmoji)
-  }, [tangrams.nodes])
+  }, [tangramsByGroup])
 
   const setCompletedTangramEmoji = useCallback((tangram, emoji) => {
     localStorage.setItem(tangram.id, emoji)
@@ -80,7 +107,7 @@ export const TangramsProvider = ({ children }) => {
       selectedTangrams,
       setCompletedTangramEmoji,
       setSelectedTangrams,
-      tangrams,
+      tangramsByGroup,
       categories,
     }
   }, [
@@ -89,7 +116,7 @@ export const TangramsProvider = ({ children }) => {
     saveRequestId,
     selectedTangrams,
     setCompletedTangramEmoji,
-    tangrams,
+    tangramsByGroup,
     categories,
   ])
 

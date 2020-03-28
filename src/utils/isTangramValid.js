@@ -1,6 +1,6 @@
-export const isTangramValid = groups => {
-  for (const group of groups) {
-    if (group.data.collisions.size > 0) {
+export const isTangramValid = piecesGroup => {
+  for (const pieceGroup of piecesGroup.children) {
+    if (pieceGroup.data.collisions.size > 0) {
       return false
     }
   }

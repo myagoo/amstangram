@@ -2,7 +2,7 @@ import paper from "paper/dist/paper-core"
 import { LENGTH_MAX, LENGTH_MIN } from "../constants"
 // import { getOffsettedPathPoints } from "./getOffsettedPathPoints"
 
-export const getSvg = (groups, scaleFactor) => {
+export const getSvg = (piecesGroup, scaleFactor) => {
   let compoundPath
 
   /**
@@ -46,8 +46,8 @@ export const getSvg = (groups, scaleFactor) => {
    * 2nd algorythm
    */
 
-  for (const group of groups) {
-    const path = group.firstChild
+  for (const pieceGroup of piecesGroup.children) {
+    const path = pieceGroup.firstChild
 
     if (!compoundPath) {
       compoundPath = path

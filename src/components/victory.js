@@ -2,7 +2,10 @@ import React from "react"
 import { FiPlay, FiSquare } from "react-icons/fi"
 import { Button } from "../components/button"
 import { View } from "../components/view"
-import { VICTORY_EMOJI_DURATION } from "../constants"
+import {
+  VICTORY_EMOJI_DURATION,
+  FADEIN_TRANSITION_DURATION,
+} from "../constants"
 import { useKeyframes } from "css-system"
 
 export const Victory = ({ emoji, onStop, onNext }) => {
@@ -49,7 +52,13 @@ export const Victory = ({ emoji, onStop, onNext }) => {
       >
         {emoji}
       </View>
-      <View css={{ flexDirection: "row", gap: 3 }}>
+      <View
+        css={{
+          flexDirection: "row",
+          gap: 3,
+          animation: `${FADEIN_TRANSITION_DURATION}ms fadeIn ${VICTORY_EMOJI_DURATION}ms ease both`,
+        }}
+      >
         <Button onClick={onStop}>
           <View as={FiSquare} css={{ m: "auto" }}></View>
         </Button>
