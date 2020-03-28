@@ -291,11 +291,6 @@ export const Tangram = () => {
         coumpoundPathRef.current.closed = true
       }
 
-      console.log(
-        piecesGroupRef.current.children[3].bounds.width,
-        piecesGroupRef.current.children[3].bounds.height
-      )
-
       const outerBounds = paper.project.view.bounds
       const innerBounds = coumpoundPathRef.current
         ? coumpoundPathRef.current.bounds
@@ -314,8 +309,6 @@ export const Tangram = () => {
           Math.min(outerBounds.height * 0.6, 700) / innerBounds.height
         )
       }
-
-      console.log(scaleFactorRef.current)
 
       if (coumpoundPathRef.current) {
         coumpoundPathRef.current.scale(scaleFactorRef.current)
@@ -340,7 +333,7 @@ export const Tangram = () => {
     init()
 
     return () => {
-      paper.project.clear()
+      paper.project.remove()
       particlesRef.current = null
       piecesGroupRef.current = null
       coumpoundPathRef.current = null
