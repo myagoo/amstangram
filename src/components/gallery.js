@@ -48,7 +48,7 @@ export const Gallery = () => {
     if (pendingSelectedTangrams.length) {
       setSelectedTangrams(pendingSelectedTangrams)
     } else {
-      setSelectedTangrams(shuffle(Object.values(tangramsByGroup).flatten()))
+      setSelectedTangrams(shuffle(Object.values(tangramsByGroup).flat()))
     }
     setPendingSelectedTangrams([])
     setGalleryOpened(false)
