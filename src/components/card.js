@@ -1,6 +1,7 @@
-import React from "react"
+import React, { useContext } from "react"
 import { View } from "./view"
 import { DEV, COLOR_TRANSITION_DURATION } from "../constants"
+import { ThemeContext } from "css-system"
 
 export const Card = ({
   tangram: { parent, difficulty, path, width, height },
@@ -8,17 +9,10 @@ export const Card = ({
   selected,
   ...props
 }) => {
-  const color =
-    difficulty === 0
-      ? "#10ac84"
-      : difficulty === 1
-      ? "#2e86de"
-      : difficulty === 2
-      ? "#ee5253"
-      : "gray"
+  const theme = useContext(ThemeContext)
+  const color = theme.colors.difficulties[difficulty]
   return (
     <View
-      className="card"
       css={{
         borderRadius: 5,
         boxShadow: selected
@@ -43,6 +37,8 @@ export const Card = ({
           justifyContent: "center",
           width: "100%",
           fill: color,
+          stroke: DEV ? "red" : undefined,
+          strokeWidth: DEV ? 4 : undefined,
         }}
         viewBox={`0 0 ${width} ${height}`}
         dangerouslySetInnerHTML={{ __html: `<path d="${path}" />` }}

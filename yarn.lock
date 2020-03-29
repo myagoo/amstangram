@@ -953,10 +953,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@css-system/gatsby-plugin-css-system@0.5.6":
-  version "0.5.6"
-  resolved "https://registry.yarnpkg.com/@css-system/gatsby-plugin-css-system/-/gatsby-plugin-css-system-0.5.6.tgz#f22c9428826c26418a9a794b74b6bd68e6187091"
-  integrity sha512-k9lck2F04EFT5Xk2ZcAlaZbKa1r1G/7tFFi5w/gl5AVEb9NFDT+vzShPgunwStzI/7sbcRbg6INTnf9WEO0PxA==
+"@css-system/gatsby-plugin-css-system@0.5.7":
+  version "0.5.7"
+  resolved "https://registry.yarnpkg.com/@css-system/gatsby-plugin-css-system/-/gatsby-plugin-css-system-0.5.7.tgz#cbee83c35394b97de08fb5122c130023bfe363b9"
+  integrity sha512-a64Pa1zKGzPD4gp3/xfhZaqnsQ5ptRRGTGsReEm2xciSoaPcwtqJhN/VPx3zsRNrm55Yoae4MZQV3zLx2oF2Aw==
 
 "@hapi/address@2.x.x":
   version "2.1.4"

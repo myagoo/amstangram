@@ -70,7 +70,6 @@ export const Gallery = () => {
   return (
     <>
       <View
-        className="gallery"
         css={{
           position: "fixed",
           left: "0",

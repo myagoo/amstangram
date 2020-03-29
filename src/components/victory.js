@@ -56,7 +56,8 @@ export const Victory = ({ emoji, onStop, onNext }) => {
         css={{
           flexDirection: "row",
           gap: 3,
-          animation: `${FADEIN_TRANSITION_DURATION}ms fadeIn ${VICTORY_EMOJI_DURATION}ms ease both`,
+          animation: `${FADEIN_TRANSITION_DURATION}ms fadeIn ${VICTORY_EMOJI_DURATION /
+            2}ms ease both`,
         }}
       >
         <Button onClick={onStop}>

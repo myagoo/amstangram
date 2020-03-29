@@ -431,6 +431,8 @@ export const Tangram = () => {
           left: 0,
           right: 0,
           zIndex: -1,
+          animation: `${FADEIN_TRANSITION_DURATION}ms fadeIn ${FADEIN_STAGGER_DURATION *
+            0}ms ease both`,
         }}
       >
         <View
@@ -439,8 +441,6 @@ export const Tangram = () => {
             alignSelf: "center",
             width: "100%",
             maxWidth: "400px",
-            animation: `${FADEIN_TRANSITION_DURATION}ms fadeIn ${FADEIN_STAGGER_DURATION *
-              0}ms ease both`,
           }}
         />
       </View>
