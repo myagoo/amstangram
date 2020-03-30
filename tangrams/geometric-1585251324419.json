@@ -1,1 +1,11 @@
-{"width":300.0000000000001,"height":299.9999999999999,"percent":43,"path":"M150,200l150,-150v100l-150,150l-150,-150v-100zM250,100h-200l100,-100z","category":"geometric","name":1585251324419}
+{
+  "path": "M150,200l150,-150v100l-150,150l-150,-150v-100zM250,100h-200l100,-100z",
+  "width": 300.0000000000001,
+  "height": 299.9999999999999,
+  "order": null,
+  "emoji": null,
+  "category": "geometric",
+  "label": null,
+  "length": 1531.370849898476,
+  "percent": 46
+}

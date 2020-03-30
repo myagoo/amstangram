@@ -1,9 +1,11 @@
 {
+  "path": "M0,400l0,-100l50,-50l0,-200l50,-50l50,50l0,200l50,50l0,100l-100,-100z",
   "width": 200.00000000000023,
   "height": 399.99999999999966,
-  "percent": 21,
-  "path": "M0,400l0,-100l50,-50l0,-200l50,-50l50,50l0,200l50,50l0,100l-100,-100z",
-  "category": "stuff",
+  "order": null,
   "emoji": "🚀",
-  "name": "rocket"
+  "category": "stuff",
+  "label": "rocket",
+  "length": 1165.685424949238,
+  "percent": 24
 }

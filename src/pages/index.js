@@ -1,16 +1,9 @@
 import { useGlobalCss } from "css-system"
-import { useSwitchTheme } from "@css-system/gatsby-plugin-css-system"
 import React from "react"
-import { FiMoon, FiSun } from "react-icons/fi"
-import { Button } from "../components/button"
 import { Gallery } from "../components/gallery"
 import { Tangram } from "../components/tangram"
-import { View } from "../components/view"
-import {
-  FADEIN_TRANSITION_DURATION,
-  COLOR_TRANSITION_DURATION,
-  FADEIN_STAGGER_DURATION,
-} from "../constants"
+import { COLOR_TRANSITION_DURATION } from "../constants"
+import { ShowBackgroundPatternProvider } from "../contexts/showBackgroundPattern"
 
 export default () => {
   useGlobalCss({
@@ -44,32 +37,10 @@ export default () => {
     },
   })
 
-  const [themeKey, switchTheme] = useSwitchTheme()
-
   return (
-    <>
+    <ShowBackgroundPatternProvider>
       <Tangram />
       <Gallery />
-      <View
-        css={{
-          position: "fixed",
-          left: 3,
-          bottom: 3,
-          animation: `${FADEIN_TRANSITION_DURATION}ms fadeIn ${FADEIN_STAGGER_DURATION *
-            2}ms ease both`,
-        }}
-      >
-        <Button
-          css={{
-            position: "fixed",
-            left: 3,
-            bottom: 3,
-          }}
-          onClick={() => switchTheme(themeKey === "dark" ? "light" : "dark")}
-        >
-          <View as={themeKey === "dark" ? FiSun : FiMoon} css={{ m: "auto" }} />
-        </Button>
-      </View>
-    </>
+    </ShowBackgroundPatternProvider>
   )
 }

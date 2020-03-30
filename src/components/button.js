@@ -28,9 +28,6 @@ export const Button = ({ as: Component = "button", css, ...props }) => {
       opacity: 0.5,
       cursor: "not-allowed",
     },
-    "&:not(:disabled):hover": {
-      opacity: 0.6,
-    },
     "&:focus": {
       outline: "none",
     },

@@ -1,5 +1,9 @@
 import paper from "paper/dist/paper-core"
-import { ERROR_MARGIN, ERROR_STROKE, SMALL_TRIANGLE_BASE } from "../constants"
+import {
+  SMALL_TRIANGLE_BASE,
+  INSET_BORDER,
+  COLLISION_MARGIN,
+} from "../constants"
 import { getOffsettedPathPoints } from "./getOffsettedPathPoints"
 import { getTriangleCenter } from "./getTriangleCenter"
 
@@ -10,26 +14,34 @@ const createTriangle = (size, id) => {
     new paper.Point(size, size),
   ]
 
-  const shape = new paper.Path({
+  const displayShape = new paper.Path({
+    name: "display",
     segments: points,
     closed: true,
   })
 
-  const inner = new paper.Path({
-    segments: getOffsettedPathPoints(points, -ERROR_MARGIN),
+  const collisionShape = new paper.Path({
+    name: "collision",
+    segments: getOffsettedPathPoints(points, -COLLISION_MARGIN),
     closed: true,
-    strokeWidth: ERROR_STROKE,
+  })
+
+  const insetBorderShape = new paper.Path({
+    name: "insetBorder",
+    segments: getOffsettedPathPoints(points, -INSET_BORDER / 2),
+    closed: true,
+    strokeWidth: INSET_BORDER,
   })
 
   const triangleCenter = getTriangleCenter(points)
 
   const center = new paper.Point(
-    paper.view.center.x + triangleCenter.x - shape.bounds.width / 2,
-    paper.view.center.y + triangleCenter.y - shape.bounds.height / 2
+    paper.view.center.x + triangleCenter.x - displayShape.bounds.width / 2,
+    paper.view.center.y + triangleCenter.y - displayShape.bounds.height / 2
   )
 
   const group = new paper.Group({
-    children: [shape, inner],
+    children: [displayShape, collisionShape, insetBorderShape],
     position: paper.view.center,
     pivot: center,
     data: { id, collisions: new Set() },
@@ -47,19 +59,28 @@ const createRhombus = (size, id) => {
     new paper.Point(size, size),
   ]
 
-  const shape = new paper.Path({
+  const displayShape = new paper.Path({
+    name: "display",
     segments: points,
     closed: true,
   })
 
-  const inner = new paper.Path({
-    segments: getOffsettedPathPoints(points, -ERROR_MARGIN),
+  const collisionShape = new paper.Path({
+    name: "collision",
+    segments: getOffsettedPathPoints(points, -COLLISION_MARGIN),
     closed: true,
-    strokeWidth: ERROR_STROKE,
+    strokeWidth: COLLISION_MARGIN,
+  })
+
+  const insetBorderShape = new paper.Path({
+    name: "insetBorder",
+    segments: getOffsettedPathPoints(points, -(INSET_BORDER / 2)),
+    closed: true,
+    strokeWidth: INSET_BORDER,
   })
 
   const group = new paper.Group({
-    children: [shape, inner],
+    children: [displayShape, collisionShape, insetBorderShape],
     position: paper.view.center,
     data: { id, collisions: new Set() },
     applyMatrix: true,
@@ -69,19 +90,27 @@ const createRhombus = (size, id) => {
 }
 
 const createSquare = (size, id) => {
-  const shape = new paper.Path.Rectangle({
+  const displayShape = new paper.Path.Rectangle({
+    name: "display",
     point: [0, 0],
     size: [size, size],
   })
 
-  const inner = new paper.Path.Rectangle({
-    point: [ERROR_MARGIN, ERROR_MARGIN],
-    size: [size - ERROR_MARGIN * 2, size - ERROR_MARGIN * 2],
-    strokeWidth: ERROR_STROKE,
+  const collisionShape = new paper.Path.Rectangle({
+    name: "collision",
+    point: [COLLISION_MARGIN, COLLISION_MARGIN],
+    size: [size - COLLISION_MARGIN * 2, size - COLLISION_MARGIN * 2],
+  })
+
+  const insetBorderShape = new paper.Path.Rectangle({
+    name: "insetBorder",
+    point: [INSET_BORDER / 2, INSET_BORDER / 2],
+    size: [size - INSET_BORDER, size - INSET_BORDER],
+    strokeWidth: INSET_BORDER,
   })
 
   const group = new paper.Group({
-    children: [shape, inner],
+    children: [displayShape, collisionShape, insetBorderShape],
     position: paper.view.center,
     data: { id, collisions: new Set() },
     applyMatrix: true,

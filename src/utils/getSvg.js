@@ -1,53 +1,11 @@
 import paper from "paper/dist/paper-core"
-import { LENGTH_MAX, LENGTH_MIN } from "../constants"
-// import { getOffsettedPathPoints } from "./getOffsettedPathPoints"
+import { MAX_LENGTH, MIN_LENGTH } from "../constants"
 
 export const getSvg = (piecesGroup, scaleFactor) => {
   let compoundPath
 
-  /**
-   * 1st algorythm
-   */
-  // for (const group of groups) {
-  //   const path = group.firstChild
-
-  //   const offsettedPath = path.clone({
-  //     insert: false,
-  //     segments: getOffsettedPathPoints([path.segments], 1)[0],
-  //   })
-
-  //   if (!compoundPath) {
-  //     compoundPath = offsettedPath
-  //   } else {
-  //     compoundPath = compoundPath.unite(offsettedPath, {
-  //       insert: false,
-  //     })
-  //   }
-  // }
-
-  // const compoundPaths = compoundPath.children
-  //   ? compoundPath.children
-  //   : [compoundPath]
-
-  // const offsetedCompoundPathsSegments = compoundPaths.map(
-  //   ({ segments }) => segments
-  // )
-
-  // const unoffsettedCompoundPathsSegments = getOffsettedPathsSegments(
-  //   offsetedCompoundPathsSegments,
-  //   -1
-  // )
-
-  // compoundPaths.forEach((offsettedCompoundPath, index) => {
-  //   offsettedCompoundPath.segments = unoffsettedCompoundPathsSegments[index]
-  // })
-
-  /**
-   * 2nd algorythm
-   */
-
   for (const pieceGroup of piecesGroup.children) {
-    const path = pieceGroup.firstChild
+    const path = pieceGroup.children["display"]
 
     if (!compoundPath) {
       compoundPath = path
@@ -70,13 +28,14 @@ export const getSvg = (piecesGroup, scaleFactor) => {
   const height = compoundPath.bounds.height
   const length = Math.ceil(compoundPath.length)
   const percent = Math.floor(
-    ((length - LENGTH_MIN) / (LENGTH_MAX - LENGTH_MIN)) * 100
+    ((length - MIN_LENGTH) / (MAX_LENGTH - MIN_LENGTH)) * 100
   )
 
   return {
     width,
     height,
     percent,
+    length,
     path,
   }
 }

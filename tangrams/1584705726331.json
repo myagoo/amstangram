@@ -1,7 +1,11 @@
 {
+  "path": "M150,250l-150,-150l100,-100l100,0l100,100zM100,100l50,50l50,-50z",
   "width": 300.0000000000001,
   "height": 249.99999999999994,
-  "percent": 14,
-  "path": "M150,250l-150,-150l100,-100l100,0l100,100zM100,100l50,50l50,-50z",
-  "category": "geometric"
+  "order": null,
+  "emoji": null,
+  "category": "geometric",
+  "label": null,
+  "length": 1048.528137423857,
+  "percent": 17
 }

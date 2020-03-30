@@ -17,9 +17,11 @@ import {
   VICTORY_PARTICLES_DURATION,
   FADEIN_TRANSITION_DURATION,
   FADEIN_STAGGER_DURATION,
+  STRICT_ERROR_MARGIN,
+  SOFT_ERROR_MARGIN,
 } from "../constants"
 import { TangramsContext } from "../contexts/tangrams"
-import { isTangramComplete } from "../utils/checkTangramCompleteness"
+import { isTangramComplete } from "../utils/isTangramComplete"
 import { createPiecesGroup } from "../utils/createPiecesGroup"
 import { getRandomEmoji } from "../utils/getRandomEmoji"
 import { getSnapVector } from "../utils/getSnapVector"
@@ -31,15 +33,18 @@ import { updateColisionState } from "../utils/updateColisionState"
 import { Victory } from "./victory"
 import { Button } from "./button"
 import { FiPlay, FiSquare } from "react-icons/fi"
+import { useShowBackgroundPattern } from "../contexts/showBackgroundPattern"
+import { Card } from "./card"
 
 export const Tangram = () => {
   const theme = useContext(ThemeContext)
+  const [showBackgroundPattern] = useShowBackgroundPattern()
   const {
     categories,
     setCompletedTangramEmoji,
     saveRequestId,
-    selectedTangrams,
-    setSelectedTangrams,
+    playlist,
+    setPlaylist,
   } = useContext(TangramsContext)
 
   const [currentTangramIndex, setCurrentTangramIndex] = useState(0)
@@ -50,25 +55,23 @@ export const Tangram = () => {
   const piecesGroupRef = useRef()
   const particlesRef = useRef()
   const coumpoundPathRef = useRef()
+  const showBackgroundPatternRef = useRef()
 
   const selectedTangram = useMemo(() => {
-    if (selectedTangrams.length === 0) {
-      return null
-    }
-    return selectedTangrams[currentTangramIndex]
-  }, [selectedTangrams, currentTangramIndex])
+    return playlist && playlist[currentTangramIndex]
+  }, [playlist, currentTangramIndex])
 
   const handleNext = () => {
     setCurrentTangramIndex(currentTangramIndex + 1)
   }
 
   const handleStop = () => {
-    setSelectedTangrams([])
+    setPlaylist(null)
   }
 
   useEffect(() => {
     setCurrentTangramIndex(0)
-  }, [selectedTangrams])
+  }, [playlist])
 
   // Handle save tangram request
   useEffect(() => {
@@ -76,8 +79,9 @@ export const Tangram = () => {
       if (isTangramValid(piecesGroupRef.current)) {
         const category =
           prompt("Categorie:\n" + categories.join("\n")) || "misc"
-        const name = prompt("Name:") || Date.now()
-        const emoji = prompt("Emoji:") || undefined
+        const label = prompt("Label:") || Date.now().toString(36)
+        const emoji = prompt("Emoji:") || null
+        const order = prompt("order:") || null
 
         fetch(`/save`, {
           method: "POST",
@@ -86,7 +90,8 @@ export const Tangram = () => {
             ...getSvg(piecesGroupRef.current, scaleFactorRef.current),
             category,
             emoji,
-            name,
+            label,
+            order,
           }),
         })
       } else {
@@ -150,17 +155,20 @@ export const Tangram = () => {
 
         ghostGroup.position = pieceGroup.position.add(vector)
 
-        const ghostShape = ghostGroup.firstChild
+        const ghostShape = ghostGroup.children["display 1"]
 
         const otherShapes = piecesGroupRef.current.children
           .filter(otherGroup => otherGroup !== pieceGroup)
-          .map(({ firstChild }) => firstChild)
+          .map(({ children }) => children["display"])
 
-        const coumpoundShapes = coumpoundPathRef.current
-          ? coumpoundPathRef.current.children
+        const coumpoundShapes =
+          playlist &&
+          showBackgroundPatternRef.current &&
+          coumpoundPathRef.current
             ? coumpoundPathRef.current.children
-            : [coumpoundPathRef.current]
-          : null
+              ? coumpoundPathRef.current.children
+              : [coumpoundPathRef.current]
+            : null
 
         const snapVector = getSnapVector(
           SNAP_DISTANCE,
@@ -216,8 +224,22 @@ export const Tangram = () => {
         ghostGroup && ghostGroup.remove()
         ghostGroup = null
 
+        if (playlist === null) {
+          return
+        }
+
+        if (showBackgroundPatternRef.current === false) {
+          coumpoundPathRef.current.position = piecesGroupRef.current.position
+        }
+
         if (
-          isTangramComplete(coumpoundPathRef.current, piecesGroupRef.current)
+          isTangramComplete(
+            coumpoundPathRef.current,
+            piecesGroupRef.current,
+            showBackgroundPatternRef.current
+              ? STRICT_ERROR_MARGIN
+              : SOFT_ERROR_MARGIN
+          )
         ) {
           const emoji = selectedTangram.emoji
             ? selectedTangram.emoji
@@ -233,8 +255,8 @@ export const Tangram = () => {
             particle.data.animation.stop()
             particle.tween(
               {
-                "position.x": paper.view.center.x,
-                "position.y": paper.view.center.y,
+                "position.x": piecesGroupRef.current.position.x,
+                "position.y": piecesGroupRef.current.position.y,
                 opacity: 0,
                 radius: 0,
               },
@@ -281,7 +303,6 @@ export const Tangram = () => {
 
         coumpoundPathRef.current.sendToBack()
         coumpoundPathRef.current.fillRule = "evenodd"
-        coumpoundPathRef.current.fillColor = "black"
 
         if (DEV) {
           coumpoundPathRef.current.strokeWidth = 2
@@ -339,6 +360,20 @@ export const Tangram = () => {
       coumpoundPathRef.current = null
     }
   }, [selectedTangram, setCompletedTangramEmoji])
+
+  useLayoutEffect(() => {
+    showBackgroundPatternRef.current = showBackgroundPattern
+    if (!coumpoundPathRef.current) {
+      return
+    }
+
+    if (showBackgroundPattern) {
+      coumpoundPathRef.current.fillColor = "black"
+      coumpoundPathRef.current.position = paper.view.center
+    } else {
+      coumpoundPathRef.current.fillColor = "transparent"
+    }
+  }, [selectedTangram, showBackgroundPattern])
 
   useLayoutEffect(() => {
     const particleGroup = new paper.Group()
@@ -404,8 +439,10 @@ export const Tangram = () => {
 
   useLayoutEffect(() => {
     for (const pieceGroup of piecesGroupRef.current.children) {
-      pieceGroup.firstChild.fillColor = theme.colors.pieces[pieceGroup.data.id]
-      pieceGroup.lastChild.strokeColor = theme.colors.pieces[pieceGroup.data.id]
+      pieceGroup.children["display"].fillColor =
+        theme.colors.pieces[pieceGroup.data.id]
+      pieceGroup.children["insetBorder"].strokeColor =
+        theme.colors.pieces[pieceGroup.data.id]
     }
 
     const pieceColors = Object.values(theme.colors.pieces)
@@ -423,27 +460,42 @@ export const Tangram = () => {
         position: "relative",
       }}
     >
-      <View
-        css={{
-          p: 3,
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: -1,
-          animation: `${FADEIN_TRANSITION_DURATION}ms fadeIn ${FADEIN_STAGGER_DURATION *
-            0}ms ease both`,
-        }}
-      >
+      {!selectedTangram && (
         <View
-          as={Logo}
           css={{
-            alignSelf: "center",
-            width: "100%",
-            maxWidth: "400px",
+            p: 3,
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: -1,
+            animation: `${FADEIN_TRANSITION_DURATION}ms fadeIn ${FADEIN_STAGGER_DURATION *
+              0}ms ease both`,
           }}
-        />
-      </View>
+        >
+          <View
+            as={Logo}
+            css={{
+              alignSelf: "center",
+              width: "100%",
+              maxWidth: "400px",
+            }}
+          />
+        </View>
+      )}
+      {selectedTangram && showBackgroundPattern === false && (
+        <View
+          css={{
+            zIndex: -1,
+            position: "absolute",
+            top: 3,
+            right: 3,
+            cursor: "pointer",
+          }}
+        >
+          <Card tangram={selectedTangram} selected></Card>
+        </View>
+      )}
       <View
         as="canvas"
         ref={canvasRef}
@@ -454,17 +506,16 @@ export const Tangram = () => {
         }}
         resize="true"
       />
-      {DEV &&
-        selectedTangrams.length > 0 &&
-        currentTangramIndex < selectedTangrams.length - 1 && (
-          <Button
-            css={{ position: "fixed", right: 3, top: 3 }}
-            onClick={handleNext}
-          >
-            <View as={FiPlay} css={{ m: "auto" }}></View>
-          </Button>
-        )}
-      {DEV && selectedTangrams.length > 0 && (
+
+      {DEV && playlist && currentTangramIndex < playlist.length - 1 && (
+        <Button
+          css={{ position: "fixed", right: 3, top: 3 }}
+          onClick={handleNext}
+        >
+          <View as={FiPlay} css={{ m: "auto" }}></View>
+        </Button>
+      )}
+      {DEV && playlist && (
         <Button
           css={{ position: "fixed", left: 3, top: 3 }}
           onClick={handleStop}
@@ -472,14 +523,12 @@ export const Tangram = () => {
           <View as={FiSquare} css={{ m: "auto" }}></View>
         </Button>
       )}
-      {victoryEmoji && (
+      {playlist && victoryEmoji && (
         <Victory
           emoji={victoryEmoji}
           onStop={handleStop}
           onNext={
-            currentTangramIndex < selectedTangrams.length - 1
-              ? handleNext
-              : undefined
+            currentTangramIndex < playlist.length - 1 ? handleNext : undefined
           }
         />
       )}

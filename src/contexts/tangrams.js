@@ -10,7 +10,7 @@ import React, {
 export const TangramsContext = createContext({})
 
 export const TangramsProvider = ({ children }) => {
-  const [selectedTangrams, setSelectedTangrams] = useState([])
+  const [playlist, setPlaylist] = useState(null)
   const [saveRequestId, setSaveRequestId] = useState(0)
   const [completedTangramsEmoji, setCompletedTangramsEmoji] = useState({})
 
@@ -25,6 +25,8 @@ export const TangramsProvider = ({ children }) => {
       path
       percent
       width
+      category
+      label
       parent {
         ... on File {
           name
@@ -104,9 +106,9 @@ export const TangramsProvider = ({ children }) => {
       completedTangramsEmoji,
       requestSave,
       saveRequestId,
-      selectedTangrams,
+      playlist,
       setCompletedTangramEmoji,
-      setSelectedTangrams,
+      setPlaylist,
       tangramsByGroup,
       categories,
     }
@@ -114,7 +116,7 @@ export const TangramsProvider = ({ children }) => {
     completedTangramsEmoji,
     requestSave,
     saveRequestId,
-    selectedTangrams,
+    playlist,
     setCompletedTangramEmoji,
     tangramsByGroup,
     categories,

@@ -7,10 +7,12 @@ export const updateColisionState = (pieceGroup, piecesGroup) => {
       continue
     }
 
+    const pieceCollisionShape = pieceGroup.children["collision"]
+    const otherPieceCollisionShape = otherPieceGroup.children["collision"]
     if (
-      pieceGroup.lastChild.intersects(otherPieceGroup.lastChild) ||
-      doesPathContainsPath(pieceGroup.lastChild, otherPieceGroup.lastChild) ||
-      doesPathContainsPath(otherPieceGroup.lastChild, pieceGroup.lastChild)
+      pieceCollisionShape.intersects(otherPieceCollisionShape) ||
+      doesPathContainsPath(pieceCollisionShape, otherPieceCollisionShape) ||
+      doesPathContainsPath(otherPieceCollisionShape, pieceCollisionShape)
     ) {
       pieceGroup.data.collisions.add(otherPieceGroup.data.id)
       otherPieceGroup.data.collisions.add(pieceGroup.data.id)
@@ -22,9 +24,9 @@ export const updateColisionState = (pieceGroup, piecesGroup) => {
 
   for (const otherPieceGroup of piecesGroup.children) {
     if (otherPieceGroup.data.collisions.size > 0) {
-      otherPieceGroup.firstChild.opacity = OVERLAPING_OPACITY
+      otherPieceGroup.children["display"].opacity = OVERLAPING_OPACITY
     } else {
-      otherPieceGroup.firstChild.opacity = 1
+      otherPieceGroup.children["display"].opacity = 1
     }
   }
 }

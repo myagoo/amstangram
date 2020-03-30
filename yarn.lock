@@ -3170,10 +3170,10 @@ css-selector-tokenizer@^0.7.0:
     fastparse "^1.1.1"
     regexpu-core "^1.0.0"
 
-css-system@0.5.1:
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/css-system/-/css-system-0.5.1.tgz#c9f5f459fcb5791b81a7b9224cb90d331fcbba0b"
-  integrity sha512-FjuAy/UCrWasFWq4eDUF2lC2/ruSmg1UHJiVfgN300KO+CczMAsZXwA/Wh3W981gK9OawpoHWjptdNRbOYxQ2A==
+css-system@0.5.3:
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/css-system/-/css-system-0.5.3.tgz#f58655e432ee57e35e2fed37c9865ae33bcb97e4"
+  integrity sha512-2AIBQoAzz8HtZ+R/JVM+CDmzKZPKUZdz90azMF+GF7M3489I4VQk8sPB+xDefeR2rHJVY8RNbfJGW498J76geg==
   dependencies:
     hash-sum "^2.0.0"
 
