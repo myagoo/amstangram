@@ -81,7 +81,8 @@ export const Tangram = () => {
           prompt("Categorie:\n" + categories.join("\n")) || "misc"
         const label = prompt("Label:") || Date.now().toString(36)
         const emoji = prompt("Emoji:") || null
-        const order = prompt("order:") || null
+        const rawOrder = prompt("order:")
+        const order = rawOrder != null ? parseInt(rawOrder, 10) : null
 
         fetch(`/save`, {
           method: "POST",
@@ -458,6 +459,7 @@ export const Tangram = () => {
       css={{
         flex: "1",
         position: "relative",
+        color: "galleryText",
       }}
     >
       {!selectedTangram && (

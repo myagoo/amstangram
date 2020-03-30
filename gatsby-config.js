@@ -50,7 +50,7 @@ module.exports = {
               difficulties: ["#10ac84", "#2e86de", "#ee5253"],
               background: "#fff",
               galleryBackground: "#ecf0f1",
-              galleryText: "#000000CC",
+              galleryText: "#303030",
             },
           },
           dark: {
@@ -68,7 +68,7 @@ module.exports = {
               difficulties: ["#0b8767", "#1a6cbd", "#ce3737"],
               background: "#232129",
               galleryBackground: "#383838",
-              galleryText: "#FFFFFFCC",
+              galleryText: "#d8d8d8",
             },
           },
         },
