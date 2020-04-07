@@ -7,6 +7,8 @@ export const Card = ({
   tangram: { parent, difficulty, path, width, height },
   completedEmoji,
   selected,
+  css,
+  scale = 1,
   ...props
 }) => {
   const theme = useContext(ThemeContext)
@@ -24,8 +26,9 @@ export const Card = ({
         textAlign: "center",
         position: "relative",
         cursor: "pointer",
-        width: 128,
-        height: 178,
+        width: 128 * scale,
+        height: 178 * scale,
+        ...css,
       }}
       deps={[selected]}
       {...props}
@@ -35,7 +38,6 @@ export const Card = ({
         css={{
           flex: "1",
           justifyContent: "center",
-          width: "100%",
           fill: color,
           stroke: DEV ? "red" : undefined,
           strokeWidth: DEV ? 4 : undefined,
@@ -48,7 +50,7 @@ export const Card = ({
           {completedEmoji}
         </View>
       )}
-      {DEV && parent.name}
+      {DEV && parent && parent.name}
     </View>
   )
 }

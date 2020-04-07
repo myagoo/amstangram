@@ -36,6 +36,8 @@ export default function HTML(props) {
           id="___gatsby"
           dangerouslySetInnerHTML={{ __html: props.body }}
         />
+        <div id="dialogContainer"></div>
+        <div id="notificationContainer"></div>
         {props.postBodyComponents}
       </body>
     </html>

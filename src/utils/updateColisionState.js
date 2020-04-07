@@ -22,11 +22,16 @@ export const updateColisionState = (pieceGroup, piecesGroup) => {
     }
   }
 
+  let isTangramValid = true
+
   for (const otherPieceGroup of piecesGroup.children) {
     if (otherPieceGroup.data.collisions.size > 0) {
+      isTangramValid = false
       otherPieceGroup.children["display"].opacity = OVERLAPING_OPACITY
     } else {
       otherPieceGroup.children["display"].opacity = 1
     }
   }
+
+  return isTangramValid
 }

@@ -1,5 +1,5 @@
 import React from "react"
-import { FiPlay, FiSquare } from "react-icons/fi"
+import { FiPlay, FiSquare, FiCheck } from "react-icons/fi"
 import { Button } from "../components/button"
 import { View } from "../components/view"
 import {
@@ -8,7 +8,7 @@ import {
 } from "../constants"
 import { useKeyframes } from "css-system"
 
-export const Victory = ({ emoji, onStop, onNext }) => {
+export const Victory = ({ emoji, onStop, onNext, onApprove }) => {
   const spin = useKeyframes({
     0: {
       opacity: "0",
@@ -56,10 +56,16 @@ export const Victory = ({ emoji, onStop, onNext }) => {
         css={{
           flexDirection: "row",
           gap: 3,
-          animation: `${FADEIN_TRANSITION_DURATION}ms fadeIn ${VICTORY_EMOJI_DURATION /
-            2}ms ease both`,
+          animation: `${FADEIN_TRANSITION_DURATION}ms fadeIn ${
+            VICTORY_EMOJI_DURATION / 2
+          }ms ease both`,
         }}
       >
+        {onApprove && (
+          <Button onClick={onApprove}>
+            <View as={FiCheck} css={{ m: "auto" }}></View>
+          </Button>
+        )}
         <Button onClick={onStop}>
           <View as={FiSquare} css={{ m: "auto" }}></View>
         </Button>

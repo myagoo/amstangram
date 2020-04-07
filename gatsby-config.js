@@ -8,11 +8,13 @@ const baseTheme = {
   sizes: {
     button: 64,
   },
+  radii: [0, 4, 8, 16, 32],
   fontSizes: [12, 14, 16, 20, 24, 32, 48, 64, 72],
 }
 
 module.exports = {
   plugins: [
+    "gatsby-plugin-postcss",
     {
       resolve: `gatsby-plugin-google-analytics`,
       options: {
@@ -20,6 +22,21 @@ module.exports = {
         trackingId: "UA-162030789-1",
         anonymize: true,
         respectDNT: true,
+      },
+    },
+    {
+      resolve: "gatsby-plugin-firebase",
+      options: {
+        credentials: {
+          apiKey: "AIzaSyAHOemftrTSOUjtoA6K3VR2hkOU5H-ScSI",
+          authDomain: "amstangram.firebaseapp.com",
+          databaseURL: "https://amstangram.firebaseio.com",
+          projectId: "amstangram",
+          storageBucket: "amstangram.appspot.com",
+          messagingSenderId: "1075176148116",
+          appId: "1:1075176148116:web:e61e6512cd983a75533881",
+          measurementId: "G-PLH3BSWLM2",
+        },
       },
     },
     {
@@ -51,6 +68,9 @@ module.exports = {
               background: "#fff",
               galleryBackground: "#ecf0f1",
               galleryText: "#303030",
+              inputBackground: "#FFF",
+              errorText: "#bd0808",
+              notificationBackground: "#FFFFFFdd",
             },
           },
           dark: {
@@ -69,6 +89,9 @@ module.exports = {
               background: "#232129",
               galleryBackground: "#383838",
               galleryText: "#d8d8d8",
+              inputBackground: "#4e4e4e",
+              errorText: "#e63c3c",
+              notificationBackground: "#000000dd",
             },
           },
         },

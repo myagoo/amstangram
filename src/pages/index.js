@@ -1,9 +1,11 @@
 import { useGlobalCss } from "css-system"
 import React from "react"
-import { Gallery } from "../components/gallery"
 import { Tangram } from "../components/tangram"
 import { COLOR_TRANSITION_DURATION } from "../constants"
+import { GalleryProvider } from "../contexts/gallery"
 import { ShowBackgroundPatternProvider } from "../contexts/showBackgroundPattern"
+import { UserProvider } from "../contexts/user"
+import { NotifyProvider } from "../contexts/notify"
 
 export default () => {
   useGlobalCss({
@@ -38,9 +40,14 @@ export default () => {
   })
 
   return (
-    <ShowBackgroundPatternProvider>
-      <Tangram />
-      <Gallery />
-    </ShowBackgroundPatternProvider>
+    <NotifyProvider>
+      <UserProvider>
+        <ShowBackgroundPatternProvider>
+          <GalleryProvider>
+            <Tangram />
+          </GalleryProvider>
+        </ShowBackgroundPatternProvider>
+      </UserProvider>
+    </NotifyProvider>
   )
 }

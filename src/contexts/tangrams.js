@@ -4,15 +4,21 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react"
+import { SaveTangramDialog } from "../components/saveTangramDialog"
+import { Deferred } from "../utils/deferred"
+import { getTangramDifficulty } from "../utils/getTangramDifficulty"
 
 export const TangramsContext = createContext({})
 
 export const TangramsProvider = ({ children }) => {
+  const getTangramRef = useRef()
   const [playlist, setPlaylist] = useState(null)
   const [saveRequestId, setSaveRequestId] = useState(0)
   const [completedTangramsEmoji, setCompletedTangramsEmoji] = useState({})
+  const [tangramDialogData, setTangramDialogData] = useState(null)
 
   const {
     data: { group: groups },
@@ -52,12 +58,10 @@ export const TangramsProvider = ({ children }) => {
     for (const { fieldValue, nodes } of groups) {
       tangramsByGroup[fieldValue] = []
 
-      for (const { percent, ...node } of nodes) {
-        const difficulty = percent > 50 ? 0 : percent > 20 ? 1 : 2
-
+      for (const node of nodes) {
         const tangram = {
           ...node,
-          difficulty,
+          difficulty: getTangramDifficulty(node),
         }
         tangramsByGroup[fieldValue].push(tangram)
       }
@@ -71,15 +75,8 @@ export const TangramsProvider = ({ children }) => {
     return tangramsByGroup
   }, [groups])
 
-  const categories = useMemo(
-    () => Object.keys(tangramsByGroup),
-    // Do not add tangrams.group to deps because it change when a tangram is created
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
-
   const requestSave = useCallback(() => {
-    setSaveRequestId(prevRequestId => prevRequestId + 1)
+    setSaveRequestId((prevRequestId) => prevRequestId + 1)
   }, [])
 
   useEffect(() => {
@@ -95,10 +92,18 @@ export const TangramsProvider = ({ children }) => {
 
   const setCompletedTangramEmoji = useCallback((tangram, emoji) => {
     localStorage.setItem(tangram.id, emoji)
-    setCompletedTangramsEmoji(prevCompletedTangrams => ({
+    setCompletedTangramsEmoji((prevCompletedTangrams) => ({
       ...prevCompletedTangrams,
       [tangram.id]: emoji,
     }))
+  }, [])
+
+  getTangramRef.current = useCallback((pathData) => {
+    const deferred = new Deferred()
+
+    setTangramDialogData({ deferred, pathData })
+
+    return deferred.promise.finally(() => setTangramDialogData(null))
   }, [])
 
   const contextValue = useMemo(() => {
@@ -110,7 +115,7 @@ export const TangramsProvider = ({ children }) => {
       setCompletedTangramEmoji,
       setPlaylist,
       tangramsByGroup,
-      categories,
+      getTangramRef,
     }
   }, [
     completedTangramsEmoji,
@@ -119,12 +124,14 @@ export const TangramsProvider = ({ children }) => {
     playlist,
     setCompletedTangramEmoji,
     tangramsByGroup,
-    categories,
   ])
 
   return (
     <TangramsContext.Provider value={contextValue}>
       {children}
+      {tangramDialogData && (
+        <SaveTangramDialog {...tangramDialogData}></SaveTangramDialog>
+      )}
     </TangramsContext.Provider>
   )
 }

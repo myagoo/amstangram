@@ -31,7 +31,10 @@
     "@css-system/gatsby-plugin-css-system": "0.5.7",
     "body-parser": "^1.19.0",
     "css-system": "0.5.3",
+    "firebase": "^7.13.1",
+    "firebaseui": "^4.5.0",
     "gatsby": "2.19.22",
+    "gatsby-plugin-firebase": "^0.2.0-beta.4",
     "gatsby-plugin-google-analytics": "^2.2.2",
     "gatsby-plugin-manifest": "^2.2.42",
     "gatsby-plugin-offline": "^3.0.35",
@@ -43,9 +46,14 @@
     "paper-jsdom": "^0.12.4",
     "react": "16.13.0",
     "react-dom": "16.13.0",
+    "react-firebaseui": "^4.1.0",
     "react-helmet": "^5.2.1",
+    "react-hook-form": "^5.2.0",
     "react-icons": "^3.9.0",
     "react-router-dom": "^5.1.2",
     "sharp": "^0.25.2"
+  },
+  "devDependencies": {
+    "gatsby-plugin-postcss": "^2.2.1"
   }
 }

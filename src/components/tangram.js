@@ -1,6 +1,8 @@
 import { ThemeContext } from "css-system"
+import firebase from "gatsby-plugin-firebase"
 import paper from "paper/dist/paper-core"
 import React, {
+  useCallback,
   useContext,
   useEffect,
   useLayoutEffect,
@@ -13,39 +15,46 @@ import { View } from "../components/view"
 import {
   CLICK_TIMEOUT,
   DEV,
-  SNAP_DISTANCE,
-  VICTORY_PARTICLES_DURATION,
-  FADEIN_TRANSITION_DURATION,
   FADEIN_STAGGER_DURATION,
-  STRICT_ERROR_MARGIN,
+  FADEIN_TRANSITION_DURATION,
+  SNAP_DISTANCE,
   SOFT_ERROR_MARGIN,
+  STRICT_ERROR_MARGIN,
+  VICTORY_PARTICLES_DURATION,
 } from "../constants"
+import { useShowBackgroundPattern } from "../contexts/showBackgroundPattern"
 import { TangramsContext } from "../contexts/tangrams"
-import { isTangramComplete } from "../utils/isTangramComplete"
+import { UserContext } from "../contexts/user"
 import { createPiecesGroup } from "../utils/createPiecesGroup"
+import { getPathData } from "../utils/getPathData"
 import { getRandomEmoji } from "../utils/getRandomEmoji"
 import { getSnapVector } from "../utils/getSnapVector"
-import { getSvg } from "../utils/getSvg"
+import { isTangramComplete } from "../utils/isTangramComplete"
 import { isTangramValid } from "../utils/isTangramValid"
 import { restrictGroupWithinCanvas } from "../utils/restrictGroupWithinCanvas"
 import { scrambleGroup } from "../utils/scrambleGroup"
 import { updateColisionState } from "../utils/updateColisionState"
-import { Victory } from "./victory"
-import { Button } from "./button"
-import { FiPlay, FiSquare } from "react-icons/fi"
-import { useShowBackgroundPattern } from "../contexts/showBackgroundPattern"
 import { Card } from "./card"
+import { TangramMenu } from "./tangramMenu"
+import { Victory } from "./victory"
+import { NotifyContext } from "../contexts/notify"
+
+const db = firebase.firestore()
 
 export const Tangram = () => {
+  const { currentUser } = useContext(UserContext)
   const theme = useContext(ThemeContext)
+  const notify = useContext(NotifyContext)
+
   const [showBackgroundPattern] = useShowBackgroundPattern()
   const {
-    categories,
+    getTangramRef,
     setCompletedTangramEmoji,
     saveRequestId,
     playlist,
     setPlaylist,
   } = useContext(TangramsContext)
+  const { getCurrentUserRef } = useContext(UserContext)
 
   const [currentTangramIndex, setCurrentTangramIndex] = useState(0)
   const [victoryEmoji, setVictoryEmoji] = useState(null)
@@ -65,8 +74,16 @@ export const Tangram = () => {
     setCurrentTangramIndex(currentTangramIndex + 1)
   }
 
-  const handleStop = () => {
+  const handleStop = useCallback(() => {
     setPlaylist(null)
+  }, [setPlaylist])
+
+  const handleApprove = () => {
+    firebase
+      .firestore()
+      .collection("communityTangrams")
+      .doc(selectedTangram.id)
+      .update({ approved: true })
   }
 
   useEffect(() => {
@@ -75,31 +92,39 @@ export const Tangram = () => {
 
   // Handle save tangram request
   useEffect(() => {
-    if (saveRequestId && DEV) {
-      if (isTangramValid(piecesGroupRef.current)) {
-        const category =
-          prompt("Categorie:\n" + categories.join("\n")) || "misc"
-        const label = prompt("Label:") || Date.now().toString(36)
-        const emoji = prompt("Emoji:") || null
-        const rawOrder = prompt("order:")
-        const order = rawOrder != null ? parseInt(rawOrder, 10) : null
-
-        fetch(`/save`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...getSvg(piecesGroupRef.current, scaleFactorRef.current),
-            category,
-            emoji,
-            label,
-            order,
-          }),
-        })
-      } else {
-        alert("Tangram is not valid")
+    if (saveRequestId) {
+      if (!isTangramValid(piecesGroupRef.current)) {
+        notify("You can't save an invalid tangram")
+        return
       }
+      const handleSaveRequest = DEV
+        ? async () => {
+            const tangram = await getTangramRef.current(
+              getPathData(piecesGroupRef.current, scaleFactorRef.current)
+            )
+            await fetch(`/save`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(tangram),
+            })
+            notify("Tangram saved")
+          }
+        : async () => {
+            const user = await getCurrentUserRef.current()
+            const tangram = await getTangramRef.current(
+              getPathData(piecesGroupRef.current, scaleFactorRef.current)
+            )
+            await db.collection("communityTangrams").add({
+              ...tangram,
+              uid: user.uid,
+              approved: false,
+            })
+            notify("Tangram submitted for review")
+          }
+
+      handleSaveRequest()
     }
-  }, [saveRequestId, categories])
+  }, [notify, saveRequestId, getTangramRef, getCurrentUserRef])
 
   // Handle window resize
   useEffect(() => {
@@ -122,21 +147,21 @@ export const Tangram = () => {
 
   // Init a game
   useLayoutEffect(() => {
-    const attachPieceGroupEvents = pieceGroup => {
+    const attachPieceGroupEvents = (pieceGroup) => {
       let anchorPoint = null
       let ghostGroup = null
       let mouseDownTimestamp = null
       let mouseDownPoint = null
 
-      const handleMouseEnter = mdEvent => {
+      const handleMouseEnter = (mdEvent) => {
         document.body.style.cursor = "pointer"
       }
 
-      const handleMouseLeave = mdEvent => {
+      const handleMouseLeave = (mdEvent) => {
         document.body.style.cursor = "default"
       }
 
-      const handleMouseDown = mdEvent => {
+      const handleMouseDown = (mdEvent) => {
         mouseDownTimestamp = Date.now()
         mouseDownPoint = mdEvent.point
 
@@ -147,7 +172,7 @@ export const Tangram = () => {
         pieceGroup.bringToFront()
       }
 
-      const handleMouseDrag = mdEvent => {
+      const handleMouseDrag = (mdEvent) => {
         document.body.style.cursor = "move"
 
         const newAnchorPoint = mdEvent.point.subtract(pieceGroup.position)
@@ -159,7 +184,7 @@ export const Tangram = () => {
         const ghostShape = ghostGroup.children["display 1"]
 
         const otherShapes = piecesGroupRef.current.children
-          .filter(otherGroup => otherGroup !== pieceGroup)
+          .filter((otherGroup) => otherGroup !== pieceGroup)
           .map(({ children }) => children["display"])
 
         const coumpoundShapes =
@@ -197,7 +222,7 @@ export const Tangram = () => {
         updateColisionState(pieceGroup, piecesGroupRef.current)
       }
 
-      const handleMouseUp = muEvent => {
+      const handleMouseUp = (muEvent) => {
         document.body.style.cursor = "pointer"
 
         if (
@@ -471,8 +496,9 @@ export const Tangram = () => {
             left: 0,
             right: 0,
             zIndex: -1,
-            animation: `${FADEIN_TRANSITION_DURATION}ms fadeIn ${FADEIN_STAGGER_DURATION *
-              0}ms ease both`,
+            animation: `${FADEIN_TRANSITION_DURATION}ms fadeIn ${
+              FADEIN_STAGGER_DURATION * 0
+            }ms ease both`,
           }}
         >
           <View
@@ -503,28 +529,13 @@ export const Tangram = () => {
         ref={canvasRef}
         css={{
           flex: 1,
-          animation: `${FADEIN_TRANSITION_DURATION}ms fadeIn ${FADEIN_STAGGER_DURATION *
-            1}ms ease both`,
+          animation: `${FADEIN_TRANSITION_DURATION}ms fadeIn ${
+            FADEIN_STAGGER_DURATION * 1
+          }ms ease both`,
         }}
         resize="true"
       />
 
-      {DEV && playlist && currentTangramIndex < playlist.length - 1 && (
-        <Button
-          css={{ position: "fixed", right: 3, top: 3 }}
-          onClick={handleNext}
-        >
-          <View as={FiPlay} css={{ m: "auto" }}></View>
-        </Button>
-      )}
-      {DEV && playlist && (
-        <Button
-          css={{ position: "fixed", left: 3, top: 3 }}
-          onClick={handleStop}
-        >
-          <View as={FiSquare} css={{ m: "auto" }}></View>
-        </Button>
-      )}
       {playlist && victoryEmoji && (
         <Victory
           emoji={victoryEmoji}
@@ -532,8 +543,18 @@ export const Tangram = () => {
           onNext={
             currentTangramIndex < playlist.length - 1 ? handleNext : undefined
           }
+          onApprove={
+            currentUser &&
+            currentUser.isAdmin &&
+            playlist &&
+            selectedTangram.uid &&
+            !selectedTangram.approved
+              ? handleApprove
+              : undefined
+          }
         />
       )}
+      <TangramMenu></TangramMenu>
     </View>
   )
 }

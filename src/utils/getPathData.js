@@ -1,7 +1,7 @@
 import paper from "paper/dist/paper-core"
 import { MAX_LENGTH, MIN_LENGTH } from "../constants"
 
-export const getSvg = (piecesGroup, scaleFactor) => {
+export const getPathData = (piecesGroup, scaleFactor) => {
   let compoundPath
 
   for (const pieceGroup of piecesGroup.children) {

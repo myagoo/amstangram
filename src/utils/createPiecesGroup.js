@@ -28,7 +28,7 @@ const createTriangle = (size, id) => {
 
   const insetBorderShape = new paper.Path({
     name: "insetBorder",
-    segments: getOffsettedPathPoints(points, -INSET_BORDER / 2),
+    segments: getOffsettedPathPoints(points, -INSET_BORDER),
     closed: true,
     strokeWidth: INSET_BORDER,
   })
@@ -74,7 +74,7 @@ const createRhombus = (size, id) => {
 
   const insetBorderShape = new paper.Path({
     name: "insetBorder",
-    segments: getOffsettedPathPoints(points, -(INSET_BORDER / 2)),
+    segments: getOffsettedPathPoints(points, -INSET_BORDER),
     closed: true,
     strokeWidth: INSET_BORDER,
   })
@@ -104,8 +104,8 @@ const createSquare = (size, id) => {
 
   const insetBorderShape = new paper.Path.Rectangle({
     name: "insetBorder",
-    point: [INSET_BORDER / 2, INSET_BORDER / 2],
-    size: [size - INSET_BORDER, size - INSET_BORDER],
+    point: [INSET_BORDER, INSET_BORDER],
+    size: [size - INSET_BORDER * 2, size - INSET_BORDER * 2],
     strokeWidth: INSET_BORDER,
   })
 

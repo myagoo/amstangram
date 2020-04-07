@@ -15,3 +15,11 @@ export const SCRAMBLE_PADDING = 100
 export const COLOR_TRANSITION_DURATION = 250
 export const FADEIN_TRANSITION_DURATION = 1000
 export const FADEIN_STAGGER_DURATION = 500
+export const CATEGORIES = [
+  "animals",
+  "letters",
+  "digits",
+  "people",
+  "geometry",
+  "stuff",
+]
