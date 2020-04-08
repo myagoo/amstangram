@@ -1,43 +1,38 @@
-import React, { useState, useContext } from "react"
+import React, { useContext, useState } from "react"
 import {
-  FiMenu,
-  FiX,
   FiGrid,
-  FiSquare,
+  FiLogIn,
+  FiLogOut,
+  FiMenu,
   FiSave,
-  FiMoon,
-  FiSun,
+  FiSettings,
+  FiSquare,
+  FiX,
 } from "react-icons/fi"
 import {
   FADEIN_STAGGER_DURATION,
   FADEIN_TRANSITION_DURATION,
 } from "../constants"
+import { GalleryContext } from "../contexts/gallery"
+import { useTranslate } from "../contexts/language"
+import { NotifyContext } from "../contexts/notify"
+import { SettingsContext } from "../contexts/settings"
+import { UserContext } from "../contexts/user"
 import { Button } from "./button"
 import { View } from "./view"
-import { GalleryContext } from "../contexts/gallery"
-import {
-  useShowBackgroundPattern,
-  FilledTangramIcon,
-  DashedTangramIcon,
-} from "../contexts/showBackgroundPattern"
-import { TangramsContext } from "../contexts/tangrams"
-import { useSwitchTheme } from "@css-system/gatsby-plugin-css-system"
-import { NotifyContext } from "../contexts/notify"
 
 const DISTANCE = 100
-const STEP_ANGLE = 60
+const STEP_ANGLE = 45
 
 export const TangramMenu = () => {
+  const t = useTranslate()
   const notify = useContext(NotifyContext)
+  const { showSettingsDialog } = useContext(SettingsContext)
+  const { currentUser, login, logout } = useContext(UserContext)
 
-  const [themeKey, switchTheme] = useSwitchTheme()
   const [opened, setOpened] = useState(false)
-  const [
-    showBackgroundPattern,
-    toggleShowBackgroundPattern,
-  ] = useShowBackgroundPattern()
 
-  const { requestSave, playlist, setPlaylist } = useContext(TangramsContext)
+  const { requestSave, playlist, setPlaylist } = useContext(GalleryContext)
 
   const { setGalleryOpened } = useContext(GalleryContext)
 
@@ -54,24 +49,25 @@ export const TangramMenu = () => {
         setGalleryOpened((prevGalleryOpened) => !prevGalleryOpened),
     },
     {
-      id: "mode",
-      icon: showBackgroundPattern ? FilledTangramIcon : DashedTangramIcon,
-      onClick: () => {
-        toggleShowBackgroundPattern()
-        notify(showBackgroundPattern ? "Realistic mode" : "Arcade mode")
-      },
-    },
-    {
       id: "stop",
       icon: playlist ? FiSquare : FiSave,
       onClick: playlist ? () => setPlaylist(null) : requestSave,
     },
     {
-      id: "theme",
-      icon: themeKey === "dark" ? FiMoon : FiSun,
-      onClick: () => {
-        switchTheme(themeKey === "dark" ? "light" : "dark")
-        notify(themeKey === "dark" ? "Light mode" : "Dark mode")
+      id: "settings",
+      icon: FiSettings,
+      onClick: () => showSettingsDialog(),
+    },
+    {
+      id: "user",
+      icon: currentUser ? FiLogOut : FiLogIn,
+      onClick: async () => {
+        if (currentUser) {
+          await logout()
+          notify(t("Logged out"))
+        } else {
+          login()
+        }
       },
     },
   ]

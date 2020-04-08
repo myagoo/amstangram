@@ -26,17 +26,15 @@ export const Dialog = ({ children, title, onClose, css, ...props }) => {
     >
       <View
         css={{
-          position: "relative",
           flex: "0 1 auto",
           bg: "galleryBackground",
           color: "galleryText",
           borderRadius: 3,
-          overflow: "hidden",
           transition: `background-color ${COLOR_TRANSITION_DURATION}ms, color ${COLOR_TRANSITION_DURATION}ms`,
-
           fontSize: 3,
           p: 3,
           gap: 3,
+          maxWidth: "95vw",
         }}
       >
         <View
@@ -61,8 +59,6 @@ export const Dialog = ({ children, title, onClose, css, ...props }) => {
           onClick={(e) => e.stopPropagation()}
           css={{
             flex: "1",
-            width: "300px",
-            maxWidth: "95vw",
             ...css,
           }}
           {...props}

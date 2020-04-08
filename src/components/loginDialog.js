@@ -7,8 +7,10 @@ import { Input } from "./input"
 import { Error, Title } from "./primitives"
 import { Text } from "./text"
 import { View } from "./view"
+import { useTranslate } from "../contexts/language"
 
-const SignupTab = ({ onClose, onSignup, switchTab }) => {
+const SignupTab = ({ onSignup, switchTab }) => {
+  const t = useTranslate()
   const {
     handleSubmit,
     register,
@@ -39,20 +41,20 @@ const SignupTab = ({ onClose, onSignup, switchTab }) => {
       } catch (error) {
         switch (error.code) {
           case "auth/weak-password":
-            setError("password", "weakPassword", "Password is too weak")
+            setError("password", "weakPassword", t("Password is too weak"))
             break
           case "auth/email-already-in-use":
-            setError("email", "alreadyExists", "Email already exists")
+            setError("email", "alreadyExists", t("Email already exists"))
             break
           case "auth/invalid-email":
-            setError("email", "invalid", "Invalid email address")
+            setError("email", "invalid", t("Invalid email address"))
             break
           default:
             return
         }
       }
     },
-    [onSignup, setError]
+    [onSignup, setError, t]
   )
 
   return (
@@ -63,43 +65,43 @@ const SignupTab = ({ onClose, onSignup, switchTab }) => {
     >
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
         <View css={{ gap: 1 }}>
-          <label>Email address</label>
+          <label>{t("Email address")}</label>
           <Input
             type="email"
             name="email"
-            ref={register({ required: "Email is required" })}
+            ref={register({ required: t("Email is required") })}
           ></Input>
           {errors.email && <Error>{errors.email.message}</Error>}
         </View>
 
         <View css={{ gap: 1 }}>
-          <label>Username</label>
+          <label>{t("Username")}</label>
           <Input
             name="username"
-            ref={register({ required: "Username is required" })}
+            ref={register({ required: t("Username is required") })}
           ></Input>
           {errors.username && <Error>{errors.username.message}</Error>}
         </View>
 
         <View css={{ gap: 1 }}>
-          <label>Password</label>
+          <label>{t("Password")}</label>
           <Input
             type="password"
             name="password"
-            ref={register({ required: "Password is required" })}
+            ref={register({ required: t("Password is required") })}
           ></Input>
           {errors.password && <Error>{errors.password.message}</Error>}
         </View>
 
         <View css={{ gap: 1 }}>
-          <label>Confirm password</label>
+          <label>{t("Confirm password")}</label>
           <Input
             type="password"
             name="passwordConfirm"
             ref={register({
               required: "Password is required",
               validate: (passwordConfirm) =>
-                passwordConfirm === password || "Passwords must match",
+                passwordConfirm === password || t("Passwords must match"),
             })}
           ></Input>
           {errors.passwordConfirm && (
@@ -109,7 +111,7 @@ const SignupTab = ({ onClose, onSignup, switchTab }) => {
       </View>
 
       <PrimaryButton disabled={formState.isSubmitting} type="submit">
-        Sign me up !
+        {t("Sign me up !")}
       </PrimaryButton>
 
       <View
@@ -124,14 +126,15 @@ const SignupTab = ({ onClose, onSignup, switchTab }) => {
             textDecoration: "underline",
           }}
         >
-          I already have an account
+          {t("I already have an account")}
         </Text>
       </View>
     </View>
   )
 }
 
-const SignInTab = ({ onClose, onSignin, switchTab }) => {
+const SignInTab = ({ onSignin, switchTab }) => {
+  const t = useTranslate()
   const { handleSubmit, register, setError, errors, formState } = useForm()
 
   const onSubmit = useCallback(
@@ -147,10 +150,10 @@ const SignInTab = ({ onClose, onSignin, switchTab }) => {
           case "auth/invalid-email":
           case "auth/user-not-found":
           case "auth/user-disabled":
-            setError("email", "weakPassword", "Unknown email address")
+            setError("email", "weakPassword", t("Unknown email address"))
             break
           case "auth/wrong-password":
-            setError("password", "mismatch", "Incorrect password")
+            setError("password", "mismatch", t("Incorrect password"))
             break
 
           default:
@@ -158,7 +161,7 @@ const SignInTab = ({ onClose, onSignin, switchTab }) => {
         }
       }
     },
-    [onSignin, setError]
+    [onSignin, setError, t]
   )
 
   return (
@@ -169,28 +172,28 @@ const SignInTab = ({ onClose, onSignin, switchTab }) => {
     >
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
         <View css={{ gap: 1 }}>
-          <label>Email adress</label>
+          <label>{t("Email address")}</label>
           <Input
             type="email"
             name="email"
-            ref={register({ required: "Email is required" })}
+            ref={register({ required: t("Email is required") })}
           ></Input>
           {errors.email && <Error>{errors.email.message}</Error>}
         </View>
 
         <View css={{ gap: 1 }}>
-          <label>Password</label>
+          <label>{t("Password")}</label>
           <Input
             type="password"
             name="password"
-            ref={register({ required: "Password is required" })}
+            ref={register({ required: t("Password is required") })}
           ></Input>
           {errors.password && <Error>{errors.password.message}</Error>}
         </View>
       </View>
 
       <PrimaryButton type="submit" disabled={formState.isSubmitting}>
-        Sign me in !
+        {t("Sign me in !")}
       </PrimaryButton>
 
       <View
@@ -205,7 +208,7 @@ const SignInTab = ({ onClose, onSignin, switchTab }) => {
             textDecoration: "underline",
           }}
         >
-          I don't have an account
+          {t("I don't have an account")}
         </Text>
       </View>
     </View>
@@ -213,15 +216,16 @@ const SignInTab = ({ onClose, onSignin, switchTab }) => {
 }
 
 export const LoginDialog = ({ deferred }) => {
+  const t = useTranslate()
   const [tab, setTab] = useState("signup")
 
   return (
     <Dialog
       title={
         tab === "signup" ? (
-          <Title>Create your account</Title>
+          <Title>{t("Create your account")}</Title>
         ) : (
-          <Title>Connect to your account</Title>
+          <Title>{t("Connect to your account")}</Title>
         )
       }
       onClose={() => deferred.reject("CLOSED")}
@@ -229,13 +233,11 @@ export const LoginDialog = ({ deferred }) => {
     >
       {tab === "signup" ? (
         <SignupTab
-          onClose={() => deferred.reject("CLOSED")}
           onSignup={deferred.resolve}
           switchTab={() => setTab("signin")}
         ></SignupTab>
       ) : (
         <SignInTab
-          onClose={() => deferred.reject("CLOSED")}
           onSignin={deferred.resolve}
           switchTab={() => setTab("signup")}
         ></SignInTab>

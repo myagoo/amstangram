@@ -24,6 +24,7 @@ export const getPathData = (piecesGroup, scaleFactor) => {
   )
 
   const path = compoundPath.exportSVG().getAttribute("d")
+  const edges = compoundPath.curves.length
   const width = compoundPath.bounds.width
   const height = compoundPath.bounds.height
   const length = Math.ceil(compoundPath.length)
@@ -37,5 +38,6 @@ export const getPathData = (piecesGroup, scaleFactor) => {
     percent,
     length,
     path,
+    edges,
   }
 }

@@ -1,2 +1,2 @@
-export const getTangramDifficulty = tangram =>
-  tangram.percent > 50 ? 0 : tangram.percent > 20 ? 1 : 2
+export const getTangramDifficulty = (tangram) =>
+  tangram.edges > 16 ? 0 : tangram.edges > 8 ? 1 : 2

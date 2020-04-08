@@ -6,10 +6,12 @@ import { PrimaryButton } from "./button"
 import { Card } from "./card"
 import { Dialog } from "./dialog"
 import { Input } from "./input"
-import { View } from "./view"
 import { Title } from "./primitives"
+import { View } from "./view"
+import { useTranslate } from "../contexts/language"
 
 export const SaveTangramDialog = ({ pathData, deferred }) => {
+  const t = useTranslate()
   const { handleSubmit, register, watch } = useForm()
 
   const onSubmit = ({ category, emoji, order: rawOrder }) => {
@@ -35,53 +37,50 @@ export const SaveTangramDialog = ({ pathData, deferred }) => {
 
   return (
     <Dialog
-      title={<Title>Submit your creation</Title>}
+      title={<Title>{t("Submit your creation")}</Title>}
       onClose={deferred.reject}
       as="form"
       onSubmit={handleSubmit(onSubmit)}
       css={{ gap: 3 }}
     >
-      <Card
-        scale={0.75}
-        completedEmoji={completedEmoji}
-        selected
-        tangram={tangram}
-        css={{ alignSelf: "center" }}
-      ></Card>
+      <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
+        <Card
+          scale={0.75}
+          completedEmoji={completedEmoji}
+          selected
+          tangram={tangram}
+          css={{ alignSelf: "center" }}
+        ></Card>
 
-      <View css={{ gap: 1 }}>
-        <label>Category</label>
-        <Input
-          as="select"
-          name="category"
-          ref={register()}
-          css={{ textTransform: "capitalize" }}
-        >
-          {CATEGORIES.map((category) => (
-            <option key={category} value={category}>
-              {category}
-            </option>
-          ))}
-        </Input>
-      </View>
-
-      <View css={{ gap: 1 }}>
-        <label>Victory emoji</label>
-        <Input
-          name="emoji"
-          ref={register()}
-          placeholder="Leave empty for random emoji"
-        />
-      </View>
-
-      {DEV && (
         <View css={{ gap: 1 }}>
-          <label>Order</label>
-          <Input name="order" type="number" ref={register()} />
+          <label>{t("Category")}</label>
+          <Input as="select" name="category" ref={register()}>
+            {CATEGORIES.map((category) => (
+              <option key={category} value={category}>
+                {t(category)}
+              </option>
+            ))}
+          </Input>
         </View>
-      )}
 
-      <PrimaryButton type="submit">Submit !</PrimaryButton>
+        <View css={{ gap: 1 }}>
+          <label>{t("Victory emoji")}</label>
+          <Input
+            name="emoji"
+            ref={register()}
+            placeholder={t("Leave empty for random emoji")}
+          />
+        </View>
+
+        {DEV && (
+          <View css={{ gap: 1 }}>
+            <label>{t("Order")}</label>
+            <Input name="order" type="number" ref={register()} />
+          </View>
+        )}
+      </View>
+
+      <PrimaryButton type="submit">{t("Submit !")}</PrimaryButton>
     </Dialog>
   )
 }

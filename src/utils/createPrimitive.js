@@ -1,12 +1,17 @@
-import { useCss } from "css-system"
-import React from "react"
+import { useCss, ThemeContext } from "css-system"
+import React, { useContext } from "react"
 
 export const extendPrimitive = (Primitive, defaultCss, defaultProps) => {
+  const mergeWithDefault =
+    typeof defaultCss === "function"
+      ? defaultCss
+      : (css) => ({
+          ...defaultCss,
+          ...css,
+        })
   return React.forwardRef(({ css, ...props }, ref) => {
-    const mergedCss = {
-      ...defaultCss,
-      ...css,
-    }
+    const theme = useContext(ThemeContext)
+    const mergedCss = mergeWithDefault(css, theme)
 
     const mergedProps = {
       ...defaultProps,
@@ -30,7 +35,8 @@ export const createPrimitive = (defaultComponent, defaultCss, defaultProps) => {
       { as: Component = defaultComponent, css, deps, className, ...props },
       ref
     ) => {
-      const cssClassName = useCss(mergeWithDefault(css), deps)
+      const theme = useContext(ThemeContext)
+      const cssClassName = useCss(mergeWithDefault(css, theme), deps)
 
       const mergedProps = {
         ...defaultProps,

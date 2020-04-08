@@ -12,11 +12,9 @@ export const Error = extendPrimitive(
 export const Title = extendPrimitive(Text, {
   fontSize: 4,
   fontWeight: "bold",
-  textTransform: "capitalize",
 })
 
 export const SubTitle = extendPrimitive(Text, {
   fontSize: 3,
   fontWeight: "bold",
-  textTransform: "capitalize",
 })

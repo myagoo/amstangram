@@ -52,6 +52,12 @@ export const ShowBackgroundPatternProvider = ({ children }) => {
 
   useEffect(() => {
     const storedData = window.localStorage.getItem("showBackgroundPattern")
+
+    if (storedData === null) {
+      setShowBackgroundPattern(true)
+      return
+    }
+
     try {
       const storedShowBackgroundPattern = JSON.parse(storedData)
       setShowBackgroundPattern(!!JSON.parse(storedShowBackgroundPattern))

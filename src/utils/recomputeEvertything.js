@@ -1,7 +1,7 @@
 import paper from "paper/dist/paper-core"
-import { MIN_LENGTH, MAX_LENGTH } from "../constants"
+import firebase from "gatsby-plugin-firebase"
 
-export const recomputeEverything = (tangrams) => {
+export const recomputeEverything = async (tangrams) => {
   if (
     !window.confirm(
       "Vous êtes sur le point de recalculer la length et le percent de tous les tangrams. Êtes vous sûr ?"
@@ -9,41 +9,24 @@ export const recomputeEverything = (tangrams) => {
   ) {
     return
   }
+
   const project = new paper.Project()
 
-  const fixedTangrams = tangrams.map(
-    ({ path, width, height, order, emoji, category, label, parent }) => {
-      const length = project.importSVG(`<path d="${path}" />`, {
-        applyMatrix: true,
-        insert: false,
-      }).length
+  const collection = await firebase
+    .firestore()
+    .collection("communityTangrams")
+    .get()
 
-      const percent = Math.floor(
-        ((length - MIN_LENGTH) / (MAX_LENGTH - MIN_LENGTH)) * 100
-      )
-
-      return {
-        path,
-        width,
-        height,
-        order,
-        emoji,
-        category,
-        label,
-        filename: parent.name,
-        length,
-        percent,
-      }
-    }
-  )
+  collection.forEach((doc) => {
+    const tangram = doc.data()
+    const compoundPath = project.importSVG(`<path d="${tangram.path}" />`, {
+      applyMatrix: true,
+      insert: false,
+    })
+    doc.ref.update({
+      edges: compoundPath.curves.length,
+    })
+  })
 
   project.remove()
-
-  console.log(fixedTangrams)
-
-  fetch(`/magic`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(fixedTangrams),
-  })
 }

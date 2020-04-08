@@ -1,31 +1,43 @@
-import firebase from "gatsby-plugin-firebase"
-import React, { useContext, useEffect, useState } from "react"
+import React, { useContext, useState } from "react"
 import { GalleryContext } from "../contexts/gallery"
-import { TangramsContext } from "../contexts/tangrams"
 import { UserContext } from "../contexts/user"
-import { getTangramDifficulty } from "../utils/getTangramDifficulty"
 import { shuffle } from "../utils/shuffle"
 import { PrimaryButton } from "./button"
 import { Card } from "./card"
 import { Dialog } from "./dialog"
 import { SubTitle, Title } from "./primitives"
 import { View } from "./view"
+import { extendPrimitive } from "../utils/createPrimitive"
+import { useTranslate } from "../contexts/language"
+import { FiShuffle } from "react-icons/fi"
+
+const FadedView = extendPrimitive(View, (css, theme) => ({
+  ...css,
+  p: 1,
+  alignItems: "center",
+  cursor: "pointer",
+  position: "sticky",
+  top: 0,
+  zIndex: 1,
+  background: `linear-gradient(0deg, rgba(0,0,0,0) 0%, ${theme.colors.galleryBackground} 50%)`,
+}))
 
 export const GalleryDialog = () => {
-  const { currentUser } = useContext(UserContext)
+  const t = useTranslate()
+  const { usersMetadata } = useContext(UserContext)
   const {
-    selectedTangrams,
-    setSelectedTangrams,
     setGalleryOpened,
+    baseTangramsByGroup,
+    communityTangramsByUser,
+    pendingTangrams,
+    completedTangramsEmoji,
+    setPlaylist,
   } = useContext(GalleryContext)
 
-  const { tangramsByGroup, completedTangramsEmoji, setPlaylist } = useContext(
-    TangramsContext
-  )
-
-  const [communityTangrams, setCommunityTangrams] = useState([])
+  const [selectedTangrams, setSelectedTangrams] = useState([])
 
   const handleTangramClick = (clickedTangram) => {
+    console.log(clickedTangram.id)
     setSelectedTangrams((prevPendingSelectedTangrams) => {
       if (
         prevPendingSelectedTangrams.some(
@@ -59,68 +71,27 @@ export const GalleryDialog = () => {
     setGalleryOpened(null)
   }
 
-  const handleCloseClick = () => setGalleryOpened(false)
-
-  useEffect(() => {
-    const unsubscribe = firebase
-      .firestore()
-      .collection("communityTangrams")
-      .where("approved", "==", true)
-      .onSnapshot((querySnapshot) => {
-        setCommunityTangrams(
-          querySnapshot.docs.map((doc) => {
-            const tangram = doc.data()
-            return {
-              id: doc.id,
-              difficulty: getTangramDifficulty(tangram),
-              ...tangram,
-            }
-          })
+  const handleShuffleClick = () => {
+    if (selectedTangrams.length) {
+      setPlaylist(shuffle(selectedTangrams))
+    } else {
+      setPlaylist(
+        shuffle(
+          Object.values(communityTangramsByUser)
+            .flat()
+            .concat(Object.values(baseTangramsByGroup).flat())
         )
-      })
-
-    return () => unsubscribe
-  }, [])
-
-  const [pendingTangrams, setPendingTangrams] = useState([])
-
-  useEffect(() => {
-    console.log(currentUser)
-    if (!currentUser || !currentUser.isAdmin) {
-      return
-    }
-    let ref = firebase
-      .firestore()
-      .collection("communityTangrams")
-      .where("approved", "==", false)
-
-    if (!currentUser.isAdmin) {
-      ref = ref.where("uid", "==", currentUser.uid)
-    }
-
-    const unsubscribe = ref.onSnapshot((querySnapshot) => {
-      setPendingTangrams(
-        querySnapshot.docs.map((doc) => {
-          const tangram = doc.data()
-          return {
-            id: doc.id,
-            difficulty: getTangramDifficulty(tangram),
-            ...tangram,
-          }
-        })
       )
-    })
-
-    return () => {
-      setPendingTangrams([])
-      unsubscribe()
     }
-  }, [currentUser])
+    setGalleryOpened(null)
+  }
+
+  const handleCloseClick = () => setGalleryOpened(false)
 
   return (
     <>
       <Dialog
-        title={<Title>Tangram gallery</Title>}
+        title={<Title>{t("Tangram gallery")}</Title>}
         css={{
           gap: 3,
           width: "600px",
@@ -137,19 +108,9 @@ export const GalleryDialog = () => {
         >
           {pendingTangrams.length !== 0 && (
             <View css={{ gap: 3 }}>
-              <View
-                css={{
-                  alignItems: "center",
-                  cursor: "pointer",
-                  position: "sticky",
-                  top: 0,
-                  zIndex: 1,
-                  bg: "galleryBackground",
-                }}
-                onClick={() => handleCategoryClick(pendingTangrams)}
-              >
-                <SubTitle>Pending approbation</SubTitle>
-              </View>
+              <FadedView onClick={() => handleCategoryClick(pendingTangrams)}>
+                <SubTitle>{t("Pending approbation")}</SubTitle>
+              </FadedView>
               <View
                 css={{
                   display: "grid",
@@ -176,100 +137,109 @@ export const GalleryDialog = () => {
               </View>
             </View>
           )}
-          {communityTangrams.length !== 0 && (
-            <View css={{ gap: 3 }}>
-              <View
-                css={{
-                  alignItems: "center",
-                  cursor: "pointer",
-                  position: "sticky",
-                  top: 0,
-                  zIndex: 1,
-                  bg: "galleryBackground",
-                }}
-                onClick={() => handleCategoryClick(communityTangrams)}
-              >
-                <SubTitle>Community</SubTitle>
+          {communityTangramsByUser === null || usersMetadata === null ? (
+            <SubTitle>{t("Loading community tangrams")}</SubTitle>
+          ) : (
+            Object.keys(communityTangramsByUser).map((userId) => (
+              <View key={userId} css={{ gap: 3 }}>
+                <FadedView
+                  onClick={() =>
+                    handleCategoryClick(communityTangramsByUser[userId])
+                  }
+                >
+                  <SubTitle>
+                    {t("{username}'s tangrams", {
+                      username: usersMetadata[userId].username,
+                    })}
+                  </SubTitle>
+                </FadedView>
+                <View
+                  css={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, 128px)",
+                    gridColumnGap: 3,
+                    gridRowGap: 3,
+                    justifyContent: "center",
+                    justifyItems: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {communityTangramsByUser[userId].map((communityTangram) => (
+                    <Card
+                      key={communityTangram.id}
+                      tangram={communityTangram}
+                      completedEmoji={
+                        completedTangramsEmoji[communityTangram.id]
+                      }
+                      selected={selectedTangrams.some(
+                        (selectedCommunityTangram) =>
+                          selectedCommunityTangram.id === communityTangram.id
+                      )}
+                      onClick={() => handleTangramClick(communityTangram)}
+                    />
+                  ))}
+                </View>
               </View>
-              <View
-                css={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, 128px)",
-                  gridColumnGap: 3,
-                  gridRowGap: 3,
-                  justifyContent: "center",
-                  justifyItems: "center",
-                  alignItems: "center",
-                }}
-              >
-                {communityTangrams.map((communityTangram) => (
-                  <Card
-                    key={communityTangram.id}
-                    tangram={communityTangram}
-                    completedEmoji={communityTangram.emoji}
-                    selected={selectedTangrams.some(
-                      (selectedCommunityTangram) =>
-                        selectedCommunityTangram.id === communityTangram.id
-                    )}
-                    onClick={() => handleTangramClick(communityTangram)}
-                  />
-                ))}
-              </View>
-            </View>
+            ))
           )}
-          {Object.keys(tangramsByGroup).map((category) => (
-            <View key={category} css={{ gap: 3 }}>
-              <View
-                css={{
-                  alignItems: "center",
-                  cursor: "pointer",
-                  position: "sticky",
-                  top: 0,
-                  zIndex: 1,
-                  bg: "galleryBackground",
-                }}
-                onClick={() => handleCategoryClick(tangramsByGroup[category])}
-              >
-                <SubTitle>{category}</SubTitle>
+          {baseTangramsByGroup === null ? (
+            <SubTitle>{t("Loading base tangrams")}</SubTitle>
+          ) : (
+            Object.keys(baseTangramsByGroup).map((category) => (
+              <View key={category} css={{ gap: 3 }}>
+                <FadedView
+                  onClick={() =>
+                    handleCategoryClick(baseTangramsByGroup[category])
+                  }
+                >
+                  <SubTitle>{t(category)}</SubTitle>
+                </FadedView>
+                <View
+                  css={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, 128px)",
+                    gridColumnGap: 3,
+                    gridRowGap: 3,
+                    justifyContent: "center",
+                    justifyItems: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {baseTangramsByGroup[category].map((tangram) => (
+                    <Card
+                      key={tangram.id}
+                      tangram={tangram}
+                      completedEmoji={completedTangramsEmoji[tangram.id]}
+                      selected={selectedTangrams.some(
+                        (pendingSelectedTangram) =>
+                          pendingSelectedTangram.id === tangram.id
+                      )}
+                      onClick={() => handleTangramClick(tangram)}
+                    />
+                  ))}
+                </View>
               </View>
-              <View
-                css={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, 128px)",
-                  gridColumnGap: 3,
-                  gridRowGap: 3,
-                  justifyContent: "center",
-                  justifyItems: "center",
-                  alignItems: "center",
-                }}
-              >
-                {tangramsByGroup[category].map((tangram) => (
-                  <Card
-                    key={tangram.id}
-                    tangram={tangram}
-                    completedEmoji={completedTangramsEmoji[tangram.id]}
-                    selected={selectedTangrams.some(
-                      (pendingSelectedTangram) =>
-                        pendingSelectedTangram.id === tangram.id
-                    )}
-                    onClick={() => handleTangramClick(tangram)}
-                  />
-                ))}
-              </View>
-            </View>
-          ))}
+            ))
+          )}
         </View>
-
-        <PrimaryButton
-          disabled={selectedTangrams.length === 0}
-          onClick={handleStartClick}
-        >
-          {selectedTangrams.length === 0
-            ? "Select tangrams to play"
-            : `Start ${selectedTangrams.length} tangram${
-                selectedTangrams.length > 1 ? "s" : ""
-              } !`}
-        </PrimaryButton>
+        <View css={{ flexDirection: "row", gap: 2 }}>
+          <PrimaryButton
+            disabled={selectedTangrams.length === 0}
+            onClick={handleStartClick}
+            css={{ flex: "1" }}
+          >
+            {selectedTangrams.length === 0
+              ? t("Select tangrams")
+              : selectedTangrams.length === 1
+              ? t("Start 1 tangram !")
+              : t("Start {count} tangrams !", {
+                  count: selectedTangrams.length,
+                })}
+          </PrimaryButton>
+          <PrimaryButton onClick={handleShuffleClick}>
+            <View as={FiShuffle} size={20}></View>
+          </PrimaryButton>
+        </View>
       </Dialog>
     </>
   )

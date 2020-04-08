@@ -1,5 +1,27 @@
 import { useCss, useKeyframes } from "css-system"
 import React from "react"
+import { createPrimitive } from "../utils/createPrimitive"
+
+export const DangerButton = createPrimitive("button", {
+  minWidth: 0,
+  minHeight: 0,
+  flex: "none",
+  fontWeight: "bold",
+  border: "2px solid",
+  borderRadius: 2,
+  fontSize: "inherit",
+  color: "errorText",
+  background: "none",
+  cursor: "pointer",
+  p: 3,
+  "&:disabled": {
+    opacity: 0.3,
+    cursor: "not-allowed",
+  },
+  "&:focus": {
+    outline: "none",
+  },
+})
 
 export const PrimaryButton = ({ as: Component = "button", css, ...props }) => {
   const gradient = useKeyframes({

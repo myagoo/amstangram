@@ -4,7 +4,7 @@ import { DEV, COLOR_TRANSITION_DURATION } from "../constants"
 import { ThemeContext } from "css-system"
 
 export const Card = ({
-  tangram: { parent, difficulty, path, width, height },
+  tangram: { difficulty, path, width, height, edges },
   completedEmoji,
   selected,
   css,
@@ -20,6 +20,7 @@ export const Card = ({
         boxShadow: selected
           ? `0px 0px 0px 4px ${color}`
           : "0px 0px 0px 1px rgba(0, 0, 0, 0.1)",
+        m: 1,
         bg: "background",
         transition: `background-color ${COLOR_TRANSITION_DURATION}ms`,
         p: 3,
@@ -50,7 +51,6 @@ export const Card = ({
           {completedEmoji}
         </View>
       )}
-      {DEV && parent && parent.name}
     </View>
   )
 }

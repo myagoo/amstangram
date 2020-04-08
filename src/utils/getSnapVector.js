@@ -176,7 +176,7 @@ export const getSnapVector = (
 
   getSecondarySnap(
     shape,
-    otherPrimaryShapes.filter(otherShape => otherShape.shape !== snap.shape),
+    otherPrimaryShapes.filter((otherShape) => otherShape.shape !== snap.shape),
     snap
   )
 

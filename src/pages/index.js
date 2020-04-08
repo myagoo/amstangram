@@ -3,9 +3,11 @@ import React from "react"
 import { Tangram } from "../components/tangram"
 import { COLOR_TRANSITION_DURATION } from "../constants"
 import { GalleryProvider } from "../contexts/gallery"
+import { LanguageProvider } from "../contexts/language"
+import { NotifyProvider } from "../contexts/notify"
+import { SettingsProvider } from "../contexts/settings"
 import { ShowBackgroundPatternProvider } from "../contexts/showBackgroundPattern"
 import { UserProvider } from "../contexts/user"
-import { NotifyProvider } from "../contexts/notify"
 
 export default () => {
   useGlobalCss({
@@ -40,14 +42,18 @@ export default () => {
   })
 
   return (
-    <NotifyProvider>
-      <UserProvider>
-        <ShowBackgroundPatternProvider>
-          <GalleryProvider>
-            <Tangram />
-          </GalleryProvider>
-        </ShowBackgroundPatternProvider>
-      </UserProvider>
-    </NotifyProvider>
+    <LanguageProvider>
+      <NotifyProvider>
+        <UserProvider>
+          <ShowBackgroundPatternProvider>
+            <GalleryProvider>
+              <SettingsProvider>
+                <Tangram />
+              </SettingsProvider>
+            </GalleryProvider>
+          </ShowBackgroundPatternProvider>
+        </UserProvider>
+      </NotifyProvider>
+    </LanguageProvider>
   )
 }

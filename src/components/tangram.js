@@ -22,8 +22,9 @@ import {
   STRICT_ERROR_MARGIN,
   VICTORY_PARTICLES_DURATION,
 } from "../constants"
+import { GalleryContext } from "../contexts/gallery"
+import { NotifyContext } from "../contexts/notify"
 import { useShowBackgroundPattern } from "../contexts/showBackgroundPattern"
-import { TangramsContext } from "../contexts/tangrams"
 import { UserContext } from "../contexts/user"
 import { createPiecesGroup } from "../utils/createPiecesGroup"
 import { getPathData } from "../utils/getPathData"
@@ -37,12 +38,11 @@ import { updateColisionState } from "../utils/updateColisionState"
 import { Card } from "./card"
 import { TangramMenu } from "./tangramMenu"
 import { Victory } from "./victory"
-import { NotifyContext } from "../contexts/notify"
-
-const db = firebase.firestore()
+import { useTranslate } from "../contexts/language"
 
 export const Tangram = () => {
-  const { currentUser } = useContext(UserContext)
+  const t = useTranslate()
+  const { getCurrentUserRef, currentUser } = useContext(UserContext)
   const theme = useContext(ThemeContext)
   const notify = useContext(NotifyContext)
 
@@ -53,8 +53,7 @@ export const Tangram = () => {
     saveRequestId,
     playlist,
     setPlaylist,
-  } = useContext(TangramsContext)
-  const { getCurrentUserRef } = useContext(UserContext)
+  } = useContext(GalleryContext)
 
   const [currentTangramIndex, setCurrentTangramIndex] = useState(0)
   const [victoryEmoji, setVictoryEmoji] = useState(null)
@@ -78,12 +77,13 @@ export const Tangram = () => {
     setPlaylist(null)
   }, [setPlaylist])
 
-  const handleApprove = () => {
-    firebase
+  const handleApprove = async () => {
+    await firebase
       .firestore()
       .collection("communityTangrams")
       .doc(selectedTangram.id)
       .update({ approved: true })
+    notify(t("Tangram approved"))
   }
 
   useEffect(() => {
@@ -94,37 +94,38 @@ export const Tangram = () => {
   useEffect(() => {
     if (saveRequestId) {
       if (!isTangramValid(piecesGroupRef.current)) {
-        notify("You can't save an invalid tangram")
+        notify(t("You can't save an invalid tangram"))
         return
       }
+
       const handleSaveRequest = DEV
         ? async () => {
             const tangram = await getTangramRef.current(
               getPathData(piecesGroupRef.current, scaleFactorRef.current)
             )
-            await fetch(`/save`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(tangram),
-            })
-            notify("Tangram saved")
+            await firebase.firestore().collection("baseTangrams").add(tangram)
+
+            notify(t("Tangram added to base gallery"))
           }
         : async () => {
             const user = await getCurrentUserRef.current()
             const tangram = await getTangramRef.current(
               getPathData(piecesGroupRef.current, scaleFactorRef.current)
             )
-            await db.collection("communityTangrams").add({
-              ...tangram,
-              uid: user.uid,
-              approved: false,
-            })
-            notify("Tangram submitted for review")
+            await firebase
+              .firestore()
+              .collection("communityTangrams")
+              .add({
+                ...tangram,
+                uid: user.uid,
+                approved: false,
+              })
+            notify(t("Tangram submitted for review"))
           }
 
       handleSaveRequest()
     }
-  }, [notify, saveRequestId, getTangramRef, getCurrentUserRef])
+  }, [notify, saveRequestId, getTangramRef, getCurrentUserRef, t])
 
   // Handle window resize
   useEffect(() => {
@@ -528,12 +529,12 @@ export const Tangram = () => {
         as="canvas"
         ref={canvasRef}
         css={{
+          minHeight: "auto",
           flex: 1,
           animation: `${FADEIN_TRANSITION_DURATION}ms fadeIn ${
             FADEIN_STAGGER_DURATION * 1
           }ms ease both`,
         }}
-        resize="true"
       />
 
       {playlist && victoryEmoji && (

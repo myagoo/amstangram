@@ -9,12 +9,20 @@ const baseTheme = {
     button: 64,
   },
   radii: [0, 4, 8, 16, 32],
-  fontSizes: [12, 14, 16, 20, 24, 32, 48, 64, 72],
+  fontSizes: [10, 12, 14, 18, 22, 30, 46, 62, 70],
 }
 
 module.exports = {
   plugins: [
-    "gatsby-plugin-postcss",
+    {
+      resolve: "gatsby-plugin-sentry",
+      options: {
+        dsn:
+          "https://1b2f34262d80460298da419637b59901@o375098.ingest.sentry.io/5194058",
+        environment: process.env.NODE_ENV,
+        enabled: process.env.NODE_ENV === "production",
+      },
+    },
     {
       resolve: `gatsby-plugin-google-analytics`,
       options: {
@@ -40,14 +48,6 @@ module.exports = {
       },
     },
     {
-      resolve: "gatsby-source-filesystem",
-      options: {
-        path: `${__dirname}/tangrams`,
-        name: "tangrams",
-      },
-    },
-    "gatsby-transformer-json",
-    {
       resolve: "@css-system/gatsby-plugin-css-system",
       options: {
         defaultTheme: "light",
@@ -66,7 +66,7 @@ module.exports = {
               },
               difficulties: ["#10ac84", "#2e86de", "#ee5253"],
               background: "#fff",
-              galleryBackground: "#ecf0f1",
+              galleryBackground: "#e0e0e0",
               galleryText: "#303030",
               inputBackground: "#FFF",
               errorText: "#bd0808",

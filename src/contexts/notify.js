@@ -30,7 +30,7 @@ export const NotifyProvider = ({ children }) => {
         content,
         timeoutId: setTimeout(() => {
           setNotificationData(null)
-        }, 3000),
+        }, 2000),
       }
     })
   }, [])
