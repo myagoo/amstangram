@@ -1,4 +1,4 @@
-export const DEV = process.env.NODE_ENV === "development"
+export const DEV = false && process.env.NODE_ENV === "development"
 export const SMALL_TRIANGLE_BASE = 50 // If you change this, the world will fall appart
 export const MIN_LENGTH = SMALL_TRIANGLE_BASE * 15.313708499 // Should be 765.685424949238
 export const MAX_LENGTH = SMALL_TRIANGLE_BASE * 48.284271247 // Should be 2414.2135623730956

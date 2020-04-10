@@ -28,8 +28,6 @@ const SignupTab = ({ onSignup, switchTab }) => {
           .auth()
           .createUserWithEmailAndPassword(email, password)
 
-        await user.updateProfile({ displayName: username })
-
         await firebase
           .firestore()
           .collection("users")

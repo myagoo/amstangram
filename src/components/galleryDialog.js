@@ -35,7 +35,7 @@ export const GalleryDialog = () => {
   const [selectedTangrams, setSelectedTangrams] = useState([])
 
   const handleTangramClick = (clickedTangram) => {
-    console.log(clickedTangram.id)
+    console.log(clickedTangram)
     setSelectedTangrams((prevPendingSelectedTangrams) => {
       if (
         prevPendingSelectedTangrams.some(
@@ -98,7 +98,7 @@ export const GalleryDialog = () => {
             gap: 4,
           }}
         >
-          {tangramsByCategory === null ? (
+          {tangramsByCategory === null || usersMetadata === null ? (
             <SubTitle>{t("Loading tangrams")}</SubTitle>
           ) : (
             Object.keys(tangramsByCategory).map((category) => (

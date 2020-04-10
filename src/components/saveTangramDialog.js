@@ -45,7 +45,6 @@ export const SaveTangramDialog = ({ pathData, deferred }) => {
     >
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
         <Card
-          scale={0.75}
           completedEmoji={completedEmoji}
           selected
           tangram={tangram}

@@ -111,7 +111,7 @@ export const Tangram = () => {
             const user = await getCurrentUserRef.current()
             const tangram = await getTangramRef.current({
               ...getPathData(piecesGroupRef.current, scaleFactorRef.current),
-              uid: user.id,
+              uid: user.uid,
             })
             await firebase
               .firestore()

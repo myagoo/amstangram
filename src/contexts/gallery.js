@@ -67,8 +67,7 @@ export const GalleryProvider = ({ children }) => {
       if (tangram.uid && !tangram.approved) {
         if (
           !currentUser ||
-          !currentUser.isAdmin ||
-          tangram.uid !== currentUser.uid
+          (!currentUser.isAdmin && tangram.uid !== currentUser.uid)
         ) {
           continue
         }
