@@ -23,7 +23,6 @@ export const SettingsDialog = ({ deferred }) => {
     showBackgroundPattern,
     toggleShowBackgroundPattern,
   ] = useShowBackgroundPattern()
-  console.log(showBackgroundPattern)
 
   const { language, setLanguage } = useContext(LanguageContext)
   const t = useTranslate()

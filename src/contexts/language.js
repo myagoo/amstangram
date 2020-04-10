@@ -20,9 +20,10 @@ export const LanguageContext = createContext({
 })
 
 export const useTranslate = () => {
-  const { language } = useContext(LanguageContext)
+  const { languageRef } = useContext(LanguageContext)
   return useCallback(
     (key, values) => {
+      const language = languageRef.current
       if (!translations[language] || !translations[language][key]) {
         DEV && console.warn(`Key ${key} not found in language ${language}`)
         return key
@@ -39,7 +40,7 @@ export const useTranslate = () => {
 
       return interpolation
     },
-    [language]
+    [languageRef]
   )
 }
 
@@ -69,18 +70,19 @@ export const LanguageProvider = ({ children }) => {
   const languageRef = useRef(language)
 
   useEffect(() => {
-    setLanguage(getDefaultLanguage())
+    const defaultLanguage = getDefaultLanguage()
+    setLanguage(defaultLanguage)
+    languageRef.current = defaultLanguage
   }, [])
-
-  useEffect(() => {
-    languageRef.current = language
-  }, [language])
 
   const contextValue = useMemo(
     () => ({
       language,
       languageRef,
-      setLanguage,
+      setLanguage: (newLanguage) => {
+        setLanguage(newLanguage)
+        languageRef.current = newLanguage
+      },
     }),
     [language]
   )

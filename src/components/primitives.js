@@ -18,3 +18,8 @@ export const SubTitle = extendPrimitive(Text, {
   fontSize: 3,
   fontWeight: "bold",
 })
+
+export const Similink = extendPrimitive(Text, {
+  cursor: "pointer",
+  textDecoration: "underline",
+})

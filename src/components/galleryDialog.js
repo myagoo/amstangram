@@ -24,12 +24,10 @@ const FadedView = extendPrimitive(View, (css, theme) => ({
 
 export const GalleryDialog = () => {
   const t = useTranslate()
-  const { usersMetadata } = useContext(UserContext)
+  const { usersMetadata, showProfile } = useContext(UserContext)
   const {
     setGalleryOpened,
-    baseTangramsByGroup,
-    communityTangramsByUser,
-    pendingTangrams,
+    tangramsByCategory,
     completedTangramsEmoji,
     setPlaylist,
   } = useContext(GalleryContext)
@@ -75,13 +73,7 @@ export const GalleryDialog = () => {
     if (selectedTangrams.length) {
       setPlaylist(shuffle(selectedTangrams))
     } else {
-      setPlaylist(
-        shuffle(
-          Object.values(communityTangramsByUser)
-            .flat()
-            .concat(Object.values(baseTangramsByGroup).flat())
-        )
-      )
+      setPlaylist(shuffle(Object.values(tangramsByCategory)))
     }
     setGalleryOpened(null)
   }
@@ -106,90 +98,14 @@ export const GalleryDialog = () => {
             gap: 4,
           }}
         >
-          {pendingTangrams.length !== 0 && (
-            <View css={{ gap: 3 }}>
-              <FadedView onClick={() => handleCategoryClick(pendingTangrams)}>
-                <SubTitle>{t("Pending approbation")}</SubTitle>
-              </FadedView>
-              <View
-                css={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, 128px)",
-                  gridColumnGap: 3,
-                  gridRowGap: 3,
-                  justifyContent: "center",
-                  justifyItems: "center",
-                  alignItems: "center",
-                }}
-              >
-                {pendingTangrams.map((pendingTangram) => (
-                  <Card
-                    key={pendingTangram.id}
-                    tangram={pendingTangram}
-                    completedEmoji={pendingTangram.emoji}
-                    selected={selectedTangrams.some(
-                      (selectedPendingTangram) =>
-                        selectedPendingTangram.id === pendingTangram.id
-                    )}
-                    onClick={() => handleTangramClick(pendingTangram)}
-                  />
-                ))}
-              </View>
-            </View>
-          )}
-          {communityTangramsByUser === null || usersMetadata === null ? (
-            <SubTitle>{t("Loading community tangrams")}</SubTitle>
+          {tangramsByCategory === null ? (
+            <SubTitle>{t("Loading tangrams")}</SubTitle>
           ) : (
-            Object.keys(communityTangramsByUser).map((userId) => (
-              <View key={userId} css={{ gap: 3 }}>
-                <FadedView
-                  onClick={() =>
-                    handleCategoryClick(communityTangramsByUser[userId])
-                  }
-                >
-                  <SubTitle>
-                    {t("{username}'s tangrams", {
-                      username: usersMetadata[userId].username,
-                    })}
-                  </SubTitle>
-                </FadedView>
-                <View
-                  css={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, 128px)",
-                    gridColumnGap: 3,
-                    gridRowGap: 3,
-                    justifyContent: "center",
-                    justifyItems: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  {communityTangramsByUser[userId].map((communityTangram) => (
-                    <Card
-                      key={communityTangram.id}
-                      tangram={communityTangram}
-                      completedEmoji={
-                        completedTangramsEmoji[communityTangram.id]
-                      }
-                      selected={selectedTangrams.some(
-                        (selectedCommunityTangram) =>
-                          selectedCommunityTangram.id === communityTangram.id
-                      )}
-                      onClick={() => handleTangramClick(communityTangram)}
-                    />
-                  ))}
-                </View>
-              </View>
-            ))
-          )}
-          {baseTangramsByGroup === null ? (
-            <SubTitle>{t("Loading base tangrams")}</SubTitle>
-          ) : (
-            Object.keys(baseTangramsByGroup).map((category) => (
+            Object.keys(tangramsByCategory).map((category) => (
               <View key={category} css={{ gap: 3 }}>
                 <FadedView
                   onClick={() =>
-                    handleCategoryClick(baseTangramsByGroup[category])
+                    handleCategoryClick(tangramsByCategory[category])
                   }
                 >
                   <SubTitle>{t(category)}</SubTitle>
@@ -197,15 +113,15 @@ export const GalleryDialog = () => {
                 <View
                   css={{
                     display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, 128px)",
-                    gridColumnGap: 3,
-                    gridRowGap: 3,
+                    gridTemplateColumns: "repeat(auto-fill, 136px)",
+                    gridColumnGap: 2,
+                    gridRowGap: 2,
                     justifyContent: "center",
                     justifyItems: "center",
                     alignItems: "center",
                   }}
                 >
-                  {baseTangramsByGroup[category].map((tangram) => (
+                  {tangramsByCategory[category].map((tangram) => (
                     <Card
                       key={tangram.id}
                       tangram={tangram}
@@ -214,7 +130,11 @@ export const GalleryDialog = () => {
                         (pendingSelectedTangram) =>
                           pendingSelectedTangram.id === tangram.id
                       )}
+                      username={
+                        tangram.uid && usersMetadata[tangram.uid].username
+                      }
                       onClick={() => handleTangramClick(tangram)}
+                      onBadgeClick={showProfile}
                     />
                   ))}
                 </View>

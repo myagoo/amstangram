@@ -43,6 +43,7 @@ export const Dialog = ({ children, title, onClose, css, ...props }) => {
             gap: 3,
             alignItems: "center",
             justifyContent: "space-between",
+            zIndex: 1,
           }}
         >
           {title}
@@ -51,6 +52,7 @@ export const Dialog = ({ children, title, onClose, css, ...props }) => {
             css={{
               cursor: "pointer",
               size: 32,
+              ml: title ? undefined : "auto",
             }}
             onClick={onClose}
           ></View>

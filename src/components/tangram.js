@@ -80,7 +80,7 @@ export const Tangram = () => {
   const handleApprove = async () => {
     await firebase
       .firestore()
-      .collection("communityTangrams")
+      .collection("tangrams")
       .doc(selectedTangram.id)
       .update({ approved: true })
     notify(t("Tangram approved"))
@@ -103,21 +103,21 @@ export const Tangram = () => {
             const tangram = await getTangramRef.current(
               getPathData(piecesGroupRef.current, scaleFactorRef.current)
             )
-            await firebase.firestore().collection("baseTangrams").add(tangram)
+            await firebase.firestore().collection("tangrams").add(tangram)
 
             notify(t("Tangram added to base gallery"))
           }
         : async () => {
             const user = await getCurrentUserRef.current()
-            const tangram = await getTangramRef.current(
-              getPathData(piecesGroupRef.current, scaleFactorRef.current)
-            )
+            const tangram = await getTangramRef.current({
+              ...getPathData(piecesGroupRef.current, scaleFactorRef.current),
+              uid: user.id,
+            })
             await firebase
               .firestore()
-              .collection("communityTangrams")
+              .collection("tangrams")
               .add({
                 ...tangram,
-                uid: user.uid,
                 approved: false,
               })
             notify(t("Tangram submitted for review"))
@@ -155,7 +155,9 @@ export const Tangram = () => {
       let mouseDownPoint = null
 
       const handleMouseEnter = (mdEvent) => {
-        document.body.style.cursor = "pointer"
+        if (document.activeElement === canvasRef.current) {
+          document.body.style.cursor = "pointer"
+        }
       }
 
       const handleMouseLeave = (mdEvent) => {

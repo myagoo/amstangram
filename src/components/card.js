@@ -2,20 +2,24 @@ import React, { useContext } from "react"
 import { View } from "./view"
 import { DEV, COLOR_TRANSITION_DURATION } from "../constants"
 import { ThemeContext } from "css-system"
+import { Badge } from "./badge"
 
 export const Card = ({
-  tangram: { difficulty, path, width, height, edges },
+  tangram: { difficulty, path, width, height, uid, approved },
   completedEmoji,
   selected,
   css,
   scale = 1,
+  onBadgeClick,
   ...props
 }) => {
   const theme = useContext(ThemeContext)
   const color = theme.colors.difficulties[difficulty]
+
   return (
     <View
       css={{
+        opacity: uid && approved === false ? 0.5 : 1,
         borderRadius: 5,
         boxShadow: selected
           ? `0px 0px 0px 4px ${color}`
@@ -31,7 +35,7 @@ export const Card = ({
         height: 178 * scale,
         ...css,
       }}
-      deps={[selected]}
+      deps={[selected, approved]}
       {...props}
     >
       <View
@@ -50,6 +54,20 @@ export const Card = ({
         <View css={{ position: "absolute", top: 2, left: 2, fontSize: "30px" }}>
           {completedEmoji}
         </View>
+      )}
+      {uid && (
+        <Badge
+          uid={uid}
+          css={{
+            position: "absolute",
+            bottom: 1,
+            right: 1,
+          }}
+          onClick={(e) => {
+            e.stopPropagation()
+            onBadgeClick(uid)
+          }}
+        ></Badge>
       )}
     </View>
   )

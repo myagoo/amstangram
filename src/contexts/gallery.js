@@ -2,157 +2,99 @@ import firebase from "gatsby-plugin-firebase"
 import React, {
   createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
+  useContext,
 } from "react"
 import { GalleryDialog } from "../components/galleryDialog"
 import { SaveTangramDialog } from "../components/saveTangramDialog"
 import { Deferred } from "../utils/deferred"
 import { getTangramDifficulty } from "../utils/getTangramDifficulty"
-import { UserContext } from "./user"
 import { sortTangrams } from "../utils/sortTangrams"
+import { UserContext } from "./user"
 
 export const GalleryContext = createContext(null)
 
 export const GalleryProvider = ({ children }) => {
+  const { currentUser } = useContext(UserContext)
+
   const [galleryOpened, setGalleryOpened] = useState(false)
 
-  const { currentUser } = useContext(UserContext)
   const getTangramRef = useRef()
   const [playlist, setPlaylist] = useState(null)
   const [saveRequestId, setSaveRequestId] = useState(0)
   const [completedTangramsEmoji, setCompletedTangramsEmoji] = useState({})
-  const [pendingTangrams, setPendingTangrams] = useState([])
-  const [baseTangramsByGroup, setBaseTangramsByGroup] = useState(null)
-  const [communityTangramsByUser, setCommunityTangramsByUser] = useState(null)
+  const [tangramsByCategory, setTangramsByCategory] = useState(null)
   const [tangramDialogData, setTangramDialogData] = useState(null)
+  const [tangrams, setTangrams] = useState(null)
 
   useEffect(() => {
     const unsubscribe = firebase
       .firestore()
-      .collection("baseTangrams")
+      .collection("tangrams")
       .onSnapshot((querySnapshot) => {
-        const baseTangramsByGroup = {}
+        const newTangrams = []
+        const newCompletedTangramsEmoji = {}
 
         for (const doc of querySnapshot.docs) {
+          const id = doc.id
           const tangram = doc.data()
-          if (!baseTangramsByGroup[tangram.category]) {
-            baseTangramsByGroup[tangram.category] = []
-          }
-          baseTangramsByGroup[tangram.category].push({
-            id: doc.id,
+          newTangrams.push({
+            id,
             difficulty: getTangramDifficulty(tangram),
             ...tangram,
           })
+          newCompletedTangramsEmoji[id] = localStorage.getItem(id)
         }
 
-        const sortedBaseTangramsByGroup = {}
-        for (const sortedCategory of Object.keys(baseTangramsByGroup).sort()) {
-          sortedBaseTangramsByGroup[sortedCategory] = baseTangramsByGroup[
-            sortedCategory
-          ].sort(sortTangrams)
-        }
-
-        setBaseTangramsByGroup(sortedBaseTangramsByGroup)
+        setTangrams(newTangrams)
+        setCompletedTangramsEmoji(newCompletedTangramsEmoji)
       })
+
     return unsubscribe
   }, [])
 
   useEffect(() => {
-    const unsubscribe = firebase
-      .firestore()
-      .collection("communityTangrams")
-      .where("approved", "==", true)
-      .onSnapshot((querySnapshot) => {
-        const baseTangramsByUser = {}
-        for (const doc of querySnapshot.docs) {
-          const tangram = doc.data()
-          if (!baseTangramsByUser[tangram.uid]) {
-            baseTangramsByUser[tangram.uid] = []
-          }
-          baseTangramsByUser[tangram.uid].push({
-            id: doc.id,
-            difficulty: getTangramDifficulty(tangram),
-            ...tangram,
-          })
-        }
-
-        const sortedBaseTangramsByUser = {}
-        for (const sortedCategory of Object.keys(baseTangramsByUser).sort(
-          (tangramsA, tangramsB) => tangramsA.length - tangramsB.length
-        )) {
-          sortedBaseTangramsByUser[sortedCategory] = baseTangramsByUser[
-            sortedCategory
-          ].sort(sortTangrams)
-        }
-
-        setCommunityTangramsByUser(sortedBaseTangramsByUser)
-      })
-    return unsubscribe
-  }, [])
-
-  useEffect(() => {
-    if (!currentUser || !currentUser.isAdmin) {
+    if (tangrams === null) {
       return
     }
-    let ref = firebase
-      .firestore()
-      .collection("communityTangrams")
-      .where("approved", "==", false)
 
-    if (!currentUser.isAdmin) {
-      ref = ref.where("uid", "==", currentUser.uid)
+    const newTangramsByCategory = {}
+
+    for (const tangram of tangrams) {
+      if (tangram.uid && !tangram.approved) {
+        if (
+          !currentUser ||
+          !currentUser.isAdmin ||
+          tangram.uid !== currentUser.uid
+        ) {
+          continue
+        }
+      }
+
+      if (!newTangramsByCategory[tangram.category]) {
+        newTangramsByCategory[tangram.category] = []
+      }
+
+      newTangramsByCategory[tangram.category].push(tangram)
     }
 
-    const unsubscribe = ref.onSnapshot((querySnapshot) => {
-      setPendingTangrams(
-        querySnapshot.docs.map((doc) => {
-          const tangram = doc.data()
-          return {
-            id: doc.id,
-            difficulty: getTangramDifficulty(tangram),
-            ...tangram,
-          }
-        })
-      )
+    const sortedTangramsByCategory = {}
 
-      return () => {
-        setPendingTangrams([])
-        unsubscribe()
-      }
-    })
-  }, [currentUser])
+    for (const sortedCategory of Object.keys(newTangramsByCategory).sort()) {
+      sortedTangramsByCategory[sortedCategory] = newTangramsByCategory[
+        sortedCategory
+      ].sort(sortTangrams)
+    }
+
+    setTangramsByCategory(sortedTangramsByCategory)
+  }, [tangrams, currentUser])
 
   const requestSave = useCallback(() => {
     setSaveRequestId((prevRequestId) => prevRequestId + 1)
   }, [])
-
-  useEffect(() => {
-    if (baseTangramsByGroup === null || communityTangramsByUser === null) {
-      return
-    }
-
-    const newCompletedTangramsEmoji = {}
-
-    for (const category in baseTangramsByGroup) {
-      const tangrams = baseTangramsByGroup[category]
-      for (const { id } of tangrams) {
-        newCompletedTangramsEmoji[id] = localStorage.getItem(id)
-      }
-    }
-
-    for (const userId in communityTangramsByUser) {
-      const tangrams = communityTangramsByUser[userId]
-      for (const { id } of tangrams) {
-        newCompletedTangramsEmoji[id] = localStorage.getItem(id)
-      }
-    }
-
-    setCompletedTangramsEmoji(newCompletedTangramsEmoji)
-  }, [baseTangramsByGroup, communityTangramsByUser])
 
   const setCompletedTangramEmoji = useCallback((tangram, emoji) => {
     localStorage.setItem(tangram.id, emoji)
@@ -179,10 +121,8 @@ export const GalleryProvider = ({ children }) => {
       playlist,
       setCompletedTangramEmoji,
       setPlaylist,
-      baseTangramsByGroup,
-      communityTangramsByUser,
+      tangramsByCategory,
       getTangramRef,
-      pendingTangrams,
     }),
     [
       galleryOpened,
@@ -191,9 +131,7 @@ export const GalleryProvider = ({ children }) => {
       saveRequestId,
       playlist,
       setCompletedTangramEmoji,
-      baseTangramsByGroup,
-      communityTangramsByUser,
-      pendingTangrams,
+      tangramsByCategory,
     ]
   )
 

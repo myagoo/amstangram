@@ -2,11 +2,11 @@ import React, { useContext, useState } from "react"
 import {
   FiGrid,
   FiLogIn,
-  FiLogOut,
   FiMenu,
   FiSave,
   FiSettings,
   FiSquare,
+  FiUser,
   FiX,
 } from "react-icons/fi"
 import {
@@ -14,8 +14,6 @@ import {
   FADEIN_TRANSITION_DURATION,
 } from "../constants"
 import { GalleryContext } from "../contexts/gallery"
-import { useTranslate } from "../contexts/language"
-import { NotifyContext } from "../contexts/notify"
 import { SettingsContext } from "../contexts/settings"
 import { UserContext } from "../contexts/user"
 import { Button } from "./button"
@@ -25,10 +23,8 @@ const DISTANCE = 100
 const STEP_ANGLE = 45
 
 export const TangramMenu = () => {
-  const t = useTranslate()
-  const notify = useContext(NotifyContext)
   const { showSettingsDialog } = useContext(SettingsContext)
-  const { currentUser, login, logout } = useContext(UserContext)
+  const { currentUser, login, showProfile } = useContext(UserContext)
 
   const [opened, setOpened] = useState(false)
 
@@ -60,11 +56,10 @@ export const TangramMenu = () => {
     },
     {
       id: "user",
-      icon: currentUser ? FiLogOut : FiLogIn,
+      icon: currentUser ? FiUser : FiLogIn,
       onClick: async () => {
         if (currentUser) {
-          await logout()
-          notify(t("Logged out"))
+          showProfile(currentUser.uid)
         } else {
           login()
         }

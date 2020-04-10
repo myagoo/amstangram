@@ -2,16 +2,17 @@ import firebase from "gatsby-plugin-firebase"
 import React, {
   createContext,
   useCallback,
+  useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
-  useMemo,
-  useContext,
 } from "react"
 import { LoginDialog } from "../components/loginDialog"
+import { ProfileDialog } from "../components/profileDialog"
 import { Deferred } from "../utils/deferred"
-import { NotifyContext } from "./notify"
 import { useTranslate } from "./language"
+import { NotifyContext } from "./notify"
 
 export const UserContext = createContext(null)
 
@@ -21,6 +22,7 @@ export const UserProvider = ({ children }) => {
   const getCurrentUserRef = useRef()
   const [currentUser, setCurrentUser] = useState(null)
   const [loginDeferred, setLoginDeferred] = useState(null)
+  const [profileDialogData, setProfileDialogData] = useState(null)
   const [usersMetadata, setUsersMetadata] = useState(null)
 
   useEffect(() => {
@@ -35,8 +37,9 @@ export const UserProvider = ({ children }) => {
           .get()
 
         setCurrentUser({
-          ...user,
+          uid: user.uid,
           ...documentRef.data(),
+          firebaseUser: user,
         })
       }
     })
@@ -68,9 +71,13 @@ export const UserProvider = ({ children }) => {
     return deferred.promise.finally(() => setLoginDeferred(null))
   }, [])
 
-  const logout = useCallback(() => {
-    return firebase.auth().signOut()
-  }, [])
+  const logout = useCallback(async () => {
+    if (profileDialogData && profileDialogData.uid === currentUser.uid) {
+      profileDialogData.deferred.resolve()
+    }
+    await firebase.auth().signOut()
+    notify(t("Logged out"))
+  }, [notify, t, currentUser, profileDialogData])
 
   getCurrentUserRef.current = useCallback(async () => {
     if (currentUser) {
@@ -79,9 +86,71 @@ export const UserProvider = ({ children }) => {
     return login()
   }, [currentUser, login])
 
+  const showProfile = useCallback((uid) => {
+    const deferred = new Deferred()
+
+    setProfileDialogData({ uid, deferred })
+
+    return deferred.promise.finally(() => setProfileDialogData(null))
+  }, [])
+
+  const updateUsername = useCallback(async (currentUser, username) => {
+    await firebase
+      .firestore()
+      .collection("users")
+      .doc(currentUser.uid)
+      .set({ username })
+
+    setCurrentUser({ ...currentUser, username })
+  }, [])
+
+  const updatePassword = useCallback(
+    async (currentUser, password, newPassword) => {
+      const credential = firebase.auth.EmailAuthProvider.credential(
+        currentUser.firebaseUser.email,
+        password
+      )
+
+      await currentUser.firebaseUser.reauthenticateWithCredential(credential)
+
+      await currentUser.firebaseUser.updatePassword(newPassword)
+    },
+    []
+  )
+
+  const updateEmail = useCallback(async (currentUser, newEmail, password) => {
+    const credential = firebase.auth.EmailAuthProvider.credential(
+      currentUser.firebaseUser.email,
+      password
+    )
+
+    await currentUser.firebaseUser.reauthenticateWithCredential(credential)
+
+    await currentUser.firebaseUser.updateEmail(newEmail)
+  }, [])
+
   const contextValue = useMemo(
-    () => ({ currentUser, login, logout, getCurrentUserRef, usersMetadata }),
-    [currentUser, login, logout, usersMetadata]
+    () => ({
+      currentUser,
+      login,
+      logout,
+      getCurrentUserRef,
+      usersMetadata,
+      showProfile,
+      updateUsername,
+      updatePassword,
+      updateEmail,
+    }),
+    [
+      currentUser,
+      login,
+      logout,
+      usersMetadata,
+      showProfile,
+      updateUsername,
+      updatePassword,
+      updateEmail,
+    ]
   )
 
   useEffect(() => {
@@ -94,6 +163,9 @@ export const UserProvider = ({ children }) => {
     <UserContext.Provider value={contextValue}>
       {children}
       {loginDeferred && <LoginDialog deferred={loginDeferred}></LoginDialog>}
+      {profileDialogData && (
+        <ProfileDialog {...profileDialogData}></ProfileDialog>
+      )}
     </UserContext.Provider>
   )
 }

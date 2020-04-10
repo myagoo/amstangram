@@ -1,13 +1,12 @@
 import firebase from "gatsby-plugin-firebase"
 import React, { useCallback, useState } from "react"
 import { useForm } from "react-hook-form"
+import { useTranslate } from "../contexts/language"
 import { PrimaryButton } from "./button"
 import { Dialog } from "./dialog"
 import { Input } from "./input"
-import { Error, Title } from "./primitives"
-import { Text } from "./text"
+import { Error, Similink, Title } from "./primitives"
 import { View } from "./view"
-import { useTranslate } from "../contexts/language"
 
 const SignupTab = ({ onSignup, switchTab }) => {
   const t = useTranslate()
@@ -35,7 +34,7 @@ const SignupTab = ({ onSignup, switchTab }) => {
           .firestore()
           .collection("users")
           .doc(user.uid)
-          .set({ username })
+          .set({ username, signupDate: Date.now() })
 
         onSignup(user)
       } catch (error) {
@@ -44,7 +43,11 @@ const SignupTab = ({ onSignup, switchTab }) => {
             setError("password", "weakPassword", t("Password is too weak"))
             break
           case "auth/email-already-in-use":
-            setError("email", "alreadyExists", t("Email already exists"))
+            setError(
+              "email",
+              "alreadyExists",
+              t("Email address already in use")
+            )
             break
           case "auth/invalid-email":
             setError("email", "invalid", t("Invalid email address"))
@@ -69,7 +72,7 @@ const SignupTab = ({ onSignup, switchTab }) => {
           <Input
             type="email"
             name="email"
-            ref={register({ required: t("Email is required") })}
+            ref={register({ required: t("Email address is required") })}
           ></Input>
           {errors.email && <Error>{errors.email.message}</Error>}
         </View>
@@ -118,16 +121,10 @@ const SignupTab = ({ onSignup, switchTab }) => {
         css={{
           alignItems: "center",
         }}
-        onClick={switchTab}
       >
-        <Text
-          css={{
-            cursor: "pointer",
-            textDecoration: "underline",
-          }}
-        >
+        <Similink onClick={switchTab}>
           {t("I already have an account")}
-        </Text>
+        </Similink>
       </View>
     </View>
   )
@@ -150,7 +147,7 @@ const SignInTab = ({ onSignin, switchTab }) => {
           case "auth/invalid-email":
           case "auth/user-not-found":
           case "auth/user-disabled":
-            setError("email", "weakPassword", t("Unknown email address"))
+            setError("email", "invalid", t("Unknown email address"))
             break
           case "auth/wrong-password":
             setError("password", "mismatch", t("Incorrect password"))
@@ -176,7 +173,7 @@ const SignInTab = ({ onSignin, switchTab }) => {
           <Input
             type="email"
             name="email"
-            ref={register({ required: t("Email is required") })}
+            ref={register({ required: t("Email address is required") })}
           ></Input>
           {errors.email && <Error>{errors.email.message}</Error>}
         </View>
@@ -200,16 +197,8 @@ const SignInTab = ({ onSignin, switchTab }) => {
         css={{
           alignItems: "center",
         }}
-        onClick={switchTab}
       >
-        <Text
-          css={{
-            cursor: "pointer",
-            textDecoration: "underline",
-          }}
-        >
-          {t("I don't have an account")}
-        </Text>
+        <Similink onClick={switchTab}>{t("I don't have an account")}</Similink>
       </View>
     </View>
   )

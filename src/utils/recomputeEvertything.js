@@ -10,23 +10,11 @@ export const recomputeEverything = async (tangrams) => {
     return
   }
 
-  const project = new paper.Project()
-
-  const collection = await firebase
-    .firestore()
-    .collection("communityTangrams")
-    .get()
+  const collection = await firebase.firestore().collection("baseTangrams").get()
 
   collection.forEach((doc) => {
     const tangram = doc.data()
-    const compoundPath = project.importSVG(`<path d="${tangram.path}" />`, {
-      applyMatrix: true,
-      insert: false,
-    })
-    doc.ref.update({
-      edges: compoundPath.curves.length,
-    })
-  })
 
-  project.remove()
+    firebase.firestore().collection("tangrams").doc(doc.id).set(tangram)
+  })
 }
