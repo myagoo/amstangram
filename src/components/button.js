@@ -1,6 +1,9 @@
 import { useCss, useKeyframes } from "css-system"
-import React from "react"
+import React, { useContext } from "react"
 import { createPrimitive } from "../utils/createPrimitive"
+import { SoundContext } from "../contexts/sound"
+import useSound from "use-sound"
+import buttonSFX from "../sounds/button.wav"
 
 export const DangerButton = createPrimitive("button", {
   minWidth: 0,
@@ -23,7 +26,17 @@ export const DangerButton = createPrimitive("button", {
   },
 })
 
-export const PrimaryButton = ({ as: Component = "button", css, ...props }) => {
+export const PrimaryButton = ({
+  as: Component = "button",
+  css,
+  onClick,
+  ...props
+}) => {
+  const [soundEnabled] = useContext(SoundContext)
+  const [play] = useSound(buttonSFX, {
+    soundEnabled,
+  })
+
   const gradient = useKeyframes({
     0: { bg: "pieces.lt2" },
     14: { bg: "pieces.rh" },
@@ -57,10 +70,33 @@ export const PrimaryButton = ({ as: Component = "button", css, ...props }) => {
     ...css,
   })
 
-  return <Component className={className} {...props} />
+  return (
+    <Component
+      className={className}
+      onClick={
+        onClick
+          ? (e) => {
+              play()
+              onClick(e)
+            }
+          : undefined
+      }
+      {...props}
+    />
+  )
 }
 
-export const Button = ({ as: Component = "button", css, ...props }) => {
+export const Button = ({
+  as: Component = "button",
+  css,
+  onClick,
+  ...props
+}) => {
+  const [soundEnabled] = useContext(SoundContext)
+  const [play] = useSound(buttonSFX, {
+    soundEnabled,
+  })
+
   const gradient = useKeyframes({
     0: { bg: "pieces.lt2" },
     14: { bg: "pieces.rh" },
@@ -93,5 +129,18 @@ export const Button = ({ as: Component = "button", css, ...props }) => {
     ...css,
   })
 
-  return <Component className={className} {...props} />
+  return (
+    <Component
+      className={className}
+      onClick={
+        onClick
+          ? (e) => {
+              play()
+              onClick(e)
+            }
+          : undefined
+      }
+      {...props}
+    />
+  )
 }

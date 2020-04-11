@@ -99,7 +99,7 @@ export const UserProvider = ({ children }) => {
       .firestore()
       .collection("users")
       .doc(currentUser.uid)
-      .set({ username })
+      .update({ username })
 
     setCurrentUser({ ...currentUser, username })
   }, [])

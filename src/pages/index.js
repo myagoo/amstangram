@@ -8,6 +8,7 @@ import { NotifyProvider } from "../contexts/notify"
 import { SettingsProvider } from "../contexts/settings"
 import { ShowBackgroundPatternProvider } from "../contexts/showBackgroundPattern"
 import { UserProvider } from "../contexts/user"
+import { SoundProvider } from "../contexts/sound"
 
 export default () => {
   useGlobalCss({
@@ -42,18 +43,20 @@ export default () => {
   })
 
   return (
-    <LanguageProvider>
-      <NotifyProvider>
-        <UserProvider>
-          <ShowBackgroundPatternProvider>
-            <GalleryProvider>
-              <SettingsProvider>
-                <Tangram />
-              </SettingsProvider>
-            </GalleryProvider>
-          </ShowBackgroundPatternProvider>
-        </UserProvider>
-      </NotifyProvider>
-    </LanguageProvider>
+    <SoundProvider>
+      <LanguageProvider>
+        <NotifyProvider>
+          <UserProvider>
+            <ShowBackgroundPatternProvider>
+              <GalleryProvider>
+                <SettingsProvider>
+                  <Tangram />
+                </SettingsProvider>
+              </GalleryProvider>
+            </ShowBackgroundPatternProvider>
+          </UserProvider>
+        </NotifyProvider>
+      </LanguageProvider>
+    </SoundProvider>
   )
 }

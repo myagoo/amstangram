@@ -15,8 +15,8 @@ import { View } from "../components/view"
 import {
   CLICK_TIMEOUT,
   DEV,
-  FADEIN_STAGGER_DURATION,
-  FADEIN_TRANSITION_DURATION,
+  FADE_STAGGER_DURATION,
+  FADE_TRANSITION_DURATION,
   SNAP_DISTANCE,
   SOFT_ERROR_MARGIN,
   STRICT_ERROR_MARGIN,
@@ -39,8 +39,18 @@ import { Card } from "./card"
 import { TangramMenu } from "./tangramMenu"
 import { Victory } from "./victory"
 import { useTranslate } from "../contexts/language"
+import { SoundContext } from "../contexts/sound"
+import useSound from "use-sound"
+import popSFX from "../sounds/pop.wav"
 
 export const Tangram = () => {
+  const [soundEnabled] = useContext(SoundContext)
+  const playRef = useRef()
+  const [play] = useSound(popSFX, {
+    soundEnabled,
+    volume: 0.5,
+  })
+  playRef.current = play
   const t = useTranslate()
   const { getCurrentUserRef, currentUser } = useContext(UserContext)
   const theme = useContext(ThemeContext)
@@ -143,7 +153,7 @@ export const Tangram = () => {
   }, [])
 
   useEffect(() => {
-    setVictoryEmoji(null)
+    setVictoryEmoji(getRandomEmoji())
   }, [selectedTangram])
 
   // Init a game
@@ -240,6 +250,7 @@ export const Tangram = () => {
               pieceGroup.scale(-1, 1) // Horizontal flip
             }
           }
+          playRef.current()
 
           restrictGroupWithinCanvas(pieceGroup, canvasRef.current)
 
@@ -270,9 +281,7 @@ export const Tangram = () => {
               : SOFT_ERROR_MARGIN
           )
         ) {
-          const emoji = selectedTangram.emoji
-            ? selectedTangram.emoji
-            : getRandomEmoji()
+          const emoji = selectedTangram.emoji ? selectedTangram.emoji : "👏"
 
           setCompletedTangramEmoji(selectedTangram, emoji)
 
@@ -499,8 +508,8 @@ export const Tangram = () => {
             left: 0,
             right: 0,
             zIndex: -1,
-            animation: `${FADEIN_TRANSITION_DURATION}ms fadeIn ${
-              FADEIN_STAGGER_DURATION * 0
+            animation: `${FADE_TRANSITION_DURATION}ms fadeIn ${
+              FADE_STAGGER_DURATION * 0
             }ms ease both`,
           }}
         >
@@ -533,8 +542,8 @@ export const Tangram = () => {
         css={{
           minHeight: "auto",
           flex: 1,
-          animation: `${FADEIN_TRANSITION_DURATION}ms fadeIn ${
-            FADEIN_STAGGER_DURATION * 1
+          animation: `${FADE_TRANSITION_DURATION}ms fadeIn ${
+            FADE_STAGGER_DURATION * 1
           }ms ease both`,
         }}
       />
@@ -549,7 +558,6 @@ export const Tangram = () => {
           onApprove={
             currentUser &&
             currentUser.isAdmin &&
-            playlist &&
             selectedTangram.uid &&
             !selectedTangram.approved
               ? handleApprove

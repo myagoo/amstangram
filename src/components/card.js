@@ -3,16 +3,23 @@ import { View } from "./view"
 import { DEV, COLOR_TRANSITION_DURATION } from "../constants"
 import { ThemeContext } from "css-system"
 import { Badge } from "./badge"
+import { SoundContext } from "../contexts/sound"
+import cardSFX from "../sounds/card.wav"
+import useSound from "use-sound"
 
 export const Card = ({
   tangram: { difficulty, path, width, height, uid, approved },
   completedEmoji,
   selected,
   css,
-  scale = 1,
   onBadgeClick,
+  onClick,
   ...props
 }) => {
+  const [soundEnabled] = useContext(SoundContext)
+  const [play] = useSound(cardSFX, {
+    soundEnabled,
+  })
   const theme = useContext(ThemeContext)
   const color = theme.colors.difficulties[difficulty]
 
@@ -31,11 +38,19 @@ export const Card = ({
         textAlign: "center",
         position: "relative",
         cursor: "pointer",
-        width: 128 * scale,
-        height: 178 * scale,
+        width: 128,
+        height: 178,
         ...css,
       }}
-      deps={[selected, approved]}
+      deps={[color, selected, uid, approved]}
+      onClick={
+        onClick
+          ? (e) => {
+              play()
+              onClick(e)
+            }
+          : undefined
+      }
       {...props}
     >
       <View
@@ -47,6 +62,7 @@ export const Card = ({
           stroke: DEV ? "red" : undefined,
           strokeWidth: DEV ? 4 : undefined,
         }}
+        deps={[color]}
         viewBox={`0 0 ${width} ${height}`}
         dangerouslySetInnerHTML={{ __html: `<path d="${path}" />` }}
       />
@@ -63,10 +79,14 @@ export const Card = ({
             bottom: 1,
             right: 1,
           }}
-          onClick={(e) => {
-            e.stopPropagation()
-            onBadgeClick(uid)
-          }}
+          onClick={
+            onBadgeClick
+              ? (e) => {
+                  e.stopPropagation()
+                  onBadgeClick(uid)
+                }
+              : undefined
+          }
         ></Badge>
       )}
     </View>

@@ -61,7 +61,7 @@
   "people": "Personnes",
   "stuff": "Trucs",
 
-  "Joined {signupDate}": "Depuis {signupDate}",
+  "Joined {signupDate}": "Depuis le {signupDate}",
   "Log out": "Se déconnecter",
 
   "Change email address": "Modifier l'adresse email",

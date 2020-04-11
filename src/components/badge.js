@@ -10,6 +10,7 @@ export const Badge = ({ uid, size = 40, css, ...props }) => {
         border: "2px solid",
         borderColor: "galleryText",
         borderRadius: "50%",
+        size,
         ...css,
       }}
       {...props}

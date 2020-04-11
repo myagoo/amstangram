@@ -1,6 +1,6 @@
 import { useSwitchTheme } from "@css-system/gatsby-plugin-css-system"
 import React, { useContext } from "react"
-import { FiMoon, FiSun } from "react-icons/fi"
+import { FiMoon, FiSun, FiVolumeX, FiVolume2 } from "react-icons/fi"
 import {
   LanguageContext,
   supportedLanguages,
@@ -17,8 +17,10 @@ import { Input } from "./input"
 import { Title } from "./primitives"
 import { Toggle } from "./toggle"
 import { View } from "./view"
+import { SoundContext } from "../contexts/sound"
 
 export const SettingsDialog = ({ deferred }) => {
+  const [soundsEnabled, toggleSounds] = useContext(SoundContext)
   const [
     showBackgroundPattern,
     toggleShowBackgroundPattern,
@@ -82,6 +84,18 @@ export const SettingsDialog = ({ deferred }) => {
           leftValue="light"
           rightComponent={<View as={FiMoon} css={{ size: 32 }}></View>}
           rightValue="dark"
+        ></Toggle>
+      </View>
+      <View css={{ gap: 1 }}>
+        <label>{t("Sounds")}</label>
+        <Toggle
+          invertSounds
+          value={soundsEnabled}
+          onChange={toggleSounds}
+          leftComponent={<View as={FiVolumeX} css={{ size: 32 }}></View>}
+          leftValue={false}
+          rightComponent={<View as={FiVolume2} css={{ size: 32 }}></View>}
+          rightValue={true}
         ></Toggle>
       </View>
       <DangerButton onClick={handleResetClick}>{t("Reset data")}</DangerButton>

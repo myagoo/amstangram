@@ -73,7 +73,7 @@ export const GalleryDialog = () => {
     if (selectedTangrams.length) {
       setPlaylist(shuffle(selectedTangrams))
     } else {
-      setPlaylist(shuffle(Object.values(tangramsByCategory)))
+      setPlaylist(shuffle(Object.values(tangramsByCategory).flat()))
     }
     setGalleryOpened(null)
   }

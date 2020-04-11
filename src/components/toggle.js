@@ -1,6 +1,9 @@
 import { ThemeContext } from "css-system"
 import React, { useContext, useMemo } from "react"
 import { View } from "./view"
+import { SoundContext } from "../contexts/sound"
+import useSound from "use-sound"
+import boopSfx from "../sounds/button.wav"
 
 export const Toggle = ({
   size = 20,
@@ -10,7 +13,13 @@ export const Toggle = ({
   rightValue,
   value,
   onChange,
+  invertSounds,
 }) => {
+  const [soundEnabled] = useContext(SoundContext)
+  const [play] = useSound(boopSfx, {
+    soundEnabled: invertSounds ? !soundEnabled : soundEnabled,
+  })
+
   const theme = useContext(ThemeContext)
 
   const selectedSide = useMemo(
@@ -22,6 +31,7 @@ export const Toggle = ({
     const newSelectedSide = selectedSide === "left" ? "right" : "left"
 
     onChange(newSelectedSide === "right" ? rightValue : leftValue)
+    play()
   }
 
   const handleSideClick = (newSelectedSide) => {
@@ -29,6 +39,7 @@ export const Toggle = ({
       return
     }
     onChange(newSelectedSide === "right" ? rightValue : leftValue)
+    play()
   }
 
   return (
