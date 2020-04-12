@@ -27,7 +27,7 @@ workbox.core.clientsClaim();
  */
 self.__precacheManifest = [
   {
-    "url": "webpack-runtime-da8e5b93333638e0589f.js"
+    "url": "webpack-runtime-102344e18dbce4e08c16.js"
   },
   {
     "url": "commons-f9f1ac872bd74792144d.js"
@@ -40,7 +40,7 @@ self.__precacheManifest = [
   },
   {
     "url": "offline-plugin-app-shell-fallback/index.html",
-    "revision": "e4ac67a96f05b9af770c7b4a96e4052a"
+    "revision": "6954b7cfad9c634f532e187a9200dda7"
   },
   {
     "url": "clipper_unminified.js"
