@@ -1,7 +1,8 @@
-import React, { useCallback, useContext, useState } from "react"
+import React, { useCallback, useContext, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { LanguageContext, useTranslate } from "../contexts/language"
 import { NotifyContext } from "../contexts/notify"
+import { TangramsContext } from "../contexts/tangrams"
 import { UserContext } from "../contexts/user"
 import { Badge } from "./badge"
 import { DangerButton, PrimaryButton } from "./button"
@@ -55,7 +56,7 @@ const ChangeEmailForm = ({ currentUser, onClose }) => {
       css={{ flex: "1", gap: 3 }}
     >
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
-        <View css={{ gap: 1 }}>
+        <View css={{ gap: 2 }}>
           <label>{t("Password")}</label>
           <Input
             type="password"
@@ -64,7 +65,7 @@ const ChangeEmailForm = ({ currentUser, onClose }) => {
           ></Input>
           {errors.password && <Error>{errors.password.message}</Error>}
         </View>
-        <View css={{ gap: 1 }}>
+        <View css={{ gap: 2 }}>
           <label>{t("New email address")}</label>
           <Input
             type="email"
@@ -117,7 +118,7 @@ const ChangeUsernameForm = ({ currentUser, onClose }) => {
       css={{ flex: "1", gap: 3 }}
     >
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
-        <View css={{ gap: 1 }}>
+        <View css={{ gap: 2 }}>
           <label>{t("New username")}</label>
           <Input
             type="text"
@@ -190,7 +191,7 @@ const ChangePasswordForm = ({ currentUser, onClose }) => {
       css={{ flex: "1", gap: 3 }}
     >
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
-        <View css={{ gap: 1 }}>
+        <View css={{ gap: 2 }}>
           <label>{t("Current password")}</label>
           <Input
             type="password"
@@ -199,7 +200,7 @@ const ChangePasswordForm = ({ currentUser, onClose }) => {
           ></Input>
           {errors.password && <Error>{errors.password.message}</Error>}
         </View>
-        <View css={{ gap: 1 }}>
+        <View css={{ gap: 2 }}>
           <label>{t("New password")}</label>
           <Input
             type="password"
@@ -209,7 +210,7 @@ const ChangePasswordForm = ({ currentUser, onClose }) => {
           {errors.newPassword && <Error>{errors.newPassword.message}</Error>}
         </View>
 
-        <View css={{ gap: 1 }}>
+        <View css={{ gap: 2 }}>
           <label>{t("Confirm new password")}</label>
           <Input
             type="password"
@@ -248,13 +249,24 @@ export const ProfileDialog = ({ uid, deferred }) => {
   const [changeEmailRequested, setChangeEmailRequested] = useState(false)
   const [changeUsernameRequested, setChangeUsernameRequested] = useState(false)
   const [changePasswordRequested, setChangePasswordRequested] = useState(false)
+  const tangrams = useContext(TangramsContext)
+
+  const claps = useMemo(() => {
+    let claps = 0
+    for (const tangram of tangrams) {
+      if (tangram.uid === uid && tangram.claps) {
+        claps += tangram.claps
+      }
+    }
+    return claps
+  }, [tangrams, uid])
 
   return (
     <Dialog
       onClose={deferred.reject}
       css={{ gap: 4, flex: "1", minWidth: "250px" }}
     >
-      <View css={{ gap: 2, mt: -4, alignItems: "center" }}>
+      <View css={{ gap: 3, mt: -4, alignItems: "center" }}>
         <Badge uid={uid} size={86} css={{}}></Badge>
 
         <Title>{username}</Title>
@@ -263,9 +275,13 @@ export const ProfileDialog = ({ uid, deferred }) => {
             signupDate: new Intl.DateTimeFormat(language).format(signupDate),
           })}
         </Text>
+        <View css={{ flexDirection: "row", alignItems: "flex-end" }}>
+          <Text css={{ fontSize: 5 }}>{"👏"}</Text>
+          <Text css={{ fontSize: 3 }}>x{claps}</Text>
+        </View>
       </View>
       {currentUser && currentUser.uid === uid && (
-        <>
+        <View css={{ gap: 3 }}>
           {changeEmailRequested ? (
             <ChangeEmailForm
               currentUser={currentUser}
@@ -298,7 +314,7 @@ export const ProfileDialog = ({ uid, deferred }) => {
               <DangerButton onClick={logout}>{t("Log out")}</DangerButton>
             </>
           )}
-        </>
+        </View>
       )}
     </Dialog>
   )

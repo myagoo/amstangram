@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useState, useRef } from "react"
 import { createPortal } from "react-dom"
 import { View } from "../components/view"
-import { FADEIN_TRANSITION_DURATION } from "../constants"
+import { FADE_TRANSITION_DURATION } from "../constants"
 import { extendPrimitive } from "../utils/createPrimitive"
 
 const Notification = extendPrimitive(View, {
@@ -10,7 +10,7 @@ const Notification = extendPrimitive(View, {
   borderRadius: 1,
   bg: "notificationBackground",
   color: "galleryText",
-  animation: `${FADEIN_TRANSITION_DURATION / 2}ms fadeIn both`,
+  animation: `${FADE_TRANSITION_DURATION / 2}ms fadeIn both`,
   boxShadow: "0px 0px 10px #00000080",
 })
 

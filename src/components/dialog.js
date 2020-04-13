@@ -2,7 +2,7 @@ import React from "react"
 import { createPortal } from "react-dom"
 import { View } from "./view"
 import {
-  FADEIN_TRANSITION_DURATION,
+  FADE_TRANSITION_DURATION,
   COLOR_TRANSITION_DURATION,
 } from "../constants"
 import { FiX } from "react-icons/fi"
@@ -20,7 +20,7 @@ export const Dialog = ({ children, title, onClose, css, ...props }) => {
         bg: "#00000080",
         alignItems: "center",
         justifyContent: "center",
-        animation: `${FADEIN_TRANSITION_DURATION / 2}ms fadeIn ease both`,
+        animation: `${FADE_TRANSITION_DURATION / 2}ms fadeIn ease both`,
         p: 3,
       }}
     >

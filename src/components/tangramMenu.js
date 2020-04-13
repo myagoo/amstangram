@@ -9,10 +9,7 @@ import {
   FiUser,
   FiX,
 } from "react-icons/fi"
-import {
-  FADEIN_STAGGER_DURATION,
-  FADEIN_TRANSITION_DURATION,
-} from "../constants"
+import { FADE_STAGGER_DURATION, FADE_TRANSITION_DURATION } from "../constants"
 import { GalleryContext } from "../contexts/gallery"
 import { SettingsContext } from "../contexts/settings"
 import { UserContext } from "../contexts/user"
@@ -74,8 +71,8 @@ export const TangramMenu = () => {
         bottom: 3,
         left: "50%",
         transform: "translateX(-50%)",
-        animation: `${FADEIN_TRANSITION_DURATION}ms fadeIn ${
-          FADEIN_STAGGER_DURATION * 2
+        animation: `${FADE_TRANSITION_DURATION}ms fadeIn ${
+          FADE_STAGGER_DURATION * 2
         }ms ease both`,
       }}
     >

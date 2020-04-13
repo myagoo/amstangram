@@ -12,6 +12,11 @@ const baseTheme = {
   fontSizes: [10, 12, 14, 18, 22, 30, 46, 62, 70],
 }
 
+const firebaseConfig =
+  process.env.NODE_ENV === "production"
+    ? require("./firebase-config.js")
+    : require("./firebase-staging-config.js")
+
 module.exports = {
   plugins: [
     {
@@ -35,16 +40,7 @@ module.exports = {
     {
       resolve: "gatsby-plugin-firebase",
       options: {
-        credentials: {
-          apiKey: "AIzaSyAHOemftrTSOUjtoA6K3VR2hkOU5H-ScSI",
-          authDomain: "amstangram.firebaseapp.com",
-          databaseURL: "https://amstangram.firebaseio.com",
-          projectId: "amstangram",
-          storageBucket: "amstangram.appspot.com",
-          messagingSenderId: "1075176148116",
-          appId: "1:1075176148116:web:e61e6512cd983a75533881",
-          measurementId: "G-PLH3BSWLM2",
-        },
+        credentials: firebaseConfig,
       },
     },
     {

@@ -1,5 +1,6 @@
 import { useCss, useKeyframes } from "css-system"
-import React from "react"
+import React, { useContext } from "react"
+import { SoundContext } from "../contexts/sound"
 import { createPrimitive } from "../utils/createPrimitive"
 
 export const DangerButton = createPrimitive("button", {
@@ -23,7 +24,14 @@ export const DangerButton = createPrimitive("button", {
   },
 })
 
-export const PrimaryButton = ({ as: Component = "button", css, ...props }) => {
+export const PrimaryButton = ({
+  as: Component = "button",
+  css,
+  onClick,
+  ...props
+}) => {
+  const { playButton } = useContext(SoundContext)
+
   const gradient = useKeyframes({
     0: { bg: "pieces.lt2" },
     14: { bg: "pieces.rh" },
@@ -57,10 +65,30 @@ export const PrimaryButton = ({ as: Component = "button", css, ...props }) => {
     ...css,
   })
 
-  return <Component className={className} {...props} />
+  return (
+    <Component
+      className={className}
+      onClick={
+        onClick
+          ? (e) => {
+              playButton()
+              onClick(e)
+            }
+          : undefined
+      }
+      {...props}
+    />
+  )
 }
 
-export const Button = ({ as: Component = "button", css, ...props }) => {
+export const Button = ({
+  as: Component = "button",
+  css,
+  onClick,
+  ...props
+}) => {
+  const { playButton } = useContext(SoundContext)
+
   const gradient = useKeyframes({
     0: { bg: "pieces.lt2" },
     14: { bg: "pieces.rh" },
@@ -93,5 +121,18 @@ export const Button = ({ as: Component = "button", css, ...props }) => {
     ...css,
   })
 
-  return <Component className={className} {...props} />
+  return (
+    <Component
+      className={className}
+      onClick={
+        onClick
+          ? (e) => {
+              playButton()
+              onClick(e)
+            }
+          : undefined
+      }
+      {...props}
+    />
+  )
 }

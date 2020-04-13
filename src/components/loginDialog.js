@@ -65,7 +65,7 @@ const SignupTab = ({ onSignup, switchTab }) => {
       css={{ flex: "1", gap: 3 }}
     >
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
-        <View css={{ gap: 1 }}>
+        <View css={{ gap: 2 }}>
           <label>{t("Email address")}</label>
           <Input
             type="email"
@@ -75,7 +75,7 @@ const SignupTab = ({ onSignup, switchTab }) => {
           {errors.email && <Error>{errors.email.message}</Error>}
         </View>
 
-        <View css={{ gap: 1 }}>
+        <View css={{ gap: 2 }}>
           <label>{t("Username")}</label>
           <Input
             name="username"
@@ -84,7 +84,7 @@ const SignupTab = ({ onSignup, switchTab }) => {
           {errors.username && <Error>{errors.username.message}</Error>}
         </View>
 
-        <View css={{ gap: 1 }}>
+        <View css={{ gap: 2 }}>
           <label>{t("Password")}</label>
           <Input
             type="password"
@@ -94,7 +94,7 @@ const SignupTab = ({ onSignup, switchTab }) => {
           {errors.password && <Error>{errors.password.message}</Error>}
         </View>
 
-        <View css={{ gap: 1 }}>
+        <View css={{ gap: 2 }}>
           <label>{t("Confirm password")}</label>
           <Input
             type="password"
@@ -166,7 +166,7 @@ const SignInTab = ({ onSignin, switchTab }) => {
       css={{ flex: "1", gap: 3 }}
     >
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
-        <View css={{ gap: 1 }}>
+        <View css={{ gap: 2 }}>
           <label>{t("Email address")}</label>
           <Input
             type="email"
@@ -176,7 +176,7 @@ const SignInTab = ({ onSignin, switchTab }) => {
           {errors.email && <Error>{errors.email.message}</Error>}
         </View>
 
-        <View css={{ gap: 1 }}>
+        <View css={{ gap: 2 }}>
           <label>{t("Password")}</label>
           <Input
             type="password"

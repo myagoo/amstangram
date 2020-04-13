@@ -1,15 +1,15 @@
 import React, { useContext, useState } from "react"
+import { FiShare2 } from "react-icons/fi"
 import { GalleryContext } from "../contexts/gallery"
+import { useTranslate } from "../contexts/language"
 import { UserContext } from "../contexts/user"
+import { extendPrimitive } from "../utils/createPrimitive"
 import { shuffle } from "../utils/shuffle"
 import { PrimaryButton } from "./button"
 import { Card } from "./card"
 import { Dialog } from "./dialog"
 import { SubTitle, Title } from "./primitives"
 import { View } from "./view"
-import { extendPrimitive } from "../utils/createPrimitive"
-import { useTranslate } from "../contexts/language"
-import { FiShuffle } from "react-icons/fi"
 
 const FadedView = extendPrimitive(View, (css, theme) => ({
   ...css,
@@ -28,8 +28,10 @@ export const GalleryDialog = () => {
   const {
     setGalleryOpened,
     tangramsByCategory,
-    completedTangramsEmoji,
     setPlaylist,
+    completedTangrams,
+    getTangramRef,
+    shareTangrams,
   } = useContext(GalleryContext)
 
   const [selectedTangrams, setSelectedTangrams] = useState([])
@@ -65,16 +67,11 @@ export const GalleryDialog = () => {
   }
 
   const handleStartClick = () => {
-    setPlaylist(selectedTangrams)
-    setGalleryOpened(null)
-  }
-
-  const handleShuffleClick = () => {
-    if (selectedTangrams.length) {
-      setPlaylist(shuffle(selectedTangrams))
-    } else {
-      setPlaylist(shuffle(Object.values(tangramsByCategory)))
-    }
+    setPlaylist(
+      selectedTangrams.length
+        ? selectedTangrams
+        : shuffle(Object.values(tangramsByCategory).flat())
+    )
     setGalleryOpened(null)
   }
 
@@ -125,16 +122,14 @@ export const GalleryDialog = () => {
                     <Card
                       key={tangram.id}
                       tangram={tangram}
-                      completedEmoji={completedTangramsEmoji[tangram.id]}
+                      completed={completedTangrams[tangram.id]}
                       selected={selectedTangrams.some(
                         (pendingSelectedTangram) =>
                           pendingSelectedTangram.id === tangram.id
                       )}
-                      username={
-                        tangram.uid && usersMetadata[tangram.uid].username
-                      }
                       onClick={() => handleTangramClick(tangram)}
                       onBadgeClick={showProfile}
+                      onLongPress={getTangramRef.current}
                     />
                   ))}
                 </View>
@@ -143,21 +138,20 @@ export const GalleryDialog = () => {
           )}
         </View>
         <View css={{ flexDirection: "row", gap: 2 }}>
-          <PrimaryButton
-            disabled={selectedTangrams.length === 0}
-            onClick={handleStartClick}
-            css={{ flex: "1" }}
-          >
+          <PrimaryButton onClick={handleStartClick} css={{ flex: "1" }}>
             {selectedTangrams.length === 0
-              ? t("Select tangrams")
+              ? t("Play now !")
               : selectedTangrams.length === 1
               ? t("Start 1 tangram !")
               : t("Start {count} tangrams !", {
                   count: selectedTangrams.length,
                 })}
           </PrimaryButton>
-          <PrimaryButton onClick={handleShuffleClick}>
-            <View as={FiShuffle} size={20}></View>
+          <PrimaryButton
+            disabled={selectedTangrams.length === 0}
+            onClick={() => shareTangrams(selectedTangrams)}
+          >
+            <View as={FiShare2} size={20}></View>
           </PrimaryButton>
         </View>
       </Dialog>
