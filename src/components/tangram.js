@@ -23,12 +23,13 @@ import {
   VICTORY_PARTICLES_DURATION,
 } from "../constants"
 import { GalleryContext } from "../contexts/gallery"
+import { useTranslate } from "../contexts/language"
 import { NotifyContext } from "../contexts/notify"
 import { useShowBackgroundPattern } from "../contexts/showBackgroundPattern"
+import { SoundContext } from "../contexts/sound"
 import { UserContext } from "../contexts/user"
 import { createPiecesGroup } from "../utils/createPiecesGroup"
 import { getPathData } from "../utils/getPathData"
-import { getRandomEmoji } from "../utils/getRandomEmoji"
 import { getSnapVector } from "../utils/getSnapVector"
 import { isTangramComplete } from "../utils/isTangramComplete"
 import { isTangramValid } from "../utils/isTangramValid"
@@ -38,19 +39,12 @@ import { updateColisionState } from "../utils/updateColisionState"
 import { Card } from "./card"
 import { TangramMenu } from "./tangramMenu"
 import { Victory } from "./victory"
-import { useTranslate } from "../contexts/language"
-import { SoundContext } from "../contexts/sound"
-import useSound from "use-sound"
-import popSFX from "../sounds/pop.wav"
 
 export const Tangram = () => {
-  const [soundEnabled] = useContext(SoundContext)
-  const playRef = useRef()
-  const [play] = useSound(popSFX, {
-    soundEnabled,
-    volume: 0.5,
-  })
-  playRef.current = play
+  const { playTangram } = useContext(SoundContext)
+  const playTangramRef = useRef()
+  playTangramRef.current = playTangram
+
   const t = useTranslate()
   const { getCurrentUserRef, currentUser } = useContext(UserContext)
   const theme = useContext(ThemeContext)
@@ -59,14 +53,17 @@ export const Tangram = () => {
   const [showBackgroundPattern] = useShowBackgroundPattern()
   const {
     getTangramRef,
-    setCompletedTangramEmoji,
+    markTangramAsComplete,
     saveRequestId,
     playlist,
     setPlaylist,
   } = useContext(GalleryContext)
 
+  const markTangramAsCompleteRef = useRef()
+  markTangramAsCompleteRef.current = markTangramAsComplete
+
   const [currentTangramIndex, setCurrentTangramIndex] = useState(0)
-  const [victoryEmoji, setVictoryEmoji] = useState(null)
+  const [victoryPhase, setVictoryPhase] = useState(false)
 
   const canvasRef = useRef()
   const scaleFactorRef = useRef()
@@ -93,6 +90,7 @@ export const Tangram = () => {
       .collection("tangrams")
       .doc(selectedTangram.id)
       .update({ approved: true })
+
     notify(t("Tangram approved"))
   }
 
@@ -108,32 +106,17 @@ export const Tangram = () => {
         return
       }
 
-      const handleSaveRequest = DEV
-        ? async () => {
-            const tangram = await getTangramRef.current(
-              getPathData(piecesGroupRef.current, scaleFactorRef.current)
-            )
-            await firebase.firestore().collection("tangrams").add(tangram)
+      const pathData = getPathData(
+        piecesGroupRef.current,
+        scaleFactorRef.current
+      )
 
-            notify(t("Tangram added to base gallery"))
-          }
-        : async () => {
-            const user = await getCurrentUserRef.current()
-            const tangram = await getTangramRef.current({
-              ...getPathData(piecesGroupRef.current, scaleFactorRef.current),
-              uid: user.uid,
-            })
-            await firebase
-              .firestore()
-              .collection("tangrams")
-              .add({
-                ...tangram,
-                approved: false,
-              })
-            notify(t("Tangram submitted for review"))
-          }
+      if (pathData.edges === 23) {
+        notify(t("You can't save such an easy tangram"))
+        return
+      }
 
-      handleSaveRequest()
+      getTangramRef.current(pathData)
     }
   }, [notify, saveRequestId, getTangramRef, getCurrentUserRef, t])
 
@@ -153,11 +136,12 @@ export const Tangram = () => {
   }, [])
 
   useEffect(() => {
-    setVictoryEmoji(getRandomEmoji())
+    setVictoryPhase(false)
   }, [selectedTangram])
 
   // Init a game
   useLayoutEffect(() => {
+    const start = Date.now()
     const attachPieceGroupEvents = (pieceGroup) => {
       let anchorPoint = null
       let ghostGroup = null
@@ -250,7 +234,7 @@ export const Tangram = () => {
               pieceGroup.scale(-1, 1) // Horizontal flip
             }
           }
-          playRef.current()
+          playTangramRef.current()
 
           restrictGroupWithinCanvas(pieceGroup, canvasRef.current)
 
@@ -281,22 +265,30 @@ export const Tangram = () => {
               : SOFT_ERROR_MARGIN
           )
         ) {
-          const emoji = selectedTangram.emoji ? selectedTangram.emoji : "👏"
-
-          setCompletedTangramEmoji(selectedTangram, emoji)
+          markTangramAsCompleteRef.current(selectedTangram, Date.now() - start)
 
           for (const pieceGroup of piecesGroupRef.current.children) {
             pieceGroup.data.removeListeners()
           }
+          document.body.style.cursor = "default"
+
+          paper.project.activeLayer.tween(
+            {
+              opacity: 0,
+            },
+            {
+              duration: VICTORY_PARTICLES_DURATION,
+              easing: "easeInCubic",
+            }
+          )
 
           for (const particle of particlesRef.current) {
             particle.data.animation.stop()
+
             particle.tween(
               {
                 "position.x": piecesGroupRef.current.position.x,
                 "position.y": piecesGroupRef.current.position.y,
-                opacity: 0,
-                radius: 0,
               },
               {
                 duration: VICTORY_PARTICLES_DURATION,
@@ -304,7 +296,41 @@ export const Tangram = () => {
               }
             )
           }
-          setTimeout(() => setVictoryEmoji(emoji), VICTORY_PARTICLES_DURATION)
+          setTimeout(() => {
+            paper.project.activeLayer.tween(
+              {
+                opacity: 1,
+              },
+              {
+                duration: FADE_TRANSITION_DURATION,
+                easing: "easeOutCubic",
+              }
+            )
+
+            const maxDistance =
+              Math.max(paper.view.bounds.width, paper.view.bounds.height) / 2
+
+            for (const particle of particlesRef.current) {
+              particle.data.animation.stop()
+              const angle = Math.random() * Math.PI * 2
+              const distance = Math.random() * maxDistance
+
+              particle.tween(
+                {
+                  "position.x":
+                    particle.position.x + distance * Math.cos(angle),
+                  "position.y":
+                    particle.position.y + distance * Math.sin(angle),
+                  opacity: 0,
+                },
+                {
+                  duration: VICTORY_PARTICLES_DURATION,
+                  easing: "easeOutCubic",
+                }
+              )
+            }
+            setVictoryPhase(true)
+          }, VICTORY_PARTICLES_DURATION)
         }
       }
 
@@ -397,7 +423,7 @@ export const Tangram = () => {
       piecesGroupRef.current = null
       coumpoundPathRef.current = null
     }
-  }, [selectedTangram, setCompletedTangramEmoji])
+  }, [selectedTangram])
 
   useLayoutEffect(() => {
     showBackgroundPatternRef.current = showBackgroundPattern
@@ -548,9 +574,9 @@ export const Tangram = () => {
         }}
       />
 
-      {playlist && victoryEmoji && (
+      {playlist && victoryPhase && (
         <Victory
-          emoji={victoryEmoji}
+          emoji={selectedTangram.emoji}
           onStop={handleStop}
           onNext={
             currentTangramIndex < playlist.length - 1 ? handleNext : undefined
@@ -563,6 +589,13 @@ export const Tangram = () => {
               ? handleApprove
               : undefined
           }
+          onClap={() => {
+            firebase
+              .firestore()
+              .collection("tangrams")
+              .doc(selectedTangram.id)
+              .update({ claps: firebase.firestore.FieldValue.increment(1) })
+          }}
         />
       )}
       <TangramMenu></TangramMenu>

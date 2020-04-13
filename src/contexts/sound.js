@@ -5,28 +5,67 @@ import React, {
   useMemo,
   createContext,
 } from "react"
+import useSound from "use-sound"
+
+import clapSound from "../sounds/clap.wav"
+import buttonSound from "../sounds/button.wav"
+import cardSound from "../sounds/card.wav"
+import tangramSound from "../sounds/pop.wav"
 
 export const SoundContext = createContext([true, () => {}])
 
 export const SoundProvider = ({ children }) => {
-  const [soundsEnabled, setSoundsEnabled] = useState(true)
+  const [soundEnabled, setSoundEnabled] = useState(true)
+
+  const [playClap] = useSound(clapSound, {
+    soundEnabled,
+  })
+  const [playButton] = useSound(buttonSound, {
+    soundEnabled,
+  })
+  const [playToggle] = useSound(buttonSound, {
+    soundEnabled,
+  })
+  const [playCard] = useSound(cardSound, {
+    soundEnabled,
+  })
+
+  const [playTangram] = useSound(tangramSound, {
+    soundEnabled,
+  })
 
   useEffect(() => {
-    setSoundsEnabled(
-      window.localStorage.getItem("sounds") === "off" ? false : true
+    setSoundEnabled(
+      window.localStorage.getItem("sound") === "off" ? false : true
     )
   }, [])
 
-  const toggleSounds = useCallback(() => {
-    const newSoundsEnabled = !soundsEnabled
-    setSoundsEnabled(newSoundsEnabled)
-    window.localStorage.setItem("sounds", newSoundsEnabled ? "on" : "off")
-  }, [soundsEnabled])
+  const toggleSound = useCallback(() => {
+    const newSoundsEnabled = !soundEnabled
+    setSoundEnabled(newSoundsEnabled)
+    window.localStorage.setItem("sound", newSoundsEnabled ? "on" : "off")
+  }, [soundEnabled])
 
-  const contextValue = useMemo(() => [soundsEnabled, toggleSounds], [
-    soundsEnabled,
-    toggleSounds,
-  ])
+  const contextValue = useMemo(
+    () => ({
+      soundEnabled,
+      toggleSound,
+      playButton,
+      playToggle,
+      playCard,
+      playClap,
+      playTangram,
+    }),
+    [
+      soundEnabled,
+      toggleSound,
+      playButton,
+      playToggle,
+      playCard,
+      playClap,
+      playTangram,
+    ]
+  )
 
   return (
     <SoundContext.Provider value={contextValue}>

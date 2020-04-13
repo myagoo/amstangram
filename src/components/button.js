@@ -1,9 +1,7 @@
 import { useCss, useKeyframes } from "css-system"
 import React, { useContext } from "react"
-import { createPrimitive } from "../utils/createPrimitive"
 import { SoundContext } from "../contexts/sound"
-import useSound from "use-sound"
-import buttonSFX from "../sounds/button.wav"
+import { createPrimitive } from "../utils/createPrimitive"
 
 export const DangerButton = createPrimitive("button", {
   minWidth: 0,
@@ -32,10 +30,7 @@ export const PrimaryButton = ({
   onClick,
   ...props
 }) => {
-  const [soundEnabled] = useContext(SoundContext)
-  const [play] = useSound(buttonSFX, {
-    soundEnabled,
-  })
+  const { playButton } = useContext(SoundContext)
 
   const gradient = useKeyframes({
     0: { bg: "pieces.lt2" },
@@ -76,7 +71,7 @@ export const PrimaryButton = ({
       onClick={
         onClick
           ? (e) => {
-              play()
+              playButton()
               onClick(e)
             }
           : undefined
@@ -92,10 +87,7 @@ export const Button = ({
   onClick,
   ...props
 }) => {
-  const [soundEnabled] = useContext(SoundContext)
-  const [play] = useSound(buttonSFX, {
-    soundEnabled,
-  })
+  const { playButton } = useContext(SoundContext)
 
   const gradient = useKeyframes({
     0: { bg: "pieces.lt2" },
@@ -135,7 +127,7 @@ export const Button = ({
       onClick={
         onClick
           ? (e) => {
-              play()
+              playButton()
               onClick(e)
             }
           : undefined

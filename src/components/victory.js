@@ -1,14 +1,12 @@
 import { useKeyframes } from "css-system"
 import React, { useContext, useState } from "react"
 import { FiCheck, FiPlay, FiSquare } from "react-icons/fi"
-import useSound from "use-sound"
 import { Button } from "../components/button"
 import { View } from "../components/view"
 import { FADE_TRANSITION_DURATION } from "../constants"
 import { SoundContext } from "../contexts/sound"
-import clapSFX from "../sounds/clap.wav"
 
-export const Victory = ({ emoji, onStop, onNext, onApprove }) => {
+export const Victory = ({ emoji, onStop, onNext, onApprove, onClap }) => {
   const [clapCount, setClapCount] = useState(false)
 
   const [emojiSpinEnded, setEmojiSpinEnded] = useState(false)
@@ -16,11 +14,7 @@ export const Victory = ({ emoji, onStop, onNext, onApprove }) => {
   const [clapFadeInEnded, setClapFadeInEnded] = useState(false)
 
   const [playbackRate, setPlaybackRate] = useState(1)
-  const [soundEnabled] = useContext(SoundContext)
-  const [play] = useSound(clapSFX, {
-    soundEnabled,
-    playbackRate,
-  })
+  const { playClap } = useContext(SoundContext)
 
   const emojiSpin = useKeyframes({
     0: {
@@ -59,9 +53,12 @@ export const Victory = ({ emoji, onStop, onNext, onApprove }) => {
 
   const handleClapClick = () => {
     if (clapCount < 10) {
-      play()
+      playClap({
+        playbackRate,
+      })
       setClapCount(clapCount + 1)
       setPlaybackRate(playbackRate + 0.01)
+      onClap()
     }
   }
 
@@ -117,7 +114,7 @@ export const Victory = ({ emoji, onStop, onNext, onApprove }) => {
             <View
               key={`clap${clapCount}`}
               css={{
-                fontSize: `${30 + clapCount}vmin`,
+                fontSize: `30vmin`,
                 animation: clapCount ? `250ms ${clap} alternate` : undefined,
               }}
               onClick={handleClapClick}

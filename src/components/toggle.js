@@ -1,12 +1,11 @@
 import { ThemeContext } from "css-system"
 import React, { useContext, useMemo } from "react"
-import { View } from "./view"
 import { SoundContext } from "../contexts/sound"
-import useSound from "use-sound"
-import boopSfx from "../sounds/button.wav"
+import { View } from "./view"
+
+const SIZE = 20
 
 export const Toggle = ({
-  size = 20,
   leftComponent,
   leftValue,
   rightComponent,
@@ -15,10 +14,7 @@ export const Toggle = ({
   onChange,
   invertSounds,
 }) => {
-  const [soundEnabled] = useContext(SoundContext)
-  const [play] = useSound(boopSfx, {
-    soundEnabled: invertSounds ? !soundEnabled : soundEnabled,
-  })
+  const { playToggle, soundEnabled } = useContext(SoundContext)
 
   const theme = useContext(ThemeContext)
 
@@ -26,6 +22,18 @@ export const Toggle = ({
     () => (value === rightValue ? "right" : "left"),
     [value, rightValue]
   )
+
+  const play = () => {
+    if (invertSounds) {
+      if (!soundEnabled) {
+        playToggle({
+          forceSoundEnabled: true,
+        })
+      }
+    } else {
+      playToggle()
+    }
+  }
 
   const toggleSelectedSide = () => {
     const newSelectedSide = selectedSide === "left" ? "right" : "left"
@@ -38,6 +46,7 @@ export const Toggle = ({
     if (newSelectedSide === selectedSide) {
       return
     }
+
     onChange(newSelectedSide === "right" ? rightValue : leftValue)
     play()
   }
@@ -51,7 +60,10 @@ export const Toggle = ({
         gap: 3,
       }}
     >
-      <View css={{ cursor: "pointer" }} onClick={() => handleSideClick("left")}>
+      <View
+        css={{ cursor: "pointer", flex: "1", alignItems: "flex-end" }}
+        onClick={() => handleSideClick("left")}
+      >
         {leftComponent}
       </View>
       <View
@@ -60,25 +72,25 @@ export const Toggle = ({
           cursor: "pointer",
           position: "relative",
           bg: "inputBackground",
-          width: `${2 * size}px`,
-          height: `${size}px`,
+          width: `${2 * SIZE}px`,
+          height: `${SIZE}px`,
           borderRadius: "99999px",
         }}
       >
         <View
           css={{
             position: "absolute",
-            size: `${size}px`,
+            size: `${SIZE}px`,
             borderRadius: "99999px",
             bg: "galleryText",
             boxShadow: `0 0 0 2px ${theme.colors.inputBackground}`,
             transition: "left 250ms ease-in-out",
           }}
-          style={{ left: selectedSide === "left" ? 0 : size }}
+          style={{ left: selectedSide === "left" ? 0 : SIZE }}
         ></View>
       </View>
       <View
-        css={{ cursor: "pointer" }}
+        css={{ cursor: "pointer", flex: "1", alignItems: "flex-start" }}
         onClick={() => handleSideClick("right")}
       >
         {rightComponent}

@@ -2,59 +2,69 @@ import firebase from "gatsby-plugin-firebase"
 import React, {
   createContext,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
-  useContext,
 } from "react"
 import { GalleryDialog } from "../components/galleryDialog"
-import { SaveTangramDialog } from "../components/saveTangramDialog"
+import { TangramDialog } from "../components/tangramDialog"
 import { Deferred } from "../utils/deferred"
-import { getTangramDifficulty } from "../utils/getTangramDifficulty"
-import { sortTangrams } from "../utils/sortTangrams"
+import {
+  sortTangrams,
+  sortDigitsTangrams,
+  sortLettersTangrams,
+} from "../utils/sortTangrams"
+import { TangramsContext } from "./tangrams"
 import { UserContext } from "./user"
+import { ChallengeDialog } from "../components/challengeDialog"
+import { copyToClipboard } from "../utils/copyToClipboard"
+import { useTranslate } from "./language"
+import { NotifyContext } from "./notify"
 
 export const GalleryContext = createContext(null)
 
 export const GalleryProvider = ({ children }) => {
+  const t = useTranslate()
+  const notify = useContext(NotifyContext)
   const { currentUser } = useContext(UserContext)
+  const tangrams = useContext(TangramsContext)
+  const [initialized, setInitialized] = useState(false)
 
   const [galleryOpened, setGalleryOpened] = useState(false)
 
   const getTangramRef = useRef()
   const [playlist, setPlaylist] = useState(null)
   const [saveRequestId, setSaveRequestId] = useState(0)
-  const [completedTangramsEmoji, setCompletedTangramsEmoji] = useState({})
+  const [completedTangrams, setCompletedTangrams] = useState({})
   const [tangramsByCategory, setTangramsByCategory] = useState(null)
   const [tangramDialogData, setTangramDialogData] = useState(null)
-  const [tangrams, setTangrams] = useState(null)
+  const [challengeDialogData, setChallengeDialogData] = useState(null)
 
   useEffect(() => {
+    if (!currentUser) {
+      setCompletedTangrams({})
+      return
+    }
+
     const unsubscribe = firebase
       .firestore()
+      .collection("users")
+      .doc(currentUser.uid)
       .collection("tangrams")
-      .onSnapshot((querySnapshot) => {
-        const newTangrams = []
-        const newCompletedTangramsEmoji = {}
-
-        for (const doc of querySnapshot.docs) {
+      .onSnapshot((collectionSnapshot) => {
+        const newCompletedTangrams = {}
+        for (const doc of collectionSnapshot.docs) {
           const id = doc.id
-          const tangram = doc.data()
-          newTangrams.push({
-            id,
-            difficulty: getTangramDifficulty(tangram),
-            ...tangram,
-          })
-          newCompletedTangramsEmoji[id] = localStorage.getItem(id)
+          const completionStats = doc.data()
+          newCompletedTangrams[id] = completionStats
         }
-
-        setTangrams(newTangrams)
-        setCompletedTangramsEmoji(newCompletedTangramsEmoji)
+        setCompletedTangrams(newCompletedTangrams)
       })
 
     return unsubscribe
-  }, [])
+  }, [currentUser])
 
   useEffect(() => {
     if (tangrams === null) {
@@ -85,28 +95,91 @@ export const GalleryProvider = ({ children }) => {
     for (const sortedCategory of Object.keys(newTangramsByCategory).sort()) {
       sortedTangramsByCategory[sortedCategory] = newTangramsByCategory[
         sortedCategory
-      ].sort(sortTangrams)
+      ].sort(
+        sortedCategory === "letters"
+          ? sortLettersTangrams
+          : sortedCategory === "digits"
+          ? sortDigitsTangrams
+          : sortTangrams
+      )
     }
 
     setTangramsByCategory(sortedTangramsByCategory)
   }, [tangrams, currentUser])
 
+  useEffect(() => {
+    if (tangrams && !initialized) {
+      if (!playlist && window.location.search) {
+        const searchParams = new URLSearchParams(window.location.search)
+
+        if (searchParams.has("tangrams")) {
+          const tangramIds = searchParams.get("tangrams").split(",")
+          const uid = searchParams.get("uid")
+          const challengeTangrams = tangrams.filter((tangram) =>
+            tangramIds.includes(tangram.id)
+          )
+          if (challengeTangrams.length) {
+            const deferred = new Deferred()
+            setChallengeDialogData({
+              deferred,
+              tangrams: challengeTangrams,
+              uid,
+            })
+            deferred.promise.finally(() => setChallengeDialogData(null))
+          }
+        }
+      }
+      setInitialized(true)
+    }
+  }, [tangrams, initialized, playlist])
+
+  const shareTangrams = useCallback(
+    (tangrams) => {
+      let challengeLink = `${window.location.origin}?tangrams=${tangrams
+        .map(({ id }) => id)
+        .join(",")}`
+      if (currentUser) {
+        challengeLink += `&uid=${currentUser.uid}`
+      }
+      copyToClipboard(challengeLink)
+      notify(t("Challenge link copied to clipboard"))
+    },
+    [notify, t, currentUser]
+  )
+
   const requestSave = useCallback(() => {
     setSaveRequestId((prevRequestId) => prevRequestId + 1)
   }, [])
 
-  const setCompletedTangramEmoji = useCallback((tangram, emoji) => {
-    localStorage.setItem(tangram.id, emoji)
+  const markTangramAsComplete = useCallback(
+    async (tangram, completionTime) => {
+      if (currentUser) {
+        const { exists } = await firebase
+          .firestore()
+          .collection("users")
+          .doc(currentUser.uid)
+          .collection("tangrams")
+          .doc(tangram.id)
+          .get()
 
-    setCompletedTangramsEmoji((prevCompletedTangrams) => ({
-      ...prevCompletedTangrams,
-      [tangram.id]: emoji,
-    }))
-  }, [])
+        if (!exists)
+          await firebase
+            .firestore()
+            .collection("users")
+            .doc(currentUser.uid)
+            .collection("tangrams")
+            .doc(tangram.id)
+            .set({
+              completionTime,
+            })
+      }
+    },
+    [currentUser]
+  )
 
-  getTangramRef.current = useCallback((pathData) => {
+  getTangramRef.current = useCallback((tangram) => {
     const deferred = new Deferred()
-    setTangramDialogData({ deferred, pathData })
+    setTangramDialogData({ deferred, tangram })
     return deferred.promise.finally(() => setTangramDialogData(null))
   }, [])
 
@@ -114,23 +187,25 @@ export const GalleryProvider = ({ children }) => {
     () => ({
       galleryOpened,
       setGalleryOpened,
-      completedTangramsEmoji,
       requestSave,
       saveRequestId,
       playlist,
-      setCompletedTangramEmoji,
       setPlaylist,
       tangramsByCategory,
       getTangramRef,
+      markTangramAsComplete,
+      completedTangrams,
+      shareTangrams,
     }),
     [
       galleryOpened,
-      completedTangramsEmoji,
       requestSave,
       saveRequestId,
       playlist,
-      setCompletedTangramEmoji,
       tangramsByCategory,
+      markTangramAsComplete,
+      completedTangrams,
+      shareTangrams,
     ]
   )
 
@@ -139,7 +214,10 @@ export const GalleryProvider = ({ children }) => {
       {children}
       {galleryOpened && <GalleryDialog></GalleryDialog>}
       {tangramDialogData && (
-        <SaveTangramDialog {...tangramDialogData}></SaveTangramDialog>
+        <TangramDialog {...tangramDialogData}></TangramDialog>
+      )}
+      {challengeDialogData && (
+        <ChallengeDialog {...challengeDialogData}></ChallengeDialog>
       )}
     </GalleryContext.Provider>
   )
