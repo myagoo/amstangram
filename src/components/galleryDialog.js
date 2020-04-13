@@ -83,7 +83,7 @@ export const GalleryDialog = () => {
         title={<Title>{t("Tangram gallery")}</Title>}
         css={{
           gap: 3,
-          width: "600px",
+          width: "500px",
           maxWidth: "80vw",
         }}
         onClose={handleCloseClick}

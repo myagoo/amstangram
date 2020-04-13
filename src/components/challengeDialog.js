@@ -24,7 +24,7 @@ export const ChallengeDialog = ({ uid, tangrams, deferred }) => {
         </Title>
       }
       onClose={deferred.reject}
-      css={{ gap: 3, minWidth: "250px" }}
+      css={{ gap: 3, minWidth: "250px", maxWidth: "500px" }}
     >
       <View
         css={{
@@ -33,7 +33,7 @@ export const ChallengeDialog = ({ uid, tangrams, deferred }) => {
           flexDirection: "row",
           flexWrap: "wrap",
           justifyContent: "center",
-          m: -2,
+          m: -1,
         }}
       >
         {tangrams.map((tangram) => (
@@ -42,7 +42,7 @@ export const ChallengeDialog = ({ uid, tangrams, deferred }) => {
             selected
             tangram={tangram}
             css={{
-              m: 2,
+              m: 1,
             }}
             onBadgeClick={showProfile}
             onLongPress={getTangramRef.current}
