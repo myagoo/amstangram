@@ -135,7 +135,7 @@ export const GalleryProvider = ({ children }) => {
 
   const shareTangrams = useCallback(
     (tangrams) => {
-      let challengeLink = `${window.location.origin}?tangrams=${tangrams
+      let challengeLink = `${window.location.origin}/?tangrams=${tangrams
         .map(({ id }) => id)
         .join(",")}`
       if (currentUser) {
