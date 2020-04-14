@@ -264,9 +264,16 @@ export const ProfileDialog = ({ uid, deferred }) => {
   return (
     <Dialog
       onClose={deferred.reject}
-      css={{ gap: 4, flex: "1", minWidth: "250px" }}
+      css={{
+        gap: 4,
+        flex: "1",
+        minWidth: "250px",
+        overflow: "auto",
+        pt: 4,
+        mt: -4,
+      }}
     >
-      <View css={{ gap: 3, mt: -4, alignItems: "center" }}>
+      <View css={{ gap: 3, alignItems: "center" }}>
         <Badge uid={uid} size={86} css={{}}></Badge>
 
         <Title>{username}</Title>
