@@ -10,6 +10,7 @@ import { Card } from "./card"
 import { Dialog } from "./dialog"
 import { SubTitle, Title } from "./primitives"
 import { View } from "./view"
+import { Loader } from "./loader"
 
 const FadedView = extendPrimitive(View, (css, theme) => ({
   ...css,
@@ -96,63 +97,67 @@ export const GalleryDialog = () => {
           }}
         >
           {tangramsByCategory === null || usersMetadata === null ? (
-            <SubTitle>{t("Loading tangrams")}</SubTitle>
+            <>
+              <Loader css={{ m: "auto" }}></Loader>
+            </>
           ) : (
-            Object.keys(tangramsByCategory).map((category) => (
-              <View key={category} css={{ gap: 3 }}>
-                <FadedView
-                  onClick={() =>
-                    handleCategoryClick(tangramsByCategory[category])
-                  }
-                >
-                  <SubTitle>{t(category)}</SubTitle>
-                </FadedView>
-                <View
-                  css={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, 136px)",
-                    gridColumnGap: 2,
-                    gridRowGap: 2,
-                    justifyContent: "center",
-                    justifyItems: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  {tangramsByCategory[category].map((tangram) => (
-                    <Card
-                      key={tangram.id}
-                      tangram={tangram}
-                      completed={completedTangrams[tangram.id]}
-                      selected={selectedTangrams.some(
-                        (pendingSelectedTangram) =>
-                          pendingSelectedTangram.id === tangram.id
-                      )}
-                      onClick={() => handleTangramClick(tangram)}
-                      onBadgeClick={showProfile}
-                      onLongPress={getTangramRef.current}
-                    />
-                  ))}
+            <>
+              {Object.keys(tangramsByCategory).map((category) => (
+                <View key={category} css={{ gap: 3 }}>
+                  <FadedView
+                    onClick={() =>
+                      handleCategoryClick(tangramsByCategory[category])
+                    }
+                  >
+                    <SubTitle>{t(category)}</SubTitle>
+                  </FadedView>
+                  <View
+                    css={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fill, 136px)",
+                      gridColumnGap: 2,
+                      gridRowGap: 2,
+                      justifyContent: "center",
+                      justifyItems: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    {tangramsByCategory[category].map((tangram) => (
+                      <Card
+                        key={tangram.id}
+                        tangram={tangram}
+                        completed={completedTangrams[tangram.id]}
+                        selected={selectedTangrams.some(
+                          (pendingSelectedTangram) =>
+                            pendingSelectedTangram.id === tangram.id
+                        )}
+                        onClick={() => handleTangramClick(tangram)}
+                        onBadgeClick={showProfile}
+                        onLongPress={getTangramRef.current}
+                      />
+                    ))}
+                  </View>
                 </View>
+              ))}
+              <View css={{ flexDirection: "row", gap: 2 }}>
+                <PrimaryButton onClick={handleStartClick} css={{ flex: "1" }}>
+                  {selectedTangrams.length === 0
+                    ? t("Play now !")
+                    : selectedTangrams.length === 1
+                    ? t("Start 1 tangram !")
+                    : t("Start {count} tangrams !", {
+                        count: selectedTangrams.length,
+                      })}
+                </PrimaryButton>
+                <PrimaryButton
+                  disabled={selectedTangrams.length === 0}
+                  onClick={() => shareTangrams(selectedTangrams)}
+                >
+                  <View as={FiShare2} size={20}></View>
+                </PrimaryButton>
               </View>
-            ))
+            </>
           )}
-        </View>
-        <View css={{ flexDirection: "row", gap: 2 }}>
-          <PrimaryButton onClick={handleStartClick} css={{ flex: "1" }}>
-            {selectedTangrams.length === 0
-              ? t("Play now !")
-              : selectedTangrams.length === 1
-              ? t("Start 1 tangram !")
-              : t("Start {count} tangrams !", {
-                  count: selectedTangrams.length,
-                })}
-          </PrimaryButton>
-          <PrimaryButton
-            disabled={selectedTangrams.length === 0}
-            onClick={() => shareTangrams(selectedTangrams)}
-          >
-            <View as={FiShare2} size={20}></View>
-          </PrimaryButton>
         </View>
       </Dialog>
     </>

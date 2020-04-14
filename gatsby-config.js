@@ -8,6 +8,9 @@ const baseTheme = {
   sizes: {
     button: 64,
   },
+  borderWidths: {
+    loader: 8,
+  },
   radii: [0, 4, 8, 16, 32],
   fontSizes: [10, 12, 14, 18, 22, 30, 46, 62, 70],
 }
