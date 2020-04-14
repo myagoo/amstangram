@@ -116,7 +116,12 @@ export const Tangram = () => {
         return
       }
 
-      getTangramRef.current(pathData)
+      const asyncTask = async () => {
+        await getCurrentUserRef.current()
+        await getTangramRef.current(pathData)
+      }
+
+      asyncTask()
     }
   }, [notify, saveRequestId, getTangramRef, getCurrentUserRef, t])
 
