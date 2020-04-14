@@ -119,7 +119,14 @@ export const GalleryProvider = ({ children }) => {
             tangramIds.includes(tangram.id)
           )
           if (challengeTangrams.length) {
+            window.history.replaceState(
+              {},
+              document.title,
+              window.location.origin
+            )
+
             const deferred = new Deferred()
+
             setChallengeDialogData({
               deferred,
               tangrams: challengeTangrams,
