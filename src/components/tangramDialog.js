@@ -18,7 +18,7 @@ import { View } from "./view"
 
 const ReadTangramDialog = ({ tangram, deferred }) => {
   return (
-    <Dialog onClose={deferred.reject} css={{ gap: 3, minWidth: "250px" }}>
+    <Dialog onClose={deferred.reject} css={{ gap: 3, minWidth: "268px" }}>
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
         <Card selected tangram={tangram} css={{ alignSelf: "center" }}></Card>
 
@@ -124,7 +124,7 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
       onClose={deferred.reject}
       as="form"
       onSubmit={handleSubmit(onSubmit)}
-      css={{ gap: 3, minWidth: "250px" }}
+      css={{ gap: 3, minWidth: "268px" }}
     >
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
         <Card

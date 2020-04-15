@@ -49,7 +49,7 @@ export const SettingsDialog = ({ deferred }) => {
     <Dialog
       title={<Title>{t("Settings")}</Title>}
       onClose={deferred.reject}
-      css={{ gap: 4, overflow: "auto", flex: "1", minWidth: "250px" }}
+      css={{ gap: 4, overflow: "auto", flex: "1", minWidth: "268px" }}
     >
       <View css={{ gap: 2 }}>
         <label>{t("Language")}</label>

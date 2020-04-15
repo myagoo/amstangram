@@ -24,7 +24,7 @@ export const ChallengeDialog = ({ uid, tangrams, deferred }) => {
         </Title>
       }
       onClose={deferred.reject}
-      css={{ gap: 3, minWidth: "250px", maxWidth: "500px" }}
+      css={{ gap: 3, minWidth: "268px", maxWidth: "500px" }}
     >
       <View
         css={{

@@ -267,7 +267,7 @@ export const ProfileDialog = ({ uid, deferred }) => {
       css={{
         gap: 4,
         flex: "1",
-        minWidth: "250px",
+        minWidth: "268px",
         overflow: "auto",
         pt: 4,
         mt: -4,
@@ -275,13 +275,18 @@ export const ProfileDialog = ({ uid, deferred }) => {
     >
       <View css={{ gap: 3, alignItems: "center" }}>
         <Badge uid={uid} size={86} css={{}}></Badge>
-
         <Title>{username}</Title>
-        <Text css={{ fontSize: 2 }}>
-          {t("Joined {signupDate}", {
-            signupDate: new Intl.DateTimeFormat(language).format(signupDate),
-          })}
-        </Text>
+        <View css={{ gap: 2, alignItems: "center" }}>
+          {currentUser && (
+            <Text css={{ fontSize: 2 }}>{currentUser.firebaseUser.email}</Text>
+          )}
+          <Text css={{ fontSize: 2 }}>
+            {t("Joined {signupDate}", {
+              signupDate: new Intl.DateTimeFormat(language).format(signupDate),
+            })}
+          </Text>
+        </View>
+
         <View css={{ flexDirection: "row", alignItems: "flex-end" }}>
           <Text css={{ fontSize: 5 }}>{"👏"}</Text>
           <Text css={{ fontSize: 3 }}>x{claps}</Text>

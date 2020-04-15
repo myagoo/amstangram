@@ -89,19 +89,13 @@ export const GalleryDialog = () => {
         }}
         onClose={handleCloseClick}
       >
-        <View
-          css={{
-            flex: "1",
-            overflow: "auto",
-            gap: 4,
-          }}
-        >
-          {tangramsByCategory === null || usersMetadata === null ? (
-            <>
-              <Loader css={{ m: "auto" }}></Loader>
-            </>
-          ) : (
-            <>
+        {tangramsByCategory === null || usersMetadata === null ? (
+          <>
+            <Loader css={{ m: "auto" }}></Loader>
+          </>
+        ) : (
+          <>
+            <View css={{ flex: "1", overflow: "auto", gap: 4 }}>
               {Object.keys(tangramsByCategory).map((category) => (
                 <View key={category} css={{ gap: 3 }}>
                   <FadedView
@@ -139,26 +133,26 @@ export const GalleryDialog = () => {
                   </View>
                 </View>
               ))}
-              <View css={{ flexDirection: "row", gap: 2 }}>
-                <PrimaryButton onClick={handleStartClick} css={{ flex: "1" }}>
-                  {selectedTangrams.length === 0
-                    ? t("Play now !")
-                    : selectedTangrams.length === 1
-                    ? t("Start 1 tangram !")
-                    : t("Start {count} tangrams !", {
-                        count: selectedTangrams.length,
-                      })}
-                </PrimaryButton>
-                <PrimaryButton
-                  disabled={selectedTangrams.length === 0}
-                  onClick={() => shareTangrams(selectedTangrams)}
-                >
-                  <View as={FiShare2} size={20}></View>
-                </PrimaryButton>
-              </View>
-            </>
-          )}
-        </View>
+            </View>
+            <View css={{ flexDirection: "row", gap: 2 }}>
+              <PrimaryButton onClick={handleStartClick} css={{ flex: "1" }}>
+                {selectedTangrams.length === 0
+                  ? t("Play now !")
+                  : selectedTangrams.length === 1
+                  ? t("Start 1 tangram !")
+                  : t("Start {count} tangrams !", {
+                      count: selectedTangrams.length,
+                    })}
+              </PrimaryButton>
+              <PrimaryButton
+                disabled={selectedTangrams.length === 0}
+                onClick={() => shareTangrams(selectedTangrams)}
+              >
+                <View as={FiShare2} size={20}></View>
+              </PrimaryButton>
+            </View>
+          </>
+        )}
       </Dialog>
     </>
   )
