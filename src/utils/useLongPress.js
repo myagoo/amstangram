@@ -1,52 +1,51 @@
-import { useCallback, useRef } from "react"
+import { useState } from "react"
 
-const isTouchEvent = (event) => {
-  return "touches" in event
-}
+export const useLongPress = (callback, ms) => {
+  const [data, setData] = useState(null)
 
-const preventDefault = (event) => {
-  if (!isTouchEvent(event)) return
-
-  if (event.touches.length < 2 && event.preventDefault) {
-    event.preventDefault()
-  }
-}
-
-export const useLongPress = (
-  callback,
-  { isPreventDefault = false, delay = 1000 } = {}
-) => {
-  const timeout = useRef()
-  const target = useRef()
-
-  const start = useCallback(
-    (event) => {
-      // prevent ghost click on mobile devices
-      if (isPreventDefault && event.target) {
-        event.target.addEventListener("touchend", preventDefault, {
-          passive: false,
-        })
-        target.current = event.target
-      }
-      timeout.current = setTimeout(() => callback(event), delay)
-    },
-    [callback, delay]
-  )
-
-  const clear = useCallback(() => {
-    // clearTimeout and removeEventListener
-    timeout.current && clearTimeout(timeout.current)
-
-    if (isPreventDefault && target.current) {
-      target.current.removeEventListener("touchend", preventDefault)
+  const handleStart = (event) => {
+    if (data && event.touches && event.touches.length !== 1) {
+      clearTimeout(data.timeoutId)
+    } else {
+      const startEvent = event.touches ? event.touches.item(0) : event
+      setData({
+        timeoutId: setTimeout(callback, ms),
+        startEvent: {
+          clientX: startEvent.clientX,
+          clientY: startEvent.clientY,
+        },
+      })
     }
-  }, [])
+  }
+
+  const handleMove = (event) => {
+    if (!data) {
+      return
+    }
+    let moveEvent = event.touches ? event.touches.item(0) : event
+    const distance = Math.sqrt(
+      Math.pow(moveEvent.clientX - data.startEvent.clientX, 2) +
+        Math.pow(moveEvent.clientY - data.startEvent.clientY, 2)
+    )
+    if (distance > 10) {
+      clearTimeout(data.timeoutId)
+    }
+  }
+
+  const handleEnd = () => {
+    if (!data) {
+      return
+    }
+    clearTimeout(data.timeoutId)
+  }
 
   return {
-    onMouseDown: start,
-    onTouchStart: start,
-    onMouseUp: clear,
-    onMouseLeave: clear,
-    onTouchEnd: clear,
+    onMouseDown: handleStart,
+    onMouseUp: handleEnd,
+    onMouseMove: handleMove,
+    onMouseLeave: handleEnd,
+    onTouchStart: handleStart,
+    onTouchEnd: handleEnd,
+    onTouchMove: handleMove,
   }
 }
