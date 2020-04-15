@@ -68,11 +68,19 @@ export const GalleryDialog = () => {
   }
 
   const handleStartClick = () => {
-    setPlaylist(
-      selectedTangrams.length
-        ? selectedTangrams
-        : shuffle(Object.values(tangramsByCategory).flat())
-    )
+    if (selectedTangrams.length) {
+      setPlaylist(selectedTangrams)
+    } else {
+      const shuffledTangrams = shuffle(Object.values(tangramsByCategory).flat())
+      setPlaylist(
+        shuffledTangrams.sort(({ id: idA }, { id: idB }) => {
+          const isTangramACompleted = completedTangrams[idA] !== undefined
+          const isTangramBCompleted = completedTangrams[idB] !== undefined
+          return isTangramACompleted - isTangramBCompleted
+        })
+      )
+    }
+
     setGalleryOpened(null)
   }
 
