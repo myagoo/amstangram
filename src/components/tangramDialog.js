@@ -1,12 +1,10 @@
 import firebase from "gatsby-plugin-firebase"
 import React, { useContext, useMemo } from "react"
 import { useForm } from "react-hook-form"
-import { FiShare2 } from "react-icons/fi"
 import { CATEGORIES, DIGITS, LETTERS } from "../constants"
 import { useTranslate } from "../contexts/language"
 import { NotifyContext } from "../contexts/notify"
 import { UserContext } from "../contexts/user"
-import { copyToClipboard } from "../utils/copyToClipboard"
 import { getRandomEmoji } from "../utils/getRandomEmoji"
 import { PrimaryButton } from "./button"
 import { Card } from "./card"
@@ -143,23 +141,6 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
           >
             <Text css={{ fontSize: 5 }}>{"👏"}</Text>
             <Text css={{ fontSize: 3 }}>x{tangram.claps || 0}</Text>
-            {tangram.id && (
-              <View
-                as={FiShare2}
-                css={{
-                  cursor: "pointer",
-                  size: 32,
-                }}
-                onClick={() => {
-                  let challengeLink = `${window.location.origin}?tangram=${tangram.id}`
-                  if (currentUser) {
-                    challengeLink += `&uid=${currentUser.uid}`
-                  }
-                  copyToClipboard(challengeLink)
-                  notify(t("Challenge link copied to clipboard"))
-                }}
-              />
-            )}
           </View>
         )}
 
