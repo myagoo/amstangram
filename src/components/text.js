@@ -1,6 +1,6 @@
-import { createPrimitive } from "../utils/createPrimitive"
+import { createLoosePrimitive } from "css-system"
 
-export const Text = createPrimitive("div", {
+export const Text = createLoosePrimitive("div", {
   display: "inline",
   minWidth: 0,
   minHeight: 0,

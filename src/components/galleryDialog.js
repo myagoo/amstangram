@@ -3,7 +3,6 @@ import { FiShare2 } from "react-icons/fi"
 import { GalleryContext } from "../contexts/gallery"
 import { useTranslate } from "../contexts/language"
 import { UserContext } from "../contexts/user"
-import { extendPrimitive } from "../utils/createPrimitive"
 import { shuffle } from "../utils/shuffle"
 import { PrimaryButton } from "./button"
 import { Card } from "./card"
@@ -11,8 +10,9 @@ import { Dialog } from "./dialog"
 import { SubTitle, Title } from "./primitives"
 import { View } from "./view"
 import { Loader } from "./loader"
+import { extendLoosePrimitive } from "css-system"
 
-const FadedView = extendPrimitive(View, (css, theme) => ({
+const FadedView = extendLoosePrimitive(View, (css, theme) => ({
   ...css,
   p: 1,
   alignItems: "center",

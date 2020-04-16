@@ -1,6 +1,6 @@
-import { createPrimitive } from "../utils/createPrimitive"
+import { createLoosePrimitive } from "css-system"
 
-export const Input = createPrimitive(
+export const Input = createLoosePrimitive(
   "input",
   (css) => ({
     color: "inherit",
