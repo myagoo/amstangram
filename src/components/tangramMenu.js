@@ -5,7 +5,6 @@ import {
   FiMenu,
   FiSave,
   FiSettings,
-  FiSquare,
   FiUser,
   FiX,
 } from "react-icons/fi"
@@ -25,7 +24,7 @@ export const TangramMenu = () => {
 
   const [opened, setOpened] = useState(false)
 
-  const { requestSave, playlist, setPlaylist } = useContext(GalleryContext)
+  const { requestSave } = useContext(GalleryContext)
 
   const { setGalleryOpened } = useContext(GalleryContext)
 
@@ -42,9 +41,9 @@ export const TangramMenu = () => {
         setGalleryOpened((prevGalleryOpened) => !prevGalleryOpened),
     },
     {
-      id: "stop",
-      icon: playlist ? FiSquare : FiSave,
-      onClick: playlist ? () => setPlaylist(null) : requestSave,
+      id: "save",
+      icon: FiSave,
+      onClick: requestSave,
     },
     {
       id: "settings",
