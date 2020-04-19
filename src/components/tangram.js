@@ -401,12 +401,6 @@ export const Tangram = () => {
 
       if (coumpoundPathRef.current) {
         coumpoundPathRef.current.scale(scaleFactorRef.current)
-
-        paper.project.activeLayer.fitBounds(
-          coumpoundPathRef.current.bounds,
-          true
-        )
-
         coumpoundPathRef.current.position = paper.view.center
       }
 
