@@ -3659,10 +3659,10 @@ css-selector-tokenizer@^0.7.0:
     fastparse "^1.1.1"
     regexpu-core "^1.0.0"
 
-css-system@0.6.2:
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/css-system/-/css-system-0.6.2.tgz#9e24bfaea0fada9d923a0a51cb19f509a61689c8"
-  integrity sha512-50ms82QOjkDj4cpXdiFvpFh/4hZOjfw6ntif8HNxVz68Y+eHI72vB0yasPvS24gvQKCBS5HR53UDgI5hmG9btQ==
+css-system@0.6.3:
+  version "0.6.3"
+  resolved "https://registry.yarnpkg.com/css-system/-/css-system-0.6.3.tgz#bc8fdb99e43ef35f505c7657ffcf261083e25153"
+  integrity sha512-Q855vvuPG47q+Xcoxw49mX0ajTCLmkEZqKm3o2KuBxb/uu+S0h6SI7wmSyH3N2jC97oICAp6bwQDZTJ22CN4JQ==
   dependencies:
     hash-sum "^2.0.0"
 

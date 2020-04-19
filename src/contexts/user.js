@@ -20,7 +20,7 @@ export const UserProvider = ({ children }) => {
   const t = useTranslate()
   const notify = useContext(NotifyContext)
   const getCurrentUserRef = useRef()
-  const [currentUser, setCurrentUser] = useState(null)
+  const [currentUser, setCurrentUser] = useState(undefined)
   const [loginDeferred, setLoginDeferred] = useState(null)
   const [profileDialogData, setProfileDialogData] = useState(null)
   const [usersMetadata, setUsersMetadata] = useState(null)

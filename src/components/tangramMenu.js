@@ -70,9 +70,7 @@ export const TangramMenu = () => {
         bottom: 3,
         left: "50%",
         transform: "translateX(-50%)",
-        animation: `${FADE_TRANSITION_DURATION}ms fadeIn ${
-          FADE_STAGGER_DURATION * 2
-        }ms ease both`,
+        animation: `${FADE_TRANSITION_DURATION}ms fadeIn ${FADE_STAGGER_DURATION}ms ease both`,
       }}
     >
       <View css={{ position: "relative" }}>

@@ -10,7 +10,6 @@ import React, {
   useRef,
   useState,
 } from "react"
-import { Logo } from "../components/logo"
 import { View } from "../components/view"
 import {
   CLICK_TIMEOUT,
@@ -384,7 +383,7 @@ export const Tangram = () => {
       const outerBounds = paper.project.view.bounds
       const innerBounds = coumpoundPathRef.current
         ? coumpoundPathRef.current.bounds
-        : piecesGroupRef.current.children[3].bounds.scale(2.5)
+        : piecesGroupRef.current.children[3].bounds.scale(2)
 
       if (outerBounds.width > outerBounds.height) {
         scaleFactorRef.current = Math.min(
@@ -528,32 +527,9 @@ export const Tangram = () => {
         flex: "1",
         position: "relative",
         color: "galleryText",
+        animation: `${FADE_TRANSITION_DURATION}ms fadeIn ease`,
       }}
     >
-      {!selectedTangram && (
-        <View
-          css={{
-            p: 3,
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            zIndex: -1,
-            animation: `${FADE_TRANSITION_DURATION}ms fadeIn ${
-              FADE_STAGGER_DURATION * 0
-            }ms ease both`,
-          }}
-        >
-          <View
-            as={Logo}
-            css={{
-              alignSelf: "center",
-              width: "100%",
-              maxWidth: "400px",
-            }}
-          />
-        </View>
-      )}
       {selectedTangram && showBackgroundPattern === false && (
         <View
           css={{
@@ -573,9 +549,6 @@ export const Tangram = () => {
         css={{
           minHeight: "auto",
           flex: 1,
-          animation: `${FADE_TRANSITION_DURATION}ms fadeIn ${
-            FADE_STAGGER_DURATION * 1
-          }ms ease both`,
         }}
       />
 

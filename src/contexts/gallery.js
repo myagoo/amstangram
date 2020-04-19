@@ -22,6 +22,7 @@ import { ChallengeDialog } from "../components/challengeDialog"
 import { copyToClipboard } from "../utils/copyToClipboard"
 import { useTranslate } from "./language"
 import { NotifyContext } from "./notify"
+import { shuffle } from "../utils/shuffle"
 
 export const GalleryContext = createContext(null)
 
@@ -108,7 +109,9 @@ export const GalleryProvider = ({ children }) => {
   }, [tangrams, currentUser])
 
   useEffect(() => {
-    if (tangrams && !initialized) {
+    if (tangrams && currentUser !== undefined && !initialized) {
+      let hasBeenChallenged = false
+
       if (!playlist && window.location.search) {
         const searchParams = new URLSearchParams(window.location.search)
 
@@ -119,6 +122,7 @@ export const GalleryProvider = ({ children }) => {
             tangramIds.includes(tangram.id)
           )
           if (challengeTangrams.length) {
+            hasBeenChallenged = true
             window.history.replaceState(
               {},
               document.title,
@@ -136,9 +140,20 @@ export const GalleryProvider = ({ children }) => {
           }
         }
       }
+
+      if (!hasBeenChallenged) {
+        setPlaylist(
+          shuffle(tangrams).sort(({ id: idA }, { id: idB }) => {
+            const isTangramACompleted = completedTangrams[idA] !== undefined
+            const isTangramBCompleted = completedTangrams[idB] !== undefined
+            return isTangramACompleted - isTangramBCompleted
+          })
+        )
+      }
+
       setInitialized(true)
     }
-  }, [tangrams, initialized, playlist])
+  }, [tangrams, currentUser, initialized, playlist, completedTangrams])
 
   const shareTangrams = useCallback(
     (tangrams) => {

@@ -1,15 +1,15 @@
 import { useGlobalCss } from "css-system"
 import React, { useEffect } from "react"
-import { Tangram } from "../components/tangram"
+import { App } from "../components/app"
 import { COLOR_TRANSITION_DURATION } from "../constants"
 import { GalleryProvider } from "../contexts/gallery"
 import { LanguageProvider } from "../contexts/language"
 import { NotifyProvider } from "../contexts/notify"
 import { SettingsProvider } from "../contexts/settings"
 import { ShowBackgroundPatternProvider } from "../contexts/showBackgroundPattern"
-import { UserProvider } from "../contexts/user"
 import { SoundProvider } from "../contexts/sound"
 import { TangramsProvider } from "../contexts/tangrams"
+import { UserProvider } from "../contexts/user"
 
 export default () => {
   useEffect(() => {
@@ -60,7 +60,7 @@ export default () => {
               <ShowBackgroundPatternProvider>
                 <GalleryProvider>
                   <SettingsProvider>
-                    <Tangram />
+                    <App></App>
                   </SettingsProvider>
                 </GalleryProvider>
               </ShowBackgroundPatternProvider>
