@@ -20,7 +20,7 @@ const FadedView = extendLoosePrimitive(View, (css, theme) => ({
   position: "sticky",
   top: 0,
   zIndex: 1,
-  background: `linear-gradient(0deg, rgba(0,0,0,0) 0%, ${theme.colors.galleryBackground} 50%)`,
+  background: `linear-gradient(0deg, rgba(0,0,0,0) 0%, ${theme.colors.dialogBackground} 50%)`,
 }))
 
 export const GalleryDialog = () => {

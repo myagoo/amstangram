@@ -27,8 +27,8 @@ export const Dialog = ({ children, title, onClose, css, ...props }) => {
       <View
         css={{
           flex: "0 1 auto",
-          bg: "galleryBackground",
-          color: "galleryText",
+          bg: "dialogBackground",
+          color: "dialogText",
           borderRadius: 3,
           transition: `background-color ${COLOR_TRANSITION_DURATION}ms, color ${COLOR_TRANSITION_DURATION}ms`,
           fontSize: 3,

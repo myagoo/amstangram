@@ -82,7 +82,7 @@ export const Toggle = ({
             position: "absolute",
             size: `${SIZE}px`,
             borderRadius: "99999px",
-            bg: "galleryText",
+            bg: "dialogText",
             boxShadow: `0 0 0 2px ${theme.colors.inputBackground}`,
             transition: "left 250ms ease-in-out",
           }}

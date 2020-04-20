@@ -9,7 +9,7 @@ const Notification = extendLoosePrimitive(View, {
   p: 2,
   borderRadius: 1,
   bg: "notificationBackground",
-  color: "galleryText",
+  color: "dialogText",
   animation: `${FADE_TRANSITION_DURATION / 2}ms fadeIn both`,
   boxShadow: "0px 0px 10px #00000080",
 })

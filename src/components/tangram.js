@@ -444,12 +444,12 @@ export const Tangram = () => {
     }
 
     if (showBackgroundPattern) {
-      coumpoundPathRef.current.fillColor = "black"
+      coumpoundPathRef.current.fillColor = theme.colors.shape
       coumpoundPathRef.current.position = paper.view.center
     } else {
       coumpoundPathRef.current.fillColor = "transparent"
     }
-  }, [selectedTangram, showBackgroundPattern])
+  }, [selectedTangram, showBackgroundPattern, theme])
 
   useLayoutEffect(() => {
     const particleGroup = new paper.Group()
@@ -534,7 +534,7 @@ export const Tangram = () => {
       css={{
         flex: "1",
         position: "relative",
-        color: "galleryText",
+        color: "dialogText",
         animation: `${FADE_TRANSITION_DURATION}ms fadeIn ease`,
       }}
     >

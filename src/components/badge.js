@@ -8,7 +8,7 @@ export const Badge = ({ uid, size = 40, css, ...props }) => {
       src={`https://api.adorable.io/avatars/${size}/${uid}.png`}
       css={{
         border: "2px solid",
-        borderColor: "galleryText",
+        borderColor: "dialogText",
         borderRadius: "50%",
         size,
         ...css,
