@@ -14,7 +14,6 @@ import { View } from "../components/view"
 import {
   CLICK_TIMEOUT,
   DEV,
-  FADE_STAGGER_DURATION,
   FADE_TRANSITION_DURATION,
   SNAP_DISTANCE,
   SOFT_ERROR_MARGIN,
@@ -26,6 +25,7 @@ import { useTranslate } from "../contexts/language"
 import { NotifyContext } from "../contexts/notify"
 import { useShowBackgroundPattern } from "../contexts/showBackgroundPattern"
 import { SoundContext } from "../contexts/sound"
+import { TangramsContext } from "../contexts/tangrams"
 import { UserContext } from "../contexts/user"
 import { createPiecesGroup } from "../utils/createPiecesGroup"
 import { getPathData } from "../utils/getPathData"
@@ -48,7 +48,7 @@ export const Tangram = () => {
   const { getCurrentUserRef, currentUser } = useContext(UserContext)
   const theme = useContext(ThemeContext)
   const notify = useContext(NotifyContext)
-
+  const tangrams = useContext(TangramsContext)
   const [showBackgroundPattern] = useShowBackgroundPattern()
   const {
     getTangramRef,
@@ -112,6 +112,20 @@ export const Tangram = () => {
 
       if (pathData.edges === 23) {
         notify(t("You can't save such an easy tangram"))
+        return
+      }
+
+      if (
+        tangrams.find((tangram) => {
+          return (
+            tangram.edges === pathData.edges &&
+            tangram.length === pathData.length &&
+            tangram.width === pathData.width &&
+            tangram.height === pathData.height
+          )
+        })
+      ) {
+        notify(t("This tangram already exists"))
         return
       }
 

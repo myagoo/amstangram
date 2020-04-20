@@ -85,31 +85,31 @@ const importFirestore = async () => {
     for (const documentId in data[collectionKey]) {
       const documentData = data[collectionKey][documentId].data
 
-      if (collectionKey === "tangrams") {
-        if (documentData.category === "letters") {
-          console.log(documentData.order)
-          documentData.emoji = LETTERS[documentData.order - 1] || "🄰"
-          delete documentData.order
-          if (!documentData.uid) {
-            documentData.uid = "gKVKolTkV1TEJKAv0HwA5qyycSg1"
-            documentData.approved = true
-          }
-        } else if (documentData.category === "digits") {
-          console.log(documentData.order)
-          documentData.emoji = DIGITS[Math.abs(documentData.order) - 1] || "0️⃣"
-          delete documentData.order
-          if (!documentData.uid) {
-            documentData.uid = "gKVKolTkV1TEJKAv0HwA5qyycSg1"
-            documentData.approved = true
-          }
-        } else {
-          delete documentData.order
-          if (!documentData.uid) {
-            documentData.uid = "5ZiQ173OfaUkHLvcxMPS7FQAzmu2"
-            documentData.approved = true
-          }
-        }
-      }
+      // if (collectionKey === "tangrams") {
+      //   if (documentData.category === "letters") {
+      //     console.log(documentData.order)
+      //     documentData.emoji = LETTERS[documentData.order - 1] || "🄰"
+      //     delete documentData.order
+      //     if (!documentData.uid) {
+      //       documentData.uid = "gKVKolTkV1TEJKAv0HwA5qyycSg1"
+      //       documentData.approved = true
+      //     }
+      //   } else if (documentData.category === "digits") {
+      //     console.log(documentData.order)
+      //     documentData.emoji = DIGITS[Math.abs(documentData.order) - 1] || "0️⃣"
+      //     delete documentData.order
+      //     if (!documentData.uid) {
+      //       documentData.uid = "gKVKolTkV1TEJKAv0HwA5qyycSg1"
+      //       documentData.approved = true
+      //     }
+      //   } else {
+      //     delete documentData.order
+      //     if (!documentData.uid) {
+      //       documentData.uid = "5ZiQ173OfaUkHLvcxMPS7FQAzmu2"
+      //       documentData.approved = true
+      //     }
+      //   }
+      // }
 
       try {
         await firebase

@@ -44,7 +44,7 @@ const exportFirestore = async () => {
   }
 
   writeFileSync(
-    `./export-${firebaseConfig.projectId}-${new Date()}.json`,
+    `./export-${firebaseConfig.projectId}-${new Date().toISOString()}.json`,
     JSON.stringify(
       {
         users,

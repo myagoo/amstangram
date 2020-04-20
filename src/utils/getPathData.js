@@ -1,5 +1,4 @@
 import paper from "paper/dist/paper-core"
-import { MAX_LENGTH, MIN_LENGTH } from "../constants"
 
 export const getPathData = (piecesGroup, scaleFactor) => {
   let compoundPath
@@ -25,17 +24,13 @@ export const getPathData = (piecesGroup, scaleFactor) => {
 
   const path = compoundPath.exportSVG().getAttribute("d")
   const edges = compoundPath.curves.length
-  const width = compoundPath.bounds.width
-  const height = compoundPath.bounds.height
-  const length = Math.ceil(compoundPath.length)
-  const percent = Math.floor(
-    ((length - MIN_LENGTH) / (MAX_LENGTH - MIN_LENGTH)) * 100
-  )
+  const width = Math.round(compoundPath.bounds.width * 100) / 100
+  const height = Math.round(compoundPath.bounds.height * 100) / 100
+  const length = Math.round(compoundPath.length)
 
   return {
     width,
     height,
-    percent,
     length,
     path,
     edges,

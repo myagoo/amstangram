@@ -2,7 +2,7 @@ import { DIGITS, LETTERS } from "../constants"
 
 export const sortTangrams = (tangramA, tangramB) => {
   return tangramB.edges === tangramA.edges
-    ? tangramB.percent - tangramA.percent
+    ? tangramB.length - tangramA.length
     : tangramB.edges - tangramA.edges
 }
 
