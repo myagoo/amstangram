@@ -53,7 +53,7 @@ const ChangeEmailForm = ({ currentUser, onClose }) => {
     <View
       as="form"
       onSubmit={handleSubmit(onSubmit)}
-      css={{ flex: "1", gap: 3 }}
+      css={{ flex: "1", gap: 4 }}
     >
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
         <View css={{ gap: 2 }}>
@@ -76,16 +76,18 @@ const ChangeEmailForm = ({ currentUser, onClose }) => {
         </View>
       </View>
 
-      <PrimaryButton disabled={formState.isSubmitting} type="submit">
-        {t("Change email address")}
-      </PrimaryButton>
+      <View css={{ gap: 3 }}>
+        <PrimaryButton disabled={formState.isSubmitting} type="submit">
+          {t("Change email address")}
+        </PrimaryButton>
 
-      <View
-        css={{
-          alignItems: "center",
-        }}
-      >
-        <Similink onClick={onClose}>{t("Back")}</Similink>
+        <View
+          css={{
+            alignItems: "center",
+          }}
+        >
+          <Similink onClick={onClose}>{t("Back")}</Similink>
+        </View>
       </View>
     </View>
   )
@@ -115,7 +117,7 @@ const ChangeUsernameForm = ({ currentUser, onClose }) => {
     <View
       as="form"
       onSubmit={handleSubmit(onSubmit)}
-      css={{ flex: "1", gap: 3 }}
+      css={{ flex: "1", gap: 4 }}
     >
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
         <View css={{ gap: 2 }}>
@@ -129,16 +131,17 @@ const ChangeUsernameForm = ({ currentUser, onClose }) => {
         </View>
       </View>
 
-      <PrimaryButton disabled={formState.isSubmitting} type="submit">
-        {t("Change username")}
-      </PrimaryButton>
-
-      <View
-        css={{
-          alignItems: "center",
-        }}
-      >
-        <Similink onClick={onClose}>{t("Back")}</Similink>
+      <View css={{ gap: 3 }}>
+        <PrimaryButton disabled={formState.isSubmitting} type="submit">
+          {t("Change username")}
+        </PrimaryButton>
+        <View
+          css={{
+            alignItems: "center",
+          }}
+        >
+          <Similink onClick={onClose}>{t("Back")}</Similink>
+        </View>
       </View>
     </View>
   )
@@ -188,7 +191,7 @@ const ChangePasswordForm = ({ currentUser, onClose }) => {
     <View
       as="form"
       onSubmit={handleSubmit(onSubmit)}
-      css={{ flex: "1", gap: 3 }}
+      css={{ flex: "1", gap: 4 }}
     >
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
         <View css={{ gap: 2 }}>
@@ -227,16 +230,17 @@ const ChangePasswordForm = ({ currentUser, onClose }) => {
         </View>
       </View>
 
-      <PrimaryButton disabled={formState.isSubmitting} type="submit">
-        {t("Change password")}
-      </PrimaryButton>
-
-      <View
-        css={{
-          alignItems: "center",
-        }}
-      >
-        <Similink onClick={onClose}>{t("Back")}</Similink>
+      <View css={{ gap: 3 }}>
+        <PrimaryButton disabled={formState.isSubmitting} type="submit">
+          {t("Change password")}
+        </PrimaryButton>
+        <View
+          css={{
+            alignItems: "center",
+          }}
+        >
+          <Similink onClick={onClose}>{t("Back")}</Similink>
+        </View>
       </View>
     </View>
   )
@@ -265,67 +269,66 @@ export const ProfileDialog = ({ uid, deferred }) => {
     <Dialog
       onClose={deferred.reject}
       css={{
-        gap: 4,
         flex: "1",
         minWidth: "268px",
         overflow: "auto",
         pt: 4,
         mt: -4,
+        gap: 3,
       }}
     >
-      <View css={{ gap: 3, alignItems: "center" }}>
-        <Badge uid={uid} size={86} css={{}}></Badge>
-        <Title>{username}</Title>
-        <View css={{ gap: 2, alignItems: "center" }}>
-          {currentUser && (
-            <Text css={{ fontSize: 2 }}>{currentUser.firebaseUser.email}</Text>
-          )}
-          <Text css={{ fontSize: 2 }}>
-            {t("Joined {signupDate}", {
-              signupDate: new Intl.DateTimeFormat(language).format(signupDate),
-            })}
-          </Text>
-        </View>
+      {changeEmailRequested ? (
+        <ChangeEmailForm
+          currentUser={currentUser}
+          onClose={() => setChangeEmailRequested(false)}
+        ></ChangeEmailForm>
+      ) : changeUsernameRequested ? (
+        <ChangeUsernameForm
+          currentUser={currentUser}
+          onClose={() => setChangeUsernameRequested(false)}
+        ></ChangeUsernameForm>
+      ) : changePasswordRequested ? (
+        <ChangePasswordForm
+          currentUser={currentUser}
+          onClose={() => setChangePasswordRequested(false)}
+        />
+      ) : (
+        <View css={{ gap: 4 }}>
+          <View css={{ gap: 3, alignItems: "center" }}>
+            <Badge uid={uid} size={86} css={{}}></Badge>
+            <Title>{username}</Title>
+            <View css={{ gap: 2, alignItems: "center" }}>
+              {currentUser && (
+                <Text css={{ fontSize: 2 }}>
+                  {currentUser.firebaseUser.email}
+                </Text>
+              )}
+              <Text css={{ fontSize: 2 }}>
+                {t("Joined {signupDate}", {
+                  signupDate: new Intl.DateTimeFormat(language).format(
+                    signupDate
+                  ),
+                })}
+              </Text>
+            </View>
+            <View css={{ flexDirection: "row", alignItems: "flex-end" }}>
+              <Text css={{ fontSize: 5 }}>{"👏"}</Text>
+              <Text css={{ fontSize: 3 }}>x{claps}</Text>
+            </View>
+          </View>
+          <View css={{ gap: 3, alignItems: "center" }}>
+            <Similink onClick={() => setChangeEmailRequested(true)}>
+              {t("Change email address")}
+            </Similink>
+            <Similink onClick={() => setChangeUsernameRequested(true)}>
+              {t("Change username")}
+            </Similink>
+            <Similink onClick={() => setChangePasswordRequested(true)}>
+              {t("Change password")}
+            </Similink>
+          </View>
 
-        <View css={{ flexDirection: "row", alignItems: "flex-end" }}>
-          <Text css={{ fontSize: 5 }}>{"👏"}</Text>
-          <Text css={{ fontSize: 3 }}>x{claps}</Text>
-        </View>
-      </View>
-      {currentUser && currentUser.uid === uid && (
-        <View css={{ gap: 3 }}>
-          {changeEmailRequested ? (
-            <ChangeEmailForm
-              currentUser={currentUser}
-              onClose={() => setChangeEmailRequested(false)}
-            ></ChangeEmailForm>
-          ) : changeUsernameRequested ? (
-            <ChangeUsernameForm
-              currentUser={currentUser}
-              onClose={() => setChangeUsernameRequested(false)}
-            ></ChangeUsernameForm>
-          ) : changePasswordRequested ? (
-            <ChangePasswordForm
-              currentUser={currentUser}
-              onClose={() => setChangePasswordRequested(false)}
-            />
-          ) : (
-            <>
-              <View css={{ gap: 3, alignItems: "center" }}>
-                <Similink onClick={() => setChangeEmailRequested(true)}>
-                  {t("Change email address")}
-                </Similink>
-                <Similink onClick={() => setChangeUsernameRequested(true)}>
-                  {t("Change username")}
-                </Similink>
-                <Similink onClick={() => setChangePasswordRequested(true)}>
-                  {t("Change password")}
-                </Similink>
-              </View>
-
-              <DangerButton onClick={logout}>{t("Log out")}</DangerButton>
-            </>
-          )}
+          <DangerButton onClick={logout}>{t("Log out")}</DangerButton>
         </View>
       )}
     </Dialog>
