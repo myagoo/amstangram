@@ -5,13 +5,19 @@ import { FADE_STAGGER_DURATION, FADE_TRANSITION_DURATION } from "../constants"
 import { GalleryContext } from "../contexts/gallery"
 import { Loader } from "./loader"
 import { Tangram } from "./tangram"
+import { UserContext } from "../contexts/user"
+import { useTranslate } from "../contexts/language"
+import { NotifyContext } from "../contexts/notify"
 
 export const App = () => {
+  const t = useTranslate()
+  const notify = useContext(NotifyContext)
   const [waited, setWaited] = useState(false)
   const [showLoader, setShowLoader] = useState(false)
   const [showLoaderTimeout, setShowLoaderTimeout] = useState(false)
   const [initialized, setInitialized] = useState(false)
   const { playlist } = useContext(GalleryContext)
+  const { currentUser } = useContext(UserContext)
 
   useEffect(() => {
     setTimeout(() => setWaited(true), FADE_TRANSITION_DURATION * 2)
@@ -31,6 +37,13 @@ export const App = () => {
     return <Tangram></Tangram>
   }
 
+  const handleAnimationEnd = () => {
+    setInitialized(true)
+    if (currentUser) {
+      notify(t("Logged in as {username}", { username: currentUser.username }))
+    }
+  }
+
   return (
     <View
       css={{
@@ -45,13 +58,13 @@ export const App = () => {
       deps={[playlist, waited]}
       onAnimationEnd={(event) => {
         if (event.currentTarget === event.target) {
-          setInitialized(true)
+          handleAnimationEnd()
         }
       }}
     >
       <View
         css={{
-          p: 4,
+          px: 4,
           width: "100%",
           maxWidth: "600px",
           animation: `${FADE_TRANSITION_DURATION}ms fadeIn  ease ${FADE_STAGGER_DURATION}ms both`,

@@ -31,7 +31,7 @@ export const Loader = ({ css, ...props }) => {
         position: "relative",
         alignItems: "center",
         justifyContent: "center",
-        size: `${theme.sizes.button * 1.25}px`,
+        size: `${Math.round(theme.sizes.button * 1.4)}px`,
         ...css,
         "& > div": {
           position: "absolute",

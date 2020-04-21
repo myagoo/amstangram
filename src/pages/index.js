@@ -10,6 +10,7 @@ import { ShowBackgroundPatternProvider } from "../contexts/showBackgroundPattern
 import { SoundProvider } from "../contexts/sound"
 import { TangramsProvider } from "../contexts/tangrams"
 import { UserProvider } from "../contexts/user"
+import { DialogProvider } from "../contexts/dialog"
 
 export default () => {
   useEffect(() => {
@@ -60,7 +61,9 @@ export default () => {
               <ShowBackgroundPatternProvider>
                 <GalleryProvider>
                   <SettingsProvider>
-                    <App></App>
+                    <DialogProvider>
+                      <App></App>
+                    </DialogProvider>
                   </SettingsProvider>
                 </GalleryProvider>
               </ShowBackgroundPatternProvider>

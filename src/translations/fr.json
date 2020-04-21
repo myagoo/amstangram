@@ -65,6 +65,7 @@
 
   "Joined {signupDate}": "Inscrit le {signupDate}",
   "Log out": "Se déconnecter",
+  "Are you sure you want to log out?": "Êtes vous sûr.e de vouloir vous déconnecter ?",
 
   "Change email address": "Modifier l'adresse email",
   "Change username": "Modifier le nom d'utilisateur",
@@ -85,5 +86,13 @@
   "Challenge link copied to clipboard": "Lien de défi copié dans le presse papier",
   "{username} challenged you": "{username} vous met au défi",
   "Rise to the challenge": "Relevez le défi",
-  "Let's go !": "C'est parti !"
+  "Let's go !": "C'est parti !",
+
+  "Leaderboard": "Classement",
+  "Completed {completed}/{total} tangrams": "{completed}/{total} tangrams complétés",
+  "Created {created} tangrams": "{created} tangrams créés",
+  "Earned {claps} 👏": "{claps} 👏 gagnés",
+  "Claps": "Claps",
+  "Completed tangrams": "Tangrams complétés",
+  "Created tangrams": "Tangrams créés"
 }

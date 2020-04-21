@@ -1,7 +1,7 @@
 import firebase from "gatsby-plugin-firebase"
 import React, { useContext, useMemo } from "react"
 import { useForm } from "react-hook-form"
-import { CATEGORIES, DIGITS, LETTERS } from "../constants"
+import { CATEGORIES, DIGITS, LETTERS, DIALOG_CLOSED_REASON } from "../constants"
 import { useTranslate } from "../contexts/language"
 import { NotifyContext } from "../contexts/notify"
 import { UserContext } from "../contexts/user"
@@ -15,21 +15,20 @@ import { Text } from "./text"
 import { View } from "./view"
 
 const ReadTangramDialog = ({ tangram, deferred }) => {
-  return (
-    <Dialog onClose={deferred.reject} css={{ gap: 3, minWidth: "268px" }}>
-      <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
-        <Card selected tangram={tangram} css={{ alignSelf: "center" }}></Card>
+  const t = useTranslate()
 
-        <View
-          css={{
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "flex-end",
-          }}
-        >
-          <Text css={{ fontSize: 5 }}>{"👏"}</Text>
-          <Text css={{ fontSize: 3 }}>x{tangram.claps || 0}</Text>
-        </View>
+  return (
+    <Dialog
+      onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
+      css={{ gap: 3, minWidth: "268px" }}
+    >
+      <View css={{ gap: 3, overflow: "auto", flex: "1", alignItems: "center" }}>
+        <Card selected tangram={tangram}></Card>
+        <Text>
+          {t("Earned {claps} 👏", {
+            claps: tangram.claps || 0,
+          })}
+        </Text>
       </View>
     </Dialog>
   )
@@ -119,7 +118,7 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
           {isCreation ? t("Submit your tangram") : t("Edit your tangram")}
         </Title>
       }
-      onClose={deferred.reject}
+      onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
       as="form"
       onSubmit={handleSubmit(onSubmit)}
       css={{ gap: 3, minWidth: "268px" }}
@@ -132,16 +131,11 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
         ></Card>
 
         {tangram.approved && (
-          <View
-            css={{
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "flex-end",
-            }}
-          >
-            <Text css={{ fontSize: 5 }}>{"👏"}</Text>
-            <Text css={{ fontSize: 3 }}>x{tangram.claps || 0}</Text>
-          </View>
+          <Text css={{ alignSelf: "center" }}>
+            {t("Earned {claps} 👏", {
+              claps: tangram.claps || 0,
+            })}
+          </Text>
         )}
 
         <View css={{ gap: 2 }}>

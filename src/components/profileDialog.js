@@ -1,5 +1,7 @@
+import firebase from "gatsby-plugin-firebase"
 import React, { useCallback, useContext, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
+import { GalleryContext } from "../contexts/gallery"
 import { LanguageContext, useTranslate } from "../contexts/language"
 import { NotifyContext } from "../contexts/notify"
 import { TangramsContext } from "../contexts/tangrams"
@@ -11,6 +13,7 @@ import { Input } from "./input"
 import { Error, Similink, Title } from "./primitives"
 import { Text } from "./text"
 import { View } from "./view"
+import { DIALOG_CLOSED_REASON } from "../constants"
 
 const ChangeEmailForm = ({ currentUser, onClose }) => {
   const { updateEmail } = useContext(UserContext)
@@ -247,27 +250,46 @@ const ChangePasswordForm = ({ currentUser, onClose }) => {
 }
 export const ProfileDialog = ({ uid, deferred }) => {
   const t = useTranslate()
+  const notify = useContext(NotifyContext)
+
   const { language } = useContext(LanguageContext)
-  const { currentUser, usersMetadata, logout } = useContext(UserContext)
+  const { completedTangrams } = useContext(GalleryContext)
+  const { currentUser, usersMetadata } = useContext(UserContext)
   const { username, signupDate } = usersMetadata[uid]
   const [changeEmailRequested, setChangeEmailRequested] = useState(false)
   const [changeUsernameRequested, setChangeUsernameRequested] = useState(false)
   const [changePasswordRequested, setChangePasswordRequested] = useState(false)
   const tangrams = useContext(TangramsContext)
 
-  const claps = useMemo(() => {
+  const { claps, completed, created } = useMemo(() => {
     let claps = 0
+    let completed = 0
+    let created = 0
     for (const tangram of tangrams) {
-      if (tangram.uid === uid && tangram.claps) {
-        claps += tangram.claps
+      if (tangram.uid === uid) {
+        claps += tangram.claps || 0
+        if (tangram.approved) {
+          created++
+        }
+      }
+      if (completedTangrams[tangram.id]) {
+        completed++
       }
     }
-    return claps
-  }, [tangrams, uid])
+    return { claps, completed, created }
+  }, [completedTangrams, tangrams, uid])
+
+  const handleLogout = async () => {
+    if (window.confirm(t("Are you sure you want to log out?"))) {
+      await firebase.auth().signOut()
+      deferred.reject(DIALOG_CLOSED_REASON)
+      notify(t("Logged out"))
+    }
+  }
 
   return (
     <Dialog
-      onClose={deferred.reject}
+      onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
       css={{
         flex: "1",
         minWidth: "268px",
@@ -297,8 +319,8 @@ export const ProfileDialog = ({ uid, deferred }) => {
           <View css={{ gap: 3, alignItems: "center" }}>
             <Badge uid={uid} size={86} css={{}}></Badge>
             <Title>{username}</Title>
-            <View css={{ gap: 2, alignItems: "center" }}>
-              {currentUser && (
+            <View css={{ gap: 2, fontSize: 2, alignItems: "center" }}>
+              {currentUser && uid === currentUser.uid && (
                 <Text css={{ fontSize: 2 }}>
                   {currentUser.firebaseUser.email}
                 </Text>
@@ -310,10 +332,22 @@ export const ProfileDialog = ({ uid, deferred }) => {
                   ),
                 })}
               </Text>
-            </View>
-            <View css={{ flexDirection: "row", alignItems: "flex-end" }}>
-              <Text css={{ fontSize: 5 }}>{"👏"}</Text>
-              <Text css={{ fontSize: 3 }}>x{claps}</Text>
+              <Text>
+                {t("Completed {completed}/{total} tangrams", {
+                  completed,
+                  total: tangrams.length,
+                })}
+              </Text>
+              <Text>
+                {t("Created {created} tangrams", {
+                  created,
+                })}
+              </Text>
+              <Text>
+                {t("Earned {claps} 👏", {
+                  claps,
+                })}
+              </Text>
             </View>
           </View>
           <View css={{ gap: 3, alignItems: "center" }}>
@@ -328,7 +362,7 @@ export const ProfileDialog = ({ uid, deferred }) => {
             </Similink>
           </View>
 
-          <DangerButton onClick={logout}>{t("Log out")}</DangerButton>
+          <DangerButton onClick={handleLogout}>{t("Log out")}</DangerButton>
         </View>
       )}
     </Dialog>

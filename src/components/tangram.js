@@ -38,20 +38,23 @@ import { updateColisionState } from "../utils/updateColisionState"
 import { Card } from "./card"
 import { TangramMenu } from "./tangramMenu"
 import { Victory } from "./victory"
+import { DialogContext } from "../contexts/dialog"
 
 export const Tangram = () => {
+  const { showLogin, showTangram } = useContext(DialogContext)
   const { playTangram } = useContext(SoundContext)
   const playTangramRef = useRef()
   playTangramRef.current = playTangram
 
   const t = useTranslate()
-  const { getCurrentUserRef, currentUser } = useContext(UserContext)
+  const { currentUser } = useContext(UserContext)
+  const currentUserRef = useRef()
+  currentUserRef.current = currentUser
   const theme = useContext(ThemeContext)
   const notify = useContext(NotifyContext)
   const tangrams = useContext(TangramsContext)
   const [showBackgroundPattern] = useShowBackgroundPattern()
   const {
-    getTangramRef,
     markTangramAsComplete,
     saveRequestId,
     playlist,
@@ -130,13 +133,15 @@ export const Tangram = () => {
       }
 
       const asyncTask = async () => {
-        await getCurrentUserRef.current()
-        await getTangramRef.current(pathData)
+        if (!currentUser) {
+          await showLogin()
+        }
+        await showTangram(pathData)
       }
 
       asyncTask()
     }
-  }, [notify, saveRequestId, getTangramRef, getCurrentUserRef, t])
+  }, [saveRequestId])
 
   // Handle window resize
   useEffect(() => {

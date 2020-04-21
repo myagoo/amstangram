@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react"
 import {
+  FiAward,
   FiGrid,
-  FiLogIn,
   FiMenu,
   FiSave,
   FiSettings,
@@ -9,6 +9,7 @@ import {
   FiX,
 } from "react-icons/fi"
 import { FADE_STAGGER_DURATION, FADE_TRANSITION_DURATION } from "../constants"
+import { DialogContext } from "../contexts/dialog"
 import { GalleryContext } from "../contexts/gallery"
 import { SettingsContext } from "../contexts/settings"
 import { UserContext } from "../contexts/user"
@@ -20,63 +21,55 @@ const STEP_ANGLE = 45
 
 export const TangramMenu = () => {
   const { showSettingsDialog } = useContext(SettingsContext)
-  const { currentUser, login, showProfile } = useContext(UserContext)
+  const { showProfile, showLeaderboard, showGallery, showLogin } = useContext(
+    DialogContext
+  )
+  const { currentUser } = useContext(UserContext)
 
   const [opened, setOpened] = useState(false)
 
   const { requestSave } = useContext(GalleryContext)
 
-  const { setGalleryOpened } = useContext(GalleryContext)
+  const buttons = [
+    <Button
+      onClick={() => {
+        showGallery()
+      }}
+    >
+      <View as={FiGrid} css={{ m: "0 auto" }}></View>
+    </Button>,
 
-  const handleClick = (event, onClick) => {
-    onClick(event)
-    setOpened(false)
-  }
-
-  const actions = [
-    {
-      id: "gallery",
-      icon: FiGrid,
-      onClick: () =>
-        setGalleryOpened((prevGalleryOpened) => !prevGalleryOpened),
-    },
-    {
-      id: "save",
-      icon: FiSave,
-      onClick: requestSave,
-    },
-    {
-      id: "settings",
-      icon: FiSettings,
-      onClick: () => showSettingsDialog(),
-    },
-    {
-      id: "user",
-      icon: currentUser ? FiUser : FiLogIn,
-      onClick: async () => {
-        if (currentUser) {
-          showProfile(currentUser.uid)
-        } else {
-          login()
-        }
-      },
-    },
+    <Button onClick={() => requestSave()}>
+      <View as={FiSave} css={{ m: "0 auto" }}></View>
+    </Button>,
+    <Button onClick={() => showLeaderboard()}>
+      <View as={FiAward} css={{ m: "0 auto" }}></View>
+    </Button>,
+    <Button
+      onClick={() => {
+        currentUser ? showProfile(currentUser.uid) : showLogin()
+      }}
+    >
+      <View as={FiUser} css={{ m: "0 auto" }}></View>
+    </Button>,
+    <Button onClick={() => showSettingsDialog()}>
+      <View as={FiSettings} css={{ m: "0 auto" }}></View>
+    </Button>,
   ]
 
   return (
-    <View
-      css={{
-        position: "fixed",
-        bottom: 3,
-        left: "50%",
-        transform: "translateX(-50%)",
-        animation: `${FADE_TRANSITION_DURATION}ms fadeIn ${FADE_STAGGER_DURATION}ms ease both`,
-      }}
-    >
-      <View css={{ position: "relative" }}>
-        {actions
-          .filter(({ visible }) => visible !== false)
-          .map(({ id, icon, onClick, disabled }, index, { length }) => {
+    <>
+      <View
+        css={{
+          position: "fixed",
+          bottom: 3,
+          left: "50%",
+          transform: "translateX(-50%)",
+          animation: `${FADE_TRANSITION_DURATION}ms fadeIn ${FADE_STAGGER_DURATION}ms ease both`,
+        }}
+      >
+        <View css={{ position: "relative" }}>
+          {buttons.map((Component, index, { length }) => {
             const startAngle = length % 2 !== 0 ? 180 : 180 - STEP_ANGLE / 2
 
             const realIndex = Math.ceil(index / 2)
@@ -102,29 +95,26 @@ export const TangramMenu = () => {
 
             return (
               <View
-                key={id}
+                key={index}
                 css={{
                   transition: `all 100ms ease-in-out ${index * 50}ms`,
                   position: "absolute",
                 }}
                 style={style}
+                onClick={() => setOpened(false)}
               >
-                <Button
-                  onClick={(e) => handleClick(e, onClick)}
-                  disabled={disabled}
-                >
-                  <View as={icon} css={{ m: "auto" }}></View>
-                </Button>
+                {Component}
               </View>
             )
           })}
 
-        <View css={{ zIndex: 1 }}>
-          <Button onClick={() => setOpened(!opened)}>
-            <View as={opened ? FiX : FiMenu} css={{ m: "auto" }}></View>
-          </Button>
+          <View css={{ zIndex: 1 }}>
+            <Button onClick={() => setOpened(!opened)}>
+              <View as={opened ? FiX : FiMenu} css={{ m: "auto" }}></View>
+            </Button>
+          </View>
         </View>
       </View>
-    </View>
+    </>
   )
 }

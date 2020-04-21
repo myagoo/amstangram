@@ -7,11 +7,14 @@ import { Card } from "./card"
 import { Dialog } from "./dialog"
 import { Title } from "./primitives"
 import { View } from "./view"
+import { DialogContext } from "../contexts/dialog"
+import { DIALOG_CLOSED_REASON } from "../constants"
 
 export const ChallengeDialog = ({ uid, tangrams, deferred }) => {
   const t = useTranslate()
-  const { usersMetadata, showProfile } = useContext(UserContext)
-  const { setPlaylist, getTangramRef } = useContext(GalleryContext)
+  const { showProfile, showTangram } = useContext(DialogContext)
+  const { usersMetadata } = useContext(UserContext)
+  const { setPlaylist } = useContext(GalleryContext)
   const username = usersMetadata[uid] ? usersMetadata[uid].username : null
 
   return (
@@ -23,7 +26,7 @@ export const ChallengeDialog = ({ uid, tangrams, deferred }) => {
             : t("Rise to the challenge")}
         </Title>
       }
-      onClose={deferred.reject}
+      onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
       css={{ gap: 3, minWidth: "268px", maxWidth: "500px" }}
     >
       <View
@@ -45,7 +48,7 @@ export const ChallengeDialog = ({ uid, tangrams, deferred }) => {
               m: 1,
             }}
             onBadgeClick={showProfile}
-            onLongPress={getTangramRef.current}
+            onLongPress={showTangram}
           ></Card>
         ))}
       </View>

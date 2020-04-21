@@ -1,5 +1,5 @@
 import firebase from "gatsby-plugin-firebase"
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useState, useContext } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslate } from "../contexts/language"
 import { PrimaryButton } from "./button"
@@ -7,6 +7,8 @@ import { Dialog } from "./dialog"
 import { Input } from "./input"
 import { Error, Similink, Title } from "./primitives"
 import { View } from "./view"
+import { NotifyContext } from "../contexts/notify"
+import { DIALOG_CLOSED_REASON } from "../constants"
 
 const SignupTab = ({ onSignup, switchTab }) => {
   const t = useTranslate()
@@ -28,13 +30,19 @@ const SignupTab = ({ onSignup, switchTab }) => {
           .auth()
           .createUserWithEmailAndPassword(email, password)
 
+        const userMetadata = { username, signupDate: Date.now() }
+
         await firebase
           .firestore()
           .collection("users")
           .doc(user.uid)
-          .set({ username, signupDate: Date.now() })
+          .set(userMetadata)
 
-        onSignup(user)
+        onSignup({
+          uid: user.uid,
+          ...userMetadata,
+          firebaseUser: user,
+        })
       } catch (error) {
         switch (error.code) {
           case "auth/weak-password":
@@ -139,7 +147,19 @@ const SignInTab = ({ onSignin, switchTab }) => {
           .auth()
           .signInWithEmailAndPassword(email, password)
 
-        onSignin(user)
+        const snapshot = await firebase
+          .firestore()
+          .collection("users")
+          .doc(user.uid)
+          .get()
+
+        const userMetadata = snapshot.data()
+
+        onSignin({
+          uid: user.uid,
+          ...userMetadata,
+          firebaseUser: user,
+        })
       } catch (error) {
         switch (error.code) {
           case "auth/invalid-email":
@@ -204,7 +224,14 @@ const SignInTab = ({ onSignin, switchTab }) => {
 
 export const LoginDialog = ({ deferred }) => {
   const t = useTranslate()
+  const notify = useContext(NotifyContext)
+
   const [tab, setTab] = useState("signup")
+
+  const handleLogin = (currentUser) => {
+    deferred.resolve(currentUser)
+    notify(t("Logged in as {username}", { username: currentUser.username }))
+  }
 
   return (
     <Dialog
@@ -215,17 +242,17 @@ export const LoginDialog = ({ deferred }) => {
           <Title>{t("Connect to your account")}</Title>
         )
       }
-      onClose={() => deferred.reject("CLOSED")}
+      onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
       css={{ gap: 3 }}
     >
       {tab === "signup" ? (
         <SignupTab
-          onSignup={deferred.resolve}
+          onSignup={handleLogin}
           switchTab={() => setTab("signin")}
         ></SignupTab>
       ) : (
         <SignInTab
-          onSignin={deferred.resolve}
+          onSignin={handleLogin}
           switchTab={() => setTab("signup")}
         ></SignInTab>
       )}

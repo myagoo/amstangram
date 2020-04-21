@@ -11,6 +11,8 @@ import { SubTitle, Title } from "./primitives"
 import { View } from "./view"
 import { Loader } from "./loader"
 import { extendLoosePrimitive } from "css-system"
+import { DialogContext } from "../contexts/dialog"
+import { DIALOG_CLOSED_REASON } from "../constants"
 
 const FadedView = extendLoosePrimitive(View, (css, theme) => ({
   ...css,
@@ -23,15 +25,14 @@ const FadedView = extendLoosePrimitive(View, (css, theme) => ({
   background: `linear-gradient(0deg, rgba(0,0,0,0) 0%, ${theme.colors.dialogBackground} 50%)`,
 }))
 
-export const GalleryDialog = () => {
+export const GalleryDialog = ({ deferred }) => {
   const t = useTranslate()
-  const { usersMetadata, showProfile } = useContext(UserContext)
+  const { showProfile, showTangram } = useContext(DialogContext)
+  const { usersMetadata } = useContext(UserContext)
   const {
-    setGalleryOpened,
     tangramsByCategory,
     setPlaylist,
     completedTangrams,
-    getTangramRef,
     shareTangrams,
   } = useContext(GalleryContext)
 
@@ -81,10 +82,10 @@ export const GalleryDialog = () => {
       )
     }
 
-    setGalleryOpened(null)
+    deferred.resolve()
   }
 
-  const handleCloseClick = () => setGalleryOpened(false)
+  const handleCloseClick = () => deferred.reject(DIALOG_CLOSED_REASON)
 
   return (
     <>
@@ -135,7 +136,7 @@ export const GalleryDialog = () => {
                         )}
                         onClick={() => handleTangramClick(tangram)}
                         onBadgeClick={showProfile}
-                        onLongPress={getTangramRef.current}
+                        onLongPress={showTangram}
                       />
                     ))}
                   </View>

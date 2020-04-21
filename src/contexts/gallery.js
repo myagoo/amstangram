@@ -5,24 +5,21 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react"
-import { GalleryDialog } from "../components/galleryDialog"
-import { TangramDialog } from "../components/tangramDialog"
-import { Deferred } from "../utils/deferred"
-import {
-  sortTangrams,
-  sortDigitsTangrams,
-  sortLettersTangrams,
-} from "../utils/sortTangrams"
-import { TangramsContext } from "./tangrams"
-import { UserContext } from "./user"
 import { ChallengeDialog } from "../components/challengeDialog"
 import { copyToClipboard } from "../utils/copyToClipboard"
+import { Deferred } from "../utils/deferred"
+import { shuffle } from "../utils/shuffle"
+import {
+  sortDigitsTangrams,
+  sortLettersTangrams,
+  sortTangrams,
+} from "../utils/sortTangrams"
 import { useTranslate } from "./language"
 import { NotifyContext } from "./notify"
-import { shuffle } from "../utils/shuffle"
+import { TangramsContext } from "./tangrams"
+import { UserContext } from "./user"
 
 export const GalleryContext = createContext(null)
 
@@ -33,14 +30,10 @@ export const GalleryProvider = ({ children }) => {
   const tangrams = useContext(TangramsContext)
   const [initialized, setInitialized] = useState(false)
 
-  const [galleryOpened, setGalleryOpened] = useState(false)
-
-  const getTangramRef = useRef()
   const [playlist, setPlaylist] = useState(null)
   const [saveRequestId, setSaveRequestId] = useState(0)
   const [completedTangrams, setCompletedTangrams] = useState({})
   const [tangramsByCategory, setTangramsByCategory] = useState(null)
-  const [tangramDialogData, setTangramDialogData] = useState(null)
   const [challengeDialogData, setChallengeDialogData] = useState(null)
 
   useEffect(() => {
@@ -199,28 +192,18 @@ export const GalleryProvider = ({ children }) => {
     [currentUser]
   )
 
-  getTangramRef.current = useCallback((tangram) => {
-    const deferred = new Deferred()
-    setTangramDialogData({ deferred, tangram })
-    return deferred.promise.finally(() => setTangramDialogData(null))
-  }, [])
-
   const contextValue = useMemo(
     () => ({
-      galleryOpened,
-      setGalleryOpened,
       requestSave,
       saveRequestId,
       playlist,
       setPlaylist,
       tangramsByCategory,
-      getTangramRef,
       markTangramAsComplete,
       completedTangrams,
       shareTangrams,
     }),
     [
-      galleryOpened,
       requestSave,
       saveRequestId,
       playlist,
@@ -234,10 +217,7 @@ export const GalleryProvider = ({ children }) => {
   return (
     <GalleryContext.Provider value={contextValue}>
       {children}
-      {galleryOpened && <GalleryDialog></GalleryDialog>}
-      {tangramDialogData && (
-        <TangramDialog {...tangramDialogData}></TangramDialog>
-      )}
+
       {challengeDialogData && (
         <ChallengeDialog {...challengeDialogData}></ChallengeDialog>
       )}

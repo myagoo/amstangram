@@ -62,6 +62,7 @@
   "stuff": "Stuff",
   "Joined {signupDate}": "Joined {signupDate}",
   "Log out": "Log out",
+  "Are you sure you want to log out?": "Are you sure you want to log out?",
 
   "Change email address": "Change email address",
   "Change username": "Change username",
@@ -82,5 +83,13 @@
   "Challenge link copied to clipboard": "Challenge link copied to clipboard",
   "{username} challenged you": "{username} challenged you",
   "Rise to the challenge": "Rise to the challenge",
-  "Let's go !": "Let's go !"
+  "Let's go !": "Let's go !",
+
+  "Leaderboard": "Leaderboard",
+  "Completed {completed}/{total} tangrams": "Completed {completed}/{total} tangrams",
+  "Created {created} tangrams": "Created {created} tangrams",
+  "Earned {claps} 👏": "Earned {claps} 👏",
+  "Claps": "Claps",
+  "Completed tangrams": "Completed tangrams",
+  "Created tangrams": "Created tangrams"
 }

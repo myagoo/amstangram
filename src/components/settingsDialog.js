@@ -15,6 +15,7 @@ import { Title } from "./primitives"
 import { Text } from "./text"
 import { Toggle } from "./toggle"
 import { View } from "./view"
+import { DIALOG_CLOSED_REASON } from "../constants"
 
 export const SettingsDialog = ({ deferred }) => {
   const { soundEnabled, toggleSound } = useContext(SoundContext)
@@ -48,7 +49,7 @@ export const SettingsDialog = ({ deferred }) => {
   return (
     <Dialog
       title={<Title>{t("Settings")}</Title>}
-      onClose={deferred.reject}
+      onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
       css={{ gap: 4, overflow: "auto", flex: "1", minWidth: "268px" }}
     >
       <View css={{ gap: 2 }}>
@@ -66,9 +67,9 @@ export const SettingsDialog = ({ deferred }) => {
         <Toggle
           value={showBackgroundPattern}
           onChange={toggleShowBackgroundPattern}
-          leftComponent={<Text css={{ fontSize: 3 }}>{t("Easy")}</Text>}
+          leftComponent={<Text>{t("Easy")}</Text>}
           leftValue={true}
-          rightComponent={<Text css={{ fontSize: 3 }}>{t("Hard")}</Text>}
+          rightComponent={<Text>{t("Hard")}</Text>}
           rightValue={false}
         ></Toggle>
       </View>

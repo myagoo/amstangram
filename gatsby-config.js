@@ -23,15 +23,6 @@ const firebaseConfig =
 module.exports = {
   plugins: [
     {
-      resolve: "gatsby-plugin-sentry",
-      options: {
-        dsn:
-          "https://1b2f34262d80460298da419637b59901@o375098.ingest.sentry.io/5194058",
-        environment: process.env.NODE_ENV,
-        enabled: process.env.NODE_ENV === "production",
-      },
-    },
-    {
       resolve: `gatsby-plugin-google-analytics`,
       options: {
         // The property ID; the tracking code won't be generated without it

@@ -1,11 +1,11 @@
 import React from "react"
 import { createPortal } from "react-dom"
-import { View } from "./view"
-import {
-  FADE_TRANSITION_DURATION,
-  COLOR_TRANSITION_DURATION,
-} from "../constants"
 import { FiX } from "react-icons/fi"
+import {
+  COLOR_TRANSITION_DURATION,
+  FADE_TRANSITION_DURATION,
+} from "../constants"
+import { View } from "./view"
 
 export const Dialog = ({ children, title, onClose, css, ...props }) => {
   return createPortal(
