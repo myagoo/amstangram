@@ -1,25 +1,31 @@
 import { Text } from "./text"
-import { extendLoosePrimitive } from "css-system"
+import { extendPrimitive } from "css-system"
 
-export const Error = extendLoosePrimitive(
+export const Error = extendPrimitive(
   Text,
-  {
-    color: "errorText",
-  },
-  { as: "small" }
+  ({ as = "small", css, ...props }) => {
+    return {
+      as,
+      css: {
+        color: "errorText",
+        ...css,
+      },
+      ...props,
+    }
+  }
 )
 
-export const Title = extendLoosePrimitive(Text, {
+export const Title = extendPrimitive(Text, {
   fontSize: 4,
   fontWeight: "bold",
 })
 
-export const SubTitle = extendLoosePrimitive(Text, {
+export const SubTitle = extendPrimitive(Text, {
   fontSize: 3,
   fontWeight: "bold",
 })
 
-export const Similink = extendLoosePrimitive(Text, {
+export const Similink = extendPrimitive(Text, {
   cursor: "pointer",
   textDecoration: "underline",
 })

@@ -30,7 +30,7 @@
   "dependencies": {
     "@css-system/gatsby-plugin-css-system": "0.5.7",
     "@sentry/browser": "^5.15.4",
-    "css-system": "0.6.3",
+    "css-system": "0.7.0",
     "firebase": "7.14.0",
     "gatsby": "2.20.18",
     "gatsby-plugin-firebase": "^0.2.0-beta.4",

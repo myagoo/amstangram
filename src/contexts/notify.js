@@ -2,9 +2,9 @@ import React, { createContext, useCallback, useState, useRef } from "react"
 import { createPortal } from "react-dom"
 import { View } from "../components/view"
 import { FADE_TRANSITION_DURATION } from "../constants"
-import { extendLoosePrimitive } from "css-system"
+import { extendPrimitive } from "css-system"
 
-const Notification = extendLoosePrimitive(View, {
+const Notification = extendPrimitive(View, {
   fontSize: 3,
   p: 2,
   borderRadius: 1,

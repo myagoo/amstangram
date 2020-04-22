@@ -10,20 +10,26 @@ import { Dialog } from "./dialog"
 import { SubTitle, Title } from "./primitives"
 import { View } from "./view"
 import { Loader } from "./loader"
-import { extendLoosePrimitive } from "css-system"
+import { extendPrimitive, ThemeContext } from "css-system"
 import { DialogContext } from "../contexts/dialog"
 import { DIALOG_CLOSED_REASON } from "../constants"
 
-const FadedView = extendLoosePrimitive(View, (css, theme) => ({
-  ...css,
-  p: 1,
-  alignItems: "center",
-  cursor: "pointer",
-  position: "sticky",
-  top: 0,
-  zIndex: 1,
-  background: `linear-gradient(0deg, rgba(0,0,0,0) 0%, ${theme.colors.dialogBackground} 50%)`,
-}))
+const FadedView = extendPrimitive(View, ({ css, ...props }) => {
+  const theme = useContext(ThemeContext)
+  return {
+    css: {
+      ...css,
+      p: 1,
+      alignItems: "center",
+      cursor: "pointer",
+      position: "sticky",
+      top: 0,
+      zIndex: 1,
+      background: `linear-gradient(0deg, rgba(0,0,0,0) 0%, ${theme.colors.dialogBackground} 50%)`,
+    },
+    ...props,
+  }
+})
 
 export const GalleryDialog = ({ deferred }) => {
   const t = useTranslate()

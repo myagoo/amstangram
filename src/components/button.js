@@ -1,8 +1,8 @@
-import { useCss, useKeyframes, createLoosePrimitive } from "css-system"
+import { useCss, useKeyframes, createPrimitive } from "css-system"
 import React, { useContext } from "react"
 import { SoundContext } from "../contexts/sound"
 
-export const DangerButton = createLoosePrimitive("button", {
+export const DangerButton = createPrimitive("button", {
   minWidth: 0,
   minHeight: 0,
   flex: "none",

@@ -18,6 +18,7 @@ export const UserProvider = ({ children }) => {
       if (!user) {
         setCurrentUser(null)
       } else {
+        // This read is redundant
         const snapshot = await firebase
           .firestore()
           .collection("users")
