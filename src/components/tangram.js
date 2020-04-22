@@ -118,13 +118,17 @@ export const Tangram = () => {
         return
       }
 
+      const roundedLength = Math.round(pathData.length)
+      const roundedWidth = Math.round(pathData.width)
+      const roundedHeight = Math.round(pathData.height)
+
       if (
         tangrams.find((tangram) => {
           return (
             tangram.edges === pathData.edges &&
-            tangram.length === pathData.length &&
-            tangram.width === pathData.width &&
-            tangram.height === pathData.height
+            Math.round(tangram.length) === roundedLength &&
+            Math.round(tangram.width) === roundedWidth &&
+            Math.round(tangram.height) === roundedHeight
           )
         })
       ) {
@@ -580,12 +584,18 @@ export const Tangram = () => {
               ? handleApprove
               : undefined
           }
-          onClap={() => {
-            firebase
-              .firestore()
-              .collection("tangrams")
-              .doc(selectedTangram.id)
-              .update({ claps: firebase.firestore.FieldValue.increment(1) })
+          onClap={(count) => {
+            if (currentUser) {
+              firebase
+                .firestore()
+                .collection("tangrams")
+                .doc(selectedTangram.id)
+                .update({
+                  claps: firebase.firestore.FieldValue.increment(count),
+                })
+            } else {
+              notify(t("Claps only count when logged in"))
+            }
           }}
         />
       )}

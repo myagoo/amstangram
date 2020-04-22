@@ -94,5 +94,7 @@
   "Earned {claps} 👏": "{claps} 👏 gagnés",
   "Claps": "Claps",
   "Completed tangrams": "Tangrams complétés",
-  "Created tangrams": "Tangrams créés"
+  "Created tangrams": "Tangrams créés",
+
+  "Claps only count when logged in": "Les claps ne comptent que si tu es identifié.e"
 }

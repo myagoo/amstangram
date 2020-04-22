@@ -16,6 +16,9 @@ export const Victory = ({ emoji, onStop, onNext, onApprove, onClap }) => {
   const [playbackRate, setPlaybackRate] = useState(1)
   const { playClap } = useContext(SoundContext)
 
+  const [stagedClapsCount, setStagedClapsCount] = useState(0)
+  const [commitClapsTimeout, setCommitClapsTimeout] = useState()
+
   const emojiSpin = useKeyframes({
     0: {
       opacity: "0",
@@ -51,14 +54,22 @@ export const Victory = ({ emoji, onStop, onNext, onApprove, onClap }) => {
     setClapFadeInEnded(true)
   }
 
+  const commitClaps = () => {
+    onClap(stagedClapsCount)
+    setStagedClapsCount(0)
+  }
+
   const handleClapClick = () => {
-    if (clapCount < 10) {
+    if (clapCount < 15) {
       playClap({
         playbackRate,
       })
       setClapCount(clapCount + 1)
-      setPlaybackRate(playbackRate + 0.01)
-      onClap()
+      setStagedClapsCount(stagedClapsCount + 1)
+      setPlaybackRate(playbackRate + 0.05)
+
+      clearTimeout(commitClapsTimeout)
+      setCommitClapsTimeout(setTimeout(commitClaps, 500))
     }
   }
 

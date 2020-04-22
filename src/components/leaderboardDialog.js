@@ -49,6 +49,7 @@ export const LeaderboardDialog = ({ deferred }) => {
         Object.keys(usersMetadata).map(async (uid) => {
           const userMetadata = usersMetadata[uid]
 
+          // All data stats should be stored under a single collection
           const snapshot = await firebase
             .firestore()
             .collection("users")

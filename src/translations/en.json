@@ -91,5 +91,7 @@
   "Earned {claps} 👏": "Earned {claps} 👏",
   "Claps": "Claps",
   "Completed tangrams": "Completed tangrams",
-  "Created tangrams": "Created tangrams"
+  "Created tangrams": "Created tangrams",
+
+  "Claps only count when logged in": "Claps only count when logged in"
 }
