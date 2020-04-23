@@ -7,10 +7,7 @@ import React, {
   useMemo,
   useState,
 } from "react"
-import { ChallengeDialog } from "../components/challengeDialog"
 import { copyToClipboard } from "../utils/copyToClipboard"
-import { Deferred } from "../utils/deferred"
-import { shuffle } from "../utils/shuffle"
 import {
   sortDigitsTangrams,
   sortLettersTangrams,
@@ -28,13 +25,11 @@ export const GalleryProvider = ({ children }) => {
   const notify = useContext(NotifyContext)
   const { currentUser } = useContext(UserContext)
   const tangrams = useContext(TangramsContext)
-  const [initialized, setInitialized] = useState(false)
 
   const [playlist, setPlaylist] = useState(null)
   const [saveRequestId, setSaveRequestId] = useState(0)
   const [completedTangrams, setCompletedTangrams] = useState({})
   const [tangramsByCategory, setTangramsByCategory] = useState(null)
-  const [challengeDialogData, setChallengeDialogData] = useState(null)
 
   useEffect(() => {
     if (!currentUser) {
@@ -100,53 +95,6 @@ export const GalleryProvider = ({ children }) => {
 
     setTangramsByCategory(sortedTangramsByCategory)
   }, [tangrams, currentUser])
-
-  useEffect(() => {
-    if (tangrams && currentUser !== undefined && !initialized) {
-      let hasBeenChallenged = false
-
-      if (!playlist && window.location.search) {
-        const searchParams = new URLSearchParams(window.location.search)
-
-        if (searchParams.has("tangrams")) {
-          const tangramIds = searchParams.get("tangrams").split(",")
-          const uid = searchParams.get("uid")
-          const challengeTangrams = tangrams.filter((tangram) =>
-            tangramIds.includes(tangram.id)
-          )
-          if (challengeTangrams.length) {
-            hasBeenChallenged = true
-            window.history.replaceState(
-              {},
-              document.title,
-              window.location.origin
-            )
-
-            const deferred = new Deferred()
-
-            setChallengeDialogData({
-              deferred,
-              tangrams: challengeTangrams,
-              uid,
-            })
-            deferred.promise.finally(() => setChallengeDialogData(null))
-          }
-        }
-      }
-
-      if (!hasBeenChallenged) {
-        setPlaylist(
-          shuffle(tangrams).sort(({ id: idA }, { id: idB }) => {
-            const isTangramACompleted = completedTangrams[idA] !== undefined
-            const isTangramBCompleted = completedTangrams[idB] !== undefined
-            return isTangramACompleted - isTangramBCompleted
-          })
-        )
-      }
-
-      setInitialized(true)
-    }
-  }, [tangrams, currentUser, initialized, playlist, completedTangrams])
 
   const shareTangrams = useCallback(
     (tangrams) => {
@@ -217,10 +165,6 @@ export const GalleryProvider = ({ children }) => {
   return (
     <GalleryContext.Provider value={contextValue}>
       {children}
-
-      {challengeDialogData && (
-        <ChallengeDialog {...challengeDialogData}></ChallengeDialog>
-      )}
     </GalleryContext.Provider>
   )
 }
