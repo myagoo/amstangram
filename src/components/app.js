@@ -72,7 +72,7 @@ export const App = () => {
             size: 128,
             "& > g": {
               transition: `all ${FADE_TRANSITION_DURATION}ms ease`,
-              transform: waited ? "translate(0, 0)" : "translate(-30px, 30px)",
+              transform: waited ? "translate(30px, -30px)" : "translate(0, 0)",
             },
           }}
           deps={[waited]}
