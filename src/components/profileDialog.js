@@ -1,5 +1,5 @@
 import firebase from "gatsby-plugin-firebase"
-import React, { useCallback, useContext, useMemo, useState } from "react"
+import React, { useCallback, useContext, useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { GalleryContext } from "../contexts/gallery"
 import { LanguageContext, useTranslate } from "../contexts/language"
@@ -14,6 +14,7 @@ import { Error, Similink, Title } from "./primitives"
 import { Text } from "./text"
 import { View } from "./view"
 import { DIALOG_CLOSED_REASON } from "../constants"
+import { Loader } from "./loader"
 
 const ChangeEmailForm = ({ currentUser, onClose }) => {
   const { updateEmail } = useContext(UserContext)
@@ -260,24 +261,55 @@ export const ProfileDialog = ({ uid, deferred }) => {
   const [changeUsernameRequested, setChangeUsernameRequested] = useState(false)
   const [changePasswordRequested, setChangePasswordRequested] = useState(false)
   const tangrams = useContext(TangramsContext)
+  const [stats, setStats] = useState(null)
 
-  const { claps, completed, created } = useMemo(() => {
-    let claps = 0
-    let completed = 0
-    let created = 0
-    for (const tangram of tangrams) {
-      if (tangram.uid === uid) {
-        claps += tangram.claps || 0
-        if (tangram.approved) {
-          created++
+  useEffect(() => {
+    if (currentUser && currentUser.uid === uid) {
+      let claps = 0
+      let completed = 0
+      let created = 0
+      for (const tangram of tangrams) {
+        if (tangram.uid === uid) {
+          claps += tangram.claps || 0
+          if (tangram.approved) {
+            created++
+          }
+        }
+        if (completedTangrams[tangram.id]) {
+          completed++
         }
       }
-      if (completedTangrams[tangram.id]) {
-        completed++
+      setStats({ claps, completed, created })
+    } else {
+      const asyncTask = async () => {
+        const snapshot = await firebase
+          .firestore()
+          .collection("users")
+          .doc(uid)
+          .collection("tangrams")
+          .get()
+
+        let claps = 0
+        let created = 0
+
+        for (const tangram of tangrams) {
+          if (tangram.uid === uid) {
+            claps += tangram.claps || 0
+            if (tangram.approved) {
+              created++
+            }
+          }
+        }
+
+        setStats({
+          claps,
+          completed: snapshot.size,
+          created,
+        })
       }
+      asyncTask()
     }
-    return { claps, completed, created }
-  }, [completedTangrams, tangrams, uid])
+  }, [currentUser, completedTangrams, tangrams, uid])
 
   const handleLogout = async () => {
     if (window.confirm(t("Are you sure you want to log out?"))) {
@@ -299,7 +331,9 @@ export const ProfileDialog = ({ uid, deferred }) => {
         gap: 3,
       }}
     >
-      {changeEmailRequested ? (
+      {stats === null ? (
+        <Loader></Loader>
+      ) : changeEmailRequested ? (
         <ChangeEmailForm
           currentUser={currentUser}
           onClose={() => setChangeEmailRequested(false)}
@@ -334,18 +368,18 @@ export const ProfileDialog = ({ uid, deferred }) => {
               </Text>
               <Text>
                 {t("Completed {completed}/{total} tangrams", {
-                  completed,
+                  completed: stats.completed,
                   total: tangrams.length,
                 })}
               </Text>
               <Text>
                 {t("Created {created} tangrams", {
-                  created,
+                  created: stats.created,
                 })}
               </Text>
               <Text>
                 {t("Earned {claps} 👏", {
-                  claps,
+                  claps: stats.claps,
                 })}
               </Text>
             </View>
