@@ -52,7 +52,7 @@ export const App = () => {
         justifyContent: "center",
         animation:
           playlist && waited
-            ? `${FADE_TRANSITION_DURATION}ms fadeIn ease reverse`
+            ? `${FADE_TRANSITION_DURATION}ms fadeIn ease ${FADE_STAGGER_DURATION}ms reverse`
             : undefined,
       }}
       deps={[playlist, waited]}
@@ -64,13 +64,19 @@ export const App = () => {
     >
       <View
         css={{
-          px: 4,
-          width: "100%",
-          maxWidth: "600px",
-          animation: `${FADE_TRANSITION_DURATION}ms fadeIn  ease ${FADE_STAGGER_DURATION}ms both`,
+          animation: `${FADE_TRANSITION_DURATION}ms fadeIn ease ${FADE_STAGGER_DURATION}ms both`,
         }}
       >
-        <View as={Logo} />
+        <Logo
+          css={{
+            size: 128,
+            "& > g": {
+              transition: `all ${FADE_TRANSITION_DURATION}ms ease`,
+              transform: waited ? "translate(0, 0)" : "translate(-30px, 30px)",
+            },
+          }}
+          deps={[waited]}
+        />
       </View>
 
       <Loader
