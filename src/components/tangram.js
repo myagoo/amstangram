@@ -25,7 +25,6 @@ import { useTranslate } from "../contexts/language"
 import { NotifyContext } from "../contexts/notify"
 import { useShowBackgroundPattern } from "../contexts/showBackgroundPattern"
 import { SoundContext } from "../contexts/sound"
-import { TangramsContext } from "../contexts/tangrams"
 import { UserContext } from "../contexts/user"
 import { createPiecesGroup } from "../utils/createPiecesGroup"
 import { getPathData } from "../utils/getPathData"
@@ -52,7 +51,6 @@ export const Tangram = () => {
   currentUserRef.current = currentUser
   const theme = useContext(ThemeContext)
   const notify = useContext(NotifyContext)
-  const tangrams = useContext(TangramsContext)
   const [showBackgroundPattern] = useShowBackgroundPattern()
   const {
     markTangramAsComplete,
@@ -115,24 +113,6 @@ export const Tangram = () => {
 
       if (pathData.edges === 23) {
         notify(t("You can't save such an easy tangram"))
-        return
-      }
-
-      const roundedLength = Math.round(pathData.length)
-      const roundedWidth = Math.round(pathData.width)
-      const roundedHeight = Math.round(pathData.height)
-
-      if (
-        tangrams.find((tangram) => {
-          return (
-            tangram.edges === pathData.edges &&
-            Math.round(tangram.length) === roundedLength &&
-            Math.round(tangram.width) === roundedWidth &&
-            Math.round(tangram.height) === roundedHeight
-          )
-        })
-      ) {
-        notify(t("This tangram already exists"))
         return
       }
 
