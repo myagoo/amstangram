@@ -15,6 +15,7 @@ export const Card = ({
   onBadgeClick,
   onClick,
   onLongPress,
+  hideBadge,
   ...props
 }) => {
   const { path, width, height, uid, approved, emoji } = tangram
@@ -77,12 +78,12 @@ export const Card = ({
         />
         {completed && emoji && (
           <View
-            css={{ position: "absolute", top: 2, left: 2, fontSize: "30px" }}
+            css={{ position: "absolute", top: 1, left: 1, fontSize: "30px" }}
           >
             {emoji}
           </View>
         )}
-        {uid && (
+        {uid && !hideBadge && (
           <Badge
             uid={uid}
             css={{

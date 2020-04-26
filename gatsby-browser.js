@@ -1,10 +1,14 @@
 require("firebase/auth")
 require("firebase/firestore")
+const { getDefaultLanguage } = require("./src/contexts/language")
 
 exports.onServiceWorkerUpdateFound = () => {
+  const defaultLanguage = getDefaultLanguage()
   if (
     window.confirm(
-      "Une nouvelle version d'Amstangram est disponible. Recharger l'application  ?"
+      defaultLanguage === "fr"
+        ? "Une nouvelle version d'Amstangram est disponible. Recharger l'application  ?"
+        : "A new version of Amstangram is available. Reload application ?"
     )
   ) {
     window.location.reload(true)

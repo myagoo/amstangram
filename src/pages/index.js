@@ -11,6 +11,7 @@ import { SoundProvider } from "../contexts/sound"
 import { TangramsProvider } from "../contexts/tangrams"
 import { UserProvider } from "../contexts/user"
 import { DialogProvider } from "../contexts/dialog"
+import { TipsProvider } from "../contexts/tips"
 
 export default () => {
   useEffect(() => {
@@ -50,25 +51,33 @@ export default () => {
       "-webkit-user-select": "none",
       "-webkit-tap-highlight-color": "rgba(0,0,0,0)",
     },
+    "input, textarea": {
+      "-webkit-user-select": "initial",
+      "-moz-user-select": "initial",
+      "-ms-user-select": "initial",
+      userSelect: "initial",
+    },
   })
 
   return (
     <SoundProvider>
       <LanguageProvider>
         <NotifyProvider>
-          <TangramsProvider>
-            <UserProvider>
+          <UserProvider>
+            <TangramsProvider>
               <ShowBackgroundPatternProvider>
                 <GalleryProvider>
                   <SettingsProvider>
                     <DialogProvider>
-                      <App></App>
+                      <TipsProvider>
+                        <App></App>
+                      </TipsProvider>
                     </DialogProvider>
                   </SettingsProvider>
                 </GalleryProvider>
               </ShowBackgroundPatternProvider>
-            </UserProvider>
-          </TangramsProvider>
+            </TangramsProvider>
+          </UserProvider>
         </NotifyProvider>
       </LanguageProvider>
     </SoundProvider>

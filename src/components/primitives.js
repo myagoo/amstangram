@@ -15,6 +15,17 @@ export const Error = extendPrimitive(
   }
 )
 
+export const Hint = extendPrimitive(Text, ({ as = "small", css, ...props }) => {
+  return {
+    as,
+    css: {
+      opacity: 0.5,
+      ...css,
+    },
+    ...props,
+  }
+})
+
 export const Title = extendPrimitive(Text, {
   fontSize: 4,
   fontWeight: "bold",

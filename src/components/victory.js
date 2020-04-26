@@ -3,7 +3,7 @@ import React, { useContext, useState } from "react"
 import { FiCheck, FiPlay, FiSquare } from "react-icons/fi"
 import { Button } from "../components/button"
 import { View } from "../components/view"
-import { FADE_TRANSITION_DURATION } from "../constants"
+import { FADE_TRANSITION_DURATION, MAX_CLAPS_COUNT } from "../constants"
 import { SoundContext } from "../contexts/sound"
 
 export const Victory = ({ emoji, onStop, onNext, onApprove, onClap }) => {
@@ -15,7 +15,6 @@ export const Victory = ({ emoji, onStop, onNext, onApprove, onClap }) => {
 
   const [playbackRate, setPlaybackRate] = useState(1)
   const { playClap } = useContext(SoundContext)
-
   const [stagedClapsCount, setStagedClapsCount] = useState(0)
   const [commitClapsTimeout, setCommitClapsTimeout] = useState()
 
@@ -60,7 +59,7 @@ export const Victory = ({ emoji, onStop, onNext, onApprove, onClap }) => {
   }
 
   const handleClapClick = () => {
-    if (clapCount < 15) {
+    if (clapCount < MAX_CLAPS_COUNT) {
       playClap({
         playbackRate,
       })
@@ -112,16 +111,17 @@ export const Victory = ({ emoji, onStop, onNext, onApprove, onClap }) => {
         <>
           {!clapFadeInEnded ? (
             <View
-              key="clapFadeInEnded"
+              key="clapFadeIn"
               css={{
                 fontSize: "30vmin",
                 animation: `${FADE_TRANSITION_DURATION}ms fadeIn ease both`,
               }}
               onAnimationEnd={handleClapFadeInAnimationEnd}
+              onClick={handleClapClick}
             >
               {"👏"}
             </View>
-          ) : (
+          ) : clapCount < MAX_CLAPS_COUNT ? (
             <View
               key={`clap${clapCount}`}
               css={{
@@ -129,6 +129,16 @@ export const Victory = ({ emoji, onStop, onNext, onApprove, onClap }) => {
                 animation: clapCount ? `250ms ${clap} alternate` : undefined,
               }}
               onClick={handleClapClick}
+            >
+              {"👏"}
+            </View>
+          ) : (
+            <View
+              key={`clapOut`}
+              css={{
+                fontSize: `30vmin`,
+                animation: `${FADE_TRANSITION_DURATION}ms ${emojiSpin} cubic-bezier(.6,1.56,.58,.92) forwards reverse`,
+              }}
             >
               {"👏"}
             </View>

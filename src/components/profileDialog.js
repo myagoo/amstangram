@@ -1,8 +1,9 @@
 import firebase from "gatsby-plugin-firebase"
-import React, { useCallback, useContext, useState, useEffect } from "react"
+import React, { useCallback, useContext, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
+import { DIALOG_CLOSED_REASON } from "../constants"
 import { GalleryContext } from "../contexts/gallery"
-import { LanguageContext, useTranslate } from "../contexts/language"
+import { LanguageContext } from "../contexts/language"
 import { NotifyContext } from "../contexts/notify"
 import { TangramsContext } from "../contexts/tangrams"
 import { UserContext } from "../contexts/user"
@@ -13,12 +14,13 @@ import { Input } from "./input"
 import { Error, Similink, Title } from "./primitives"
 import { Text } from "./text"
 import { View } from "./view"
-import { DIALOG_CLOSED_REASON } from "../constants"
-import { Loader } from "./loader"
+import { useIntl } from "react-intl"
 
 const ChangeEmailForm = ({ currentUser, onClose }) => {
+  const intl = useIntl()
+
   const { updateEmail } = useContext(UserContext)
-  const t = useTranslate()
+
   const notify = useContext(NotifyContext)
   const { handleSubmit, register, setError, errors, formState } = useForm()
 
@@ -26,31 +28,40 @@ const ChangeEmailForm = ({ currentUser, onClose }) => {
     async ({ password, newEmail }) => {
       try {
         await updateEmail(currentUser, password, newEmail)
-        notify(t("Email address updated sucessfuly"))
+        notify(intl.formatMessage({ id: "Email address updated sucessfuly" }))
         onClose()
       } catch (error) {
-        console.log(error)
         switch (error.code) {
           case "auth/email-already-in-use":
             setError(
               "newEmail",
               "alreadyExists",
-              t("Email address already in use")
+              intl.formatMessage({ id: "Email address already in use" })
             )
             break
           case "auth/invalid-email":
-            setError("newEmail", "invalid", t("Invalid email address"))
+            setError(
+              "newEmail",
+              "invalid",
+              intl.formatMessage({ id: "Invalid email address" })
+            )
             break
           case "auth/wrong-password":
-            setError("password", "mismatch", t("Incorrect password"))
+            setError(
+              "password",
+              "mismatch",
+              intl.formatMessage({ id: "Incorrect password" })
+            )
             break
           default:
-            notify(t("An error occured, please retry later"))
-            return
+            notify(
+              intl.formatMessage({ id: "An error occured, please retry later" })
+            )
+            throw error
         }
       }
     },
-    [currentUser, updateEmail, setError, onClose, t, notify]
+    [currentUser, updateEmail, setError, onClose, notify, intl]
   )
 
   return (
@@ -61,20 +72,24 @@ const ChangeEmailForm = ({ currentUser, onClose }) => {
     >
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
         <View css={{ gap: 2 }}>
-          <label>{t("Password")}</label>
+          <label>{intl.formatMessage({ id: "Password" })}</label>
           <Input
             type="password"
             name="password"
-            ref={register({ required: t("Password is required") })}
+            ref={register({
+              required: intl.formatMessage({ id: "Password is required" }),
+            })}
           ></Input>
           {errors.password && <Error>{errors.password.message}</Error>}
         </View>
         <View css={{ gap: 2 }}>
-          <label>{t("New email address")}</label>
+          <label>{intl.formatMessage({ id: "New email address" })}</label>
           <Input
             type="email"
             name="newEmail"
-            ref={register({ required: t("Email address is required") })}
+            ref={register({
+              required: intl.formatMessage({ id: "Email address is required" }),
+            })}
           ></Input>
           {errors.newEmail && <Error>{errors.newEmail.message}</Error>}
         </View>
@@ -82,7 +97,7 @@ const ChangeEmailForm = ({ currentUser, onClose }) => {
 
       <View css={{ gap: 3 }}>
         <PrimaryButton disabled={formState.isSubmitting} type="submit">
-          {t("Change email address")}
+          {intl.formatMessage({ id: "Change email address" })}
         </PrimaryButton>
 
         <View
@@ -90,7 +105,9 @@ const ChangeEmailForm = ({ currentUser, onClose }) => {
             alignItems: "center",
           }}
         >
-          <Similink onClick={onClose}>{t("Back")}</Similink>
+          <Similink onClick={onClose}>
+            {intl.formatMessage({ id: "Back" })}
+          </Similink>
         </View>
       </View>
     </View>
@@ -98,8 +115,10 @@ const ChangeEmailForm = ({ currentUser, onClose }) => {
 }
 
 const ChangeUsernameForm = ({ currentUser, onClose }) => {
+  const intl = useIntl()
+
   const { updateUsername } = useContext(UserContext)
-  const t = useTranslate()
+
   const notify = useContext(NotifyContext)
   const { handleSubmit, register, errors, formState } = useForm()
 
@@ -107,14 +126,16 @@ const ChangeUsernameForm = ({ currentUser, onClose }) => {
     async ({ newUsername }) => {
       try {
         await updateUsername(currentUser, newUsername)
-        notify(t("Username updated sucessfuly"))
+        notify(intl.formatMessage({ id: "Username updated sucessfuly" }))
         onClose()
       } catch (error) {
-        console.log(error)
-        notify(t("An error occured, please retry later"))
+        notify(
+          intl.formatMessage({ id: "An error occured, please retry later" })
+        )
+        throw error
       }
     },
-    [currentUser, updateUsername, onClose, t, notify]
+    [currentUser, updateUsername, onClose, notify, intl]
   )
 
   return (
@@ -125,11 +146,13 @@ const ChangeUsernameForm = ({ currentUser, onClose }) => {
     >
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
         <View css={{ gap: 2 }}>
-          <label>{t("New username")}</label>
+          <label>{intl.formatMessage({ id: "New username" })}</label>
           <Input
             type="text"
             name="newUsername"
-            ref={register({ required: t("Username is required") })}
+            ref={register({
+              required: intl.formatMessage({ id: "Username is required" }),
+            })}
           ></Input>
           {errors.newUsername && <Error>{errors.newUsername.message}</Error>}
         </View>
@@ -137,14 +160,16 @@ const ChangeUsernameForm = ({ currentUser, onClose }) => {
 
       <View css={{ gap: 3 }}>
         <PrimaryButton disabled={formState.isSubmitting} type="submit">
-          {t("Change username")}
+          {intl.formatMessage({ id: "Change username" })}
         </PrimaryButton>
         <View
           css={{
             alignItems: "center",
           }}
         >
-          <Similink onClick={onClose}>{t("Back")}</Similink>
+          <Similink onClick={onClose}>
+            {intl.formatMessage({ id: "Back" })}
+          </Similink>
         </View>
       </View>
     </View>
@@ -152,9 +177,10 @@ const ChangeUsernameForm = ({ currentUser, onClose }) => {
 }
 
 const ChangePasswordForm = ({ currentUser, onClose }) => {
+  const intl = useIntl()
+
   const { updateUsername } = useContext(UserContext)
 
-  const t = useTranslate()
   const notify = useContext(NotifyContext)
 
   const {
@@ -172,23 +198,33 @@ const ChangePasswordForm = ({ currentUser, onClose }) => {
     async ({ password, newPassword }) => {
       try {
         await updateUsername(currentUser, password, newPassword)
-        notify(t("Password changed sucessfuly"))
+        notify(intl.formatMessage({ id: "Password changed sucessfuly" }))
         onClose()
       } catch (error) {
         switch (error.code) {
           case "auth/weak-password":
-            setError("newPassword", "weakPassword", t("Password is too weak"))
+            setError(
+              "newPassword",
+              "weakPassword",
+              intl.formatMessage({ id: "Password is too weak" })
+            )
             break
           case "auth/wrong-password":
-            setError("password", "mismatch", t("Incorrect password"))
+            setError(
+              "password",
+              "mismatch",
+              intl.formatMessage({ id: "Incorrect password" })
+            )
             break
           default:
-            notify(t("An error occured, please retry later"))
+            notify(
+              intl.formatMessage({ id: "An error occured, please retry later" })
+            )
             return
         }
       }
     },
-    [currentUser, updateUsername, onClose, setError, t, notify]
+    [currentUser, updateUsername, onClose, setError, notify, intl]
   )
 
   return (
@@ -199,33 +235,38 @@ const ChangePasswordForm = ({ currentUser, onClose }) => {
     >
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
         <View css={{ gap: 2 }}>
-          <label>{t("Current password")}</label>
+          <label>{intl.formatMessage({ id: "Current password" })}</label>
           <Input
             type="password"
             name="password"
-            ref={register({ required: t("Password is required") })}
+            ref={register({
+              required: intl.formatMessage({ id: "Password is required" }),
+            })}
           ></Input>
           {errors.password && <Error>{errors.password.message}</Error>}
         </View>
         <View css={{ gap: 2 }}>
-          <label>{t("New password")}</label>
+          <label>{intl.formatMessage({ id: "New password" })}</label>
           <Input
             type="password"
             name="newPassword"
-            ref={register({ required: t("Password is required") })}
+            ref={register({
+              required: intl.formatMessage({ id: "Password is required" }),
+            })}
           ></Input>
           {errors.newPassword && <Error>{errors.newPassword.message}</Error>}
         </View>
 
         <View css={{ gap: 2 }}>
-          <label>{t("Confirm new password")}</label>
+          <label>{intl.formatMessage({ id: "Confirm new password" })}</label>
           <Input
             type="password"
             name="newPasswordConfirm"
             ref={register({
               required: "Password is required",
               validate: (newPasswordConfirm) =>
-                newPasswordConfirm === newPassword || t("Passwords must match"),
+                newPasswordConfirm === newPassword ||
+                intl.formatMessage({ id: "Passwords must match" }),
             })}
           ></Input>
           {errors.newPasswordConfirm && (
@@ -236,21 +277,23 @@ const ChangePasswordForm = ({ currentUser, onClose }) => {
 
       <View css={{ gap: 3 }}>
         <PrimaryButton disabled={formState.isSubmitting} type="submit">
-          {t("Change password")}
+          {intl.formatMessage({ id: "Change password" })}
         </PrimaryButton>
         <View
           css={{
             alignItems: "center",
           }}
         >
-          <Similink onClick={onClose}>{t("Back")}</Similink>
+          <Similink onClick={onClose}>
+            {intl.formatMessage({ id: "Back" })}
+          </Similink>
         </View>
       </View>
     </View>
   )
 }
 export const ProfileDialog = ({ uid, deferred }) => {
-  const t = useTranslate()
+  const intl = useIntl()
   const notify = useContext(NotifyContext)
 
   const { language } = useContext(LanguageContext)
@@ -260,62 +303,35 @@ export const ProfileDialog = ({ uid, deferred }) => {
   const [changeEmailRequested, setChangeEmailRequested] = useState(false)
   const [changeUsernameRequested, setChangeUsernameRequested] = useState(false)
   const [changePasswordRequested, setChangePasswordRequested] = useState(false)
-  const tangrams = useContext(TangramsContext)
-  const [stats, setStats] = useState(null)
+  const { approvedTangrams } = useContext(TangramsContext)
 
-  useEffect(() => {
-    if (currentUser && currentUser.uid === uid) {
-      let claps = 0
-      let completed = 0
-      let created = 0
-      for (const tangram of tangrams) {
-        if (tangram.uid === uid) {
-          claps += tangram.claps || 0
-          if (tangram.approved) {
-            created++
-          }
-        }
-        if (completedTangrams[tangram.id]) {
-          completed++
-        }
+  const { claps, completed, created } = useMemo(() => {
+    let claps = 0
+    let created = 0
+    for (const tangram of approvedTangrams) {
+      if (tangram.uid === uid) {
+        claps += tangram.claps || 0
+        created++
       }
-      setStats({ claps, completed, created })
-    } else {
-      const asyncTask = async () => {
-        const snapshot = await firebase
-          .firestore()
-          .collection("users")
-          .doc(uid)
-          .collection("tangrams")
-          .get()
-
-        let claps = 0
-        let created = 0
-
-        for (const tangram of tangrams) {
-          if (tangram.uid === uid) {
-            claps += tangram.claps || 0
-            if (tangram.approved) {
-              created++
-            }
-          }
-        }
-
-        setStats({
-          claps,
-          completed: snapshot.size,
-          created,
-        })
-      }
-      asyncTask()
     }
-  }, [currentUser, completedTangrams, tangrams, uid])
+    return {
+      claps,
+      completed: completedTangrams[uid]
+        ? Object.keys(completedTangrams[uid]).length
+        : 0,
+      created,
+    }
+  }, [completedTangrams, approvedTangrams, uid])
 
   const handleLogout = async () => {
-    if (window.confirm(t("Are you sure you want to log out?"))) {
+    if (
+      window.confirm(
+        intl.formatMessage({ id: "Are you sure you want to log out?" })
+      )
+    ) {
       await firebase.auth().signOut()
       deferred.reject(DIALOG_CLOSED_REASON)
-      notify(t("Logged out"))
+      notify(intl.formatMessage({ id: "Logged out" }))
     }
   }
 
@@ -331,9 +347,7 @@ export const ProfileDialog = ({ uid, deferred }) => {
         gap: 3,
       }}
     >
-      {stats === null ? (
-        <Loader></Loader>
-      ) : changeEmailRequested ? (
+      {changeEmailRequested ? (
         <ChangeEmailForm
           currentUser={currentUser}
           onClose={() => setChangeEmailRequested(false)}
@@ -360,43 +374,57 @@ export const ProfileDialog = ({ uid, deferred }) => {
                 </Text>
               )}
               <Text css={{ fontSize: 2 }}>
-                {t("Joined {signupDate}", {
-                  signupDate: new Intl.DateTimeFormat(language).format(
-                    signupDate
-                  ),
-                })}
+                {intl.formatMessage(
+                  { id: "Joined {signupDate}" },
+                  {
+                    signupDate: new Intl.DateTimeFormat(language).format(
+                      signupDate
+                    ),
+                  }
+                )}
               </Text>
               <Text>
-                {t("Completed {completed}/{total} tangrams", {
-                  completed: stats.completed,
-                  total: tangrams.length,
-                })}
+                {intl.formatMessage(
+                  { id: "Completed {completed}/{total} tangrams" },
+                  {
+                    completed,
+                    total: approvedTangrams.length,
+                  }
+                )}
               </Text>
               <Text>
-                {t("Created {created} tangrams", {
-                  created: stats.created,
-                })}
+                {intl.formatMessage(
+                  { id: "Created {created} tangrams" },
+                  {
+                    created,
+                  }
+                )}
               </Text>
               <Text>
-                {t("Earned {claps} 👏", {
-                  claps: stats.claps,
-                })}
+                {intl.formatMessage(
+                  { id: "Earned {claps} 👏" },
+                  {
+                    claps,
+                  }
+                )}
               </Text>
             </View>
           </View>
           <View css={{ gap: 3, alignItems: "center" }}>
             <Similink onClick={() => setChangeEmailRequested(true)}>
-              {t("Change email address")}
+              {intl.formatMessage({ id: "Change email address" })}
             </Similink>
             <Similink onClick={() => setChangeUsernameRequested(true)}>
-              {t("Change username")}
+              {intl.formatMessage({ id: "Change username" })}
             </Similink>
             <Similink onClick={() => setChangePasswordRequested(true)}>
-              {t("Change password")}
+              {intl.formatMessage({ id: "Change password" })}
             </Similink>
           </View>
 
-          <DangerButton onClick={handleLogout}>{t("Log out")}</DangerButton>
+          <DangerButton onClick={handleLogout}>
+            {intl.formatMessage({ id: "Log out" })}
+          </DangerButton>
         </View>
       )}
     </Dialog>

@@ -1,6 +1,5 @@
 import paper from "paper/dist/paper-core"
 import firebase from "gatsby-plugin-firebase"
-import { getRandomEmoji } from "./getRandomEmoji"
 
 export const recomputeEverything = async (tangrams) => {
   if (
@@ -21,13 +20,11 @@ export const recomputeEverything = async (tangrams) => {
       applyMatrix: true,
       insert: false,
     })
-    delete tangram.percent
     doc.ref.set({
       ...tangram,
-      emoji: tangram.emoji || getRandomEmoji(),
-      height: Math.round(tangram.height * 100) / 100,
-      width: Math.round(tangram.width * 100) / 100,
-      length: Math.round(compoundPath.length * 100) / 100,
+      height: Math.round(tangram.height),
+      width: Math.round(tangram.width),
+      length: Math.round(compoundPath.length),
     })
   })
 

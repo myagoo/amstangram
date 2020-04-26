@@ -1,77 +1,65 @@
-import React, { useContext, useMemo, useState, useEffect } from "react"
-import { useTranslate } from "../contexts/language"
+import React, { useContext, useMemo, useState } from "react"
+import { DIALOG_CLOSED_REASON } from "../constants"
+import { DialogContext } from "../contexts/dialog"
+import { GalleryContext } from "../contexts/gallery"
+
 import { TangramsContext } from "../contexts/tangrams"
 import { UserContext } from "../contexts/user"
 import { Badge } from "./badge"
 import { Dialog } from "./dialog"
+import { Input } from "./input"
 import { Title } from "./primitives"
 import { Text } from "./text"
 import { View } from "./view"
-import { Input } from "./input"
-import firebase from "gatsby-plugin-firebase"
-import { Loader } from "./loader"
-import { DialogContext } from "../contexts/dialog"
-import { DIALOG_CLOSED_REASON } from "../constants"
+import { useIntl } from "react-intl"
 
 export const LeaderboardDialog = ({ deferred }) => {
-  const t = useTranslate()
+  const intl = useIntl()
+
   const { showProfile } = useContext(DialogContext)
 
   const { currentUser, usersMetadata } = useContext(UserContext)
-  const tangrams = useContext(TangramsContext)
-  const [selected, setSelected] = useState("claps")
-  const [users, setUsers] = useState(null)
+  const { approvedTangrams } = useContext(TangramsContext)
+  const { completedTangrams } = useContext(GalleryContext)
+  const [selected, setSelected] = useState(
+    () => window.localStorage.getItem("selectedLeaderboard") || "claps"
+  )
 
   const handleChange = (e) => {
     setSelected(e.target.value)
+    window.localStorage.setItem("selectedLeaderboard", e.target.value)
   }
 
   const handleBadgeClick = (uid) => {
     showProfile(uid)
   }
 
-  useEffect(() => {
-    const asyncTask = async () => {
-      const clapsByUserId = {}
-      const createdTangramsByUserId = {}
-      for (const { uid, claps, approved } of tangrams) {
-        if (!clapsByUserId[uid]) {
-          clapsByUserId[uid] = 0
-          createdTangramsByUserId[uid] = 0
-        }
-        clapsByUserId[uid] += claps || 0
-        if (approved) {
-          createdTangramsByUserId[uid] += 1
-        }
+  const users = useMemo(() => {
+    const clapsByUserId = {}
+    const createdTangramsByUserId = {}
+    for (const { uid, claps } of approvedTangrams) {
+      if (!clapsByUserId[uid]) {
+        clapsByUserId[uid] = 0
+        createdTangramsByUserId[uid] = 0
       }
-
-      const users = await Promise.all(
-        Object.keys(usersMetadata).map(async (uid) => {
-          const userMetadata = usersMetadata[uid]
-
-          // All data stats should be stored under a single collection
-          const snapshot = await firebase
-            .firestore()
-            .collection("users")
-            .doc(uid)
-            .collection("tangrams")
-            .get()
-
-          return {
-            uid,
-            ...userMetadata,
-            claps: clapsByUserId[uid] || 0,
-            completed: snapshot.size,
-            created: createdTangramsByUserId[uid] || 0,
-          }
-        })
-      )
-
-      setUsers(users)
+      clapsByUserId[uid] += claps || 0
+      createdTangramsByUserId[uid] += 1
     }
 
-    asyncTask()
-  }, [tangrams, usersMetadata])
+    return Object.keys(usersMetadata).map((uid) => {
+      const userMetadata = usersMetadata[uid]
+
+      return {
+        uid,
+        ...userMetadata,
+        claps: clapsByUserId[uid] || 0,
+        completed: completedTangrams[uid]
+          ? Object.keys(completedTangrams[uid]).length
+          : 0,
+        created: createdTangramsByUserId[uid] || 0,
+      }
+    })
+  }, [completedTangrams, approvedTangrams, usersMetadata])
 
   const sortedUsers = useMemo(() => {
     if (!users) {
@@ -82,7 +70,7 @@ export const LeaderboardDialog = ({ deferred }) => {
 
   return (
     <Dialog
-      title={<Title>{t("Leaderboard")}</Title>}
+      title={<Title>{intl.formatMessage({ id: "Leaderboard" })}</Title>}
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
       css={{
         gap: 3,
@@ -92,14 +80,16 @@ export const LeaderboardDialog = ({ deferred }) => {
         overflow: "auto",
       }}
     >
-      {!sortedUsers ? (
-        <Loader css={{ m: "auto" }}></Loader>
-      ) : (
+      {
         <>
           <Input as="select" value={selected} onChange={handleChange}>
-            <option value="claps">{t("Claps")}</option>
-            <option value="completed">{t("Completed tangrams")}</option>
-            <option value="created">{t("Created tangrams")}</option>
+            <option value="claps">{intl.formatMessage({ id: "Claps" })}</option>
+            <option value="completed">
+              {intl.formatMessage({ id: "Completed tangrams" })}
+            </option>
+            <option value="created">
+              {intl.formatMessage({ id: "Created tangrams" })}
+            </option>
           </Input>
 
           <View css={{ flex: "1", overflow: "auto", gap: 2 }}>
@@ -146,7 +136,7 @@ export const LeaderboardDialog = ({ deferred }) => {
             ))}
           </View>
         </>
-      )}
+      }
     </Dialog>
   )
 }

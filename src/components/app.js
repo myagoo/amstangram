@@ -6,18 +6,25 @@ import { GalleryContext } from "../contexts/gallery"
 import { Loader } from "./loader"
 import { Tangram } from "./tangram"
 import { UserContext } from "../contexts/user"
-import { useTranslate } from "../contexts/language"
 import { NotifyContext } from "../contexts/notify"
+import { TangramsContext } from "../contexts/tangrams"
+import { useIntl } from "react-intl"
 
 export const App = () => {
-  const t = useTranslate()
+  const intl = useIntl()
   const notify = useContext(NotifyContext)
   const [waited, setWaited] = useState(false)
   const [showLoader, setShowLoader] = useState(false)
   const [showLoaderTimeout, setShowLoaderTimeout] = useState(false)
   const [initialized, setInitialized] = useState(false)
-  const { playlist } = useContext(GalleryContext)
-  const { currentUser } = useContext(UserContext)
+  const { initialized: tangramsInitialized } = useContext(TangramsContext)
+  const { playlist, initialized: galleryInitialized } = useContext(
+    GalleryContext
+  )
+  const { currentUser, initialized: usersInitialized } = useContext(UserContext)
+
+  const isEverythingInitialized =
+    usersInitialized && tangramsInitialized && galleryInitialized && playlist
 
   useEffect(() => {
     setTimeout(() => setWaited(true), FADE_TRANSITION_DURATION * 2)
@@ -28,10 +35,10 @@ export const App = () => {
   }, [])
 
   useEffect(() => {
-    if (playlist) {
+    if (isEverythingInitialized) {
       clearTimeout(showLoaderTimeout)
     }
-  }, [playlist, showLoaderTimeout])
+  }, [isEverythingInitialized])
 
   if (initialized) {
     return <Tangram></Tangram>
@@ -40,7 +47,14 @@ export const App = () => {
   const handleAnimationEnd = () => {
     setInitialized(true)
     if (currentUser) {
-      notify(t("Logged in as {username}", { username: currentUser.username }))
+      notify(
+        intl.formatMessage(
+          { id: "Logged in as {username}" },
+          {
+            username: currentUser.username,
+          }
+        )
+      )
     }
   }
 
@@ -51,11 +65,11 @@ export const App = () => {
         alignItems: "center",
         justifyContent: "center",
         animation:
-          playlist && waited
+          isEverythingInitialized && waited
             ? `${FADE_TRANSITION_DURATION}ms fadeIn ease ${FADE_STAGGER_DURATION}ms reverse`
             : undefined,
       }}
-      deps={[playlist, waited]}
+      deps={[isEverythingInitialized, waited]}
       onAnimationEnd={(event) => {
         if (event.currentTarget === event.target) {
           handleAnimationEnd()
@@ -70,12 +84,16 @@ export const App = () => {
         <Logo
           css={{
             size: 128,
+            overflow: "visible",
             "& > g": {
               transition: `all ${FADE_TRANSITION_DURATION}ms ease`,
-              transform: waited ? "translate(30px, -30px)" : "translate(0, 0)",
+              transform:
+                isEverythingInitialized && waited
+                  ? "translate(30px, -30px)"
+                  : "translate(0, 0)",
             },
           }}
-          deps={[waited]}
+          deps={[isEverythingInitialized, waited]}
         />
       </View>
 

@@ -1,17 +1,18 @@
 import firebase from "gatsby-plugin-firebase"
-import React, { useCallback, useState, useContext } from "react"
+import React, { useCallback, useContext, useState } from "react"
 import { useForm } from "react-hook-form"
-import { useTranslate } from "../contexts/language"
+import { useIntl } from "react-intl"
+import { DIALOG_CLOSED_REASON } from "../constants"
+import { NotifyContext } from "../contexts/notify"
 import { PrimaryButton } from "./button"
 import { Dialog } from "./dialog"
 import { Input } from "./input"
 import { Error, Similink, Title } from "./primitives"
 import { View } from "./view"
-import { NotifyContext } from "../contexts/notify"
-import { DIALOG_CLOSED_REASON } from "../constants"
 
 const SignupTab = ({ onSignup, switchTab }) => {
-  const t = useTranslate()
+  const intl = useIntl()
+
   const {
     handleSubmit,
     register,
@@ -46,24 +47,32 @@ const SignupTab = ({ onSignup, switchTab }) => {
       } catch (error) {
         switch (error.code) {
           case "auth/weak-password":
-            setError("password", "weakPassword", t("Password is too weak"))
+            setError(
+              "password",
+              "weakPassword",
+              intl.formatMessage({ id: "Password is too weak" })
+            )
             break
           case "auth/email-already-in-use":
             setError(
               "email",
               "alreadyExists",
-              t("Email address already in use")
+              intl.formatMessage({ id: "Email address already in use" })
             )
             break
           case "auth/invalid-email":
-            setError("email", "invalid", t("Invalid email address"))
+            setError(
+              "email",
+              "invalid",
+              intl.formatMessage({ id: "Invalid email address" })
+            )
             break
           default:
             return
         }
       }
     },
-    [onSignup, setError, t]
+    [onSignup, setError, intl]
   )
 
   return (
@@ -74,43 +83,50 @@ const SignupTab = ({ onSignup, switchTab }) => {
     >
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
         <View css={{ gap: 2 }}>
-          <label>{t("Email address")}</label>
+          <label>{intl.formatMessage({ id: "Email address" })}</label>
           <Input
             type="email"
             name="email"
-            ref={register({ required: t("Email address is required") })}
+            ref={register({
+              required: intl.formatMessage({ id: "Email address is required" }),
+            })}
           ></Input>
           {errors.email && <Error>{errors.email.message}</Error>}
         </View>
 
         <View css={{ gap: 2 }}>
-          <label>{t("Username")}</label>
+          <label>{intl.formatMessage({ id: "Username" })}</label>
           <Input
             name="username"
-            ref={register({ required: t("Username is required") })}
+            ref={register({
+              required: intl.formatMessage({ id: "Username is required" }),
+            })}
           ></Input>
           {errors.username && <Error>{errors.username.message}</Error>}
         </View>
 
         <View css={{ gap: 2 }}>
-          <label>{t("Password")}</label>
+          <label>{intl.formatMessage({ id: "Password" })}</label>
           <Input
             type="password"
             name="password"
-            ref={register({ required: t("Password is required") })}
+            ref={register({
+              required: intl.formatMessage({ id: "Password is required" }),
+            })}
           ></Input>
           {errors.password && <Error>{errors.password.message}</Error>}
         </View>
 
         <View css={{ gap: 2 }}>
-          <label>{t("Confirm password")}</label>
+          <label>{intl.formatMessage({ id: "Confirm password" })}</label>
           <Input
             type="password"
             name="passwordConfirm"
             ref={register({
               required: "Password is required",
               validate: (passwordConfirm) =>
-                passwordConfirm === password || t("Passwords must match"),
+                passwordConfirm === password ||
+                intl.formatMessage({ id: "Passwords must match" }),
             })}
           ></Input>
           {errors.passwordConfirm && (
@@ -120,7 +136,7 @@ const SignupTab = ({ onSignup, switchTab }) => {
       </View>
 
       <PrimaryButton disabled={formState.isSubmitting} type="submit">
-        {t("Sign me up !")}
+        {intl.formatMessage({ id: "Sign me up !" })}
       </PrimaryButton>
 
       <View
@@ -129,7 +145,7 @@ const SignupTab = ({ onSignup, switchTab }) => {
         }}
       >
         <Similink onClick={switchTab}>
-          {t("I already have an account")}
+          {intl.formatMessage({ id: "I already have an account" })}
         </Similink>
       </View>
     </View>
@@ -137,7 +153,8 @@ const SignupTab = ({ onSignup, switchTab }) => {
 }
 
 const SignInTab = ({ onSignin, switchTab }) => {
-  const t = useTranslate()
+  const intl = useIntl()
+
   const { handleSubmit, register, setError, errors, formState } = useForm()
 
   const onSubmit = useCallback(
@@ -165,10 +182,18 @@ const SignInTab = ({ onSignin, switchTab }) => {
           case "auth/invalid-email":
           case "auth/user-not-found":
           case "auth/user-disabled":
-            setError("email", "invalid", t("Unknown email address"))
+            setError(
+              "email",
+              "invalid",
+              intl.formatMessage({ id: "Unknown email address" })
+            )
             break
           case "auth/wrong-password":
-            setError("password", "mismatch", t("Incorrect password"))
+            setError(
+              "password",
+              "mismatch",
+              intl.formatMessage({ id: "Incorrect password" })
+            )
             break
 
           default:
@@ -176,7 +201,7 @@ const SignInTab = ({ onSignin, switchTab }) => {
         }
       }
     },
-    [onSignin, setError, t]
+    [onSignin, setError, intl]
   )
 
   return (
@@ -187,28 +212,32 @@ const SignInTab = ({ onSignin, switchTab }) => {
     >
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
         <View css={{ gap: 2 }}>
-          <label>{t("Email address")}</label>
+          <label>{intl.formatMessage({ id: "Email address" })}</label>
           <Input
             type="email"
             name="email"
-            ref={register({ required: t("Email address is required") })}
+            ref={register({
+              required: intl.formatMessage({ id: "Email address is required" }),
+            })}
           ></Input>
           {errors.email && <Error>{errors.email.message}</Error>}
         </View>
 
         <View css={{ gap: 2 }}>
-          <label>{t("Password")}</label>
+          <label>{intl.formatMessage({ id: "Password" })}</label>
           <Input
             type="password"
             name="password"
-            ref={register({ required: t("Password is required") })}
+            ref={register({
+              required: intl.formatMessage({ id: "Password is required" }),
+            })}
           ></Input>
           {errors.password && <Error>{errors.password.message}</Error>}
         </View>
       </View>
 
       <PrimaryButton type="submit" disabled={formState.isSubmitting}>
-        {t("Sign me in !")}
+        {intl.formatMessage({ id: "Sign me in !" })}
       </PrimaryButton>
 
       <View
@@ -216,30 +245,38 @@ const SignInTab = ({ onSignin, switchTab }) => {
           alignItems: "center",
         }}
       >
-        <Similink onClick={switchTab}>{t("I don't have an account")}</Similink>
+        <Similink onClick={switchTab}>
+          {intl.formatMessage({ id: "I don't have an account" })}
+        </Similink>
       </View>
     </View>
   )
 }
 
 export const LoginDialog = ({ deferred }) => {
-  const t = useTranslate()
+  const intl = useIntl()
+
   const notify = useContext(NotifyContext)
 
   const [tab, setTab] = useState("signup")
 
   const handleLogin = (currentUser) => {
     deferred.resolve(currentUser)
-    notify(t("Logged in as {username}", { username: currentUser.username }))
+    notify(
+      intl.formatMessage(
+        { id: "Logged in as {username}" },
+        { username: currentUser.username }
+      )
+    )
   }
 
   return (
     <Dialog
       title={
         tab === "signup" ? (
-          <Title>{t("Create your account")}</Title>
+          <Title>{intl.formatMessage({ id: "Create your account" })}</Title>
         ) : (
-          <Title>{t("Connect to your account")}</Title>
+          <Title>{intl.formatMessage({ id: "Connect to your account" })}</Title>
         )
       }
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}

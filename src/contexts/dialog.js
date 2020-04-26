@@ -1,22 +1,21 @@
 import React, {
   createContext,
   useCallback,
-  useMemo,
-  useState,
   useContext,
   useEffect,
+  useMemo,
+  useState,
 } from "react"
+import { ChallengeDialog } from "../components/challengeDialog"
 import { GalleryDialog } from "../components/galleryDialog"
 import { LeaderboardDialog } from "../components/leaderboardDialog"
 import { LoginDialog } from "../components/loginDialog"
 import { ProfileDialog } from "../components/profileDialog"
 import { TangramDialog } from "../components/tangramDialog"
 import { Deferred } from "../utils/deferred"
-import { UserContext } from "./user"
-import { TangramsContext } from "./tangrams"
 import { GalleryContext } from "./gallery"
-import { shuffle } from "../utils/shuffle"
-import { ChallengeDialog } from "../components/challengeDialog"
+import { TangramsContext } from "./tangrams"
+import { UserContext } from "./user"
 
 export const DialogContext = createContext()
 
@@ -28,11 +27,15 @@ export const DialogProvider = ({ children }) => {
   const [tangramDialogData, setTangramDialogData] = useState(null)
   const [challengeDialogData, setChallengeDialogData] = useState(null)
 
-  const { currentUser } = useContext(UserContext)
-  const { playlist, setPlaylist, completedTangrams } = useContext(
-    GalleryContext
+  const { initialized: usersInitialized } = useContext(UserContext)
+  const {
+    playlist,
+    startRandomPlaylist,
+    initialized: galleryInitialized,
+  } = useContext(GalleryContext)
+  const { initialized: tangramsInitialized, approvedTangrams } = useContext(
+    TangramsContext
   )
-  const tangrams = useContext(TangramsContext)
   const [initialized, setInitialized] = useState(false)
 
   const showProfile = useCallback((uid) => {
@@ -68,17 +71,13 @@ export const DialogProvider = ({ children }) => {
   }, [])
 
   useEffect(() => {
-    if (tangrams && currentUser !== undefined && !initialized) {
+    if (
+      tangramsInitialized &&
+      galleryInitialized &&
+      usersInitialized &&
+      !initialized
+    ) {
       let hasBeenChallenged = false
-
-      const startRandomPlaylist = () =>
-        setPlaylist(
-          shuffle(tangrams).sort(({ id: idA }, { id: idB }) => {
-            const isTangramACompleted = completedTangrams[idA] !== undefined
-            const isTangramBCompleted = completedTangrams[idB] !== undefined
-            return isTangramACompleted - isTangramBCompleted
-          })
-        )
 
       if (!playlist && window.location.search) {
         const searchParams = new URLSearchParams(window.location.search)
@@ -86,7 +85,7 @@ export const DialogProvider = ({ children }) => {
         if (searchParams.has("tangrams")) {
           const tangramIds = searchParams.get("tangrams").split(",")
           const uid = searchParams.get("uid")
-          const challengeTangrams = tangrams.filter((tangram) =>
+          const challengeTangrams = approvedTangrams.filter((tangram) =>
             tangramIds.includes(tangram.id)
           )
           if (challengeTangrams.length) {
@@ -122,14 +121,7 @@ export const DialogProvider = ({ children }) => {
 
       setInitialized(true)
     }
-  }, [
-    tangrams,
-    currentUser,
-    initialized,
-    playlist,
-    setPlaylist,
-    completedTangrams,
-  ])
+  }, [tangramsInitialized, galleryInitialized, usersInitialized, initialized])
 
   const contextValue = useMemo(
     () => ({

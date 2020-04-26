@@ -8,93 +8,71 @@ import React, {
   useState,
 } from "react"
 import { copyToClipboard } from "../utils/copyToClipboard"
-import {
-  sortDigitsTangrams,
-  sortLettersTangrams,
-  sortTangrams,
-} from "../utils/sortTangrams"
-import { useTranslate } from "./language"
+
 import { NotifyContext } from "./notify"
 import { TangramsContext } from "./tangrams"
 import { UserContext } from "./user"
+import { shuffle } from "../utils/shuffle"
+import { useIntl } from "react-intl"
 
 export const GalleryContext = createContext(null)
 
 export const GalleryProvider = ({ children }) => {
-  const t = useTranslate()
+  const intl = useIntl()
+
   const notify = useContext(NotifyContext)
   const { currentUser } = useContext(UserContext)
-  const tangrams = useContext(TangramsContext)
+  const { approvedTangrams } = useContext(TangramsContext)
 
   const [playlist, setPlaylist] = useState(null)
   const [saveRequestId, setSaveRequestId] = useState(0)
-  const [completedTangrams, setCompletedTangrams] = useState({})
-  const [tangramsByCategory, setTangramsByCategory] = useState(null)
+  const [stats, setStats] = useState(null)
+  const [initialized, setInitialized] = useState(false)
 
   useEffect(() => {
-    if (!currentUser) {
-      setCompletedTangrams({})
-      return
-    }
-
     const unsubscribe = firebase
       .firestore()
-      .collection("users")
-      .doc(currentUser.uid)
-      .collection("tangrams")
+      .collection("stats")
       .onSnapshot((collectionSnapshot) => {
-        const newCompletedTangrams = {}
+        const newStats = {}
         for (const doc of collectionSnapshot.docs) {
           const id = doc.id
           const completionStats = doc.data()
-          newCompletedTangrams[id] = completionStats
+          newStats[id] = completionStats
         }
-        setCompletedTangrams(newCompletedTangrams)
+        setStats(newStats)
       })
 
     return unsubscribe
-  }, [currentUser])
+  }, [])
 
-  useEffect(() => {
-    if (tangrams === null) {
-      return
+  const completedTangrams = useMemo(() => {
+    if (!approvedTangrams || !stats) {
+      return null
     }
 
-    const newTangramsByCategory = {}
+    const approvedTangramsIds = approvedTangrams.map(({ id }) => id)
 
-    for (const tangram of tangrams) {
-      if (tangram.uid && !tangram.approved) {
-        if (
-          !currentUser ||
-          (!currentUser.isAdmin && tangram.uid !== currentUser.uid)
-        ) {
-          continue
+    let newCompletedTangrams = {}
+
+    for (const userId in stats) {
+      if (!newCompletedTangrams[userId]) {
+        newCompletedTangrams[userId] = {}
+      }
+      for (const tangramId in stats[userId]) {
+        if (approvedTangramsIds.includes(tangramId)) {
+          newCompletedTangrams[userId][tangramId] = stats[userId][tangramId]
         }
       }
-
-      if (!newTangramsByCategory[tangram.category]) {
-        newTangramsByCategory[tangram.category] = []
-      }
-
-      newTangramsByCategory[tangram.category].push(tangram)
     }
+    return newCompletedTangrams
+  }, [stats, approvedTangrams])
 
-    const sortedTangramsByCategory = {}
-
-    for (const sortedCategory of Object.keys(newTangramsByCategory).sort()) {
-      sortedTangramsByCategory[sortedCategory] = newTangramsByCategory[
-        sortedCategory
-      ].sort(
-        sortedCategory === "letters"
-          ? sortLettersTangrams
-          : sortedCategory === "digits"
-          ? sortDigitsTangrams
-          : sortTangrams
-      )
+  useEffect(() => {
+    if (completedTangrams) {
+      setInitialized(true)
     }
-
-    setTangramsByCategory(sortedTangramsByCategory)
-  }, [tangrams, currentUser])
+  }, [completedTangrams])
 
   const shareTangrams = useCallback(
     (tangrams) => {
@@ -105,9 +83,9 @@ export const GalleryProvider = ({ children }) => {
         challengeLink += `&uid=${currentUser.uid}`
       }
       copyToClipboard(challengeLink)
-      notify(t("Challenge link copied to clipboard"))
+      notify(intl.formatMessage({ id: "Challenge link copied to clipboard" }))
     },
-    [notify, t, currentUser]
+    [notify, currentUser, intl]
   )
 
   const requestSave = useCallback(() => {
@@ -116,49 +94,63 @@ export const GalleryProvider = ({ children }) => {
 
   const markTangramAsComplete = useCallback(
     async (tangram, completionTime) => {
-      if (currentUser) {
-        const { exists } = await firebase
+      if (currentUser && tangram.approved && !completedTangrams[tangram.id]) {
+        await firebase
           .firestore()
-          .collection("users")
+          .collection("stats")
           .doc(currentUser.uid)
-          .collection("tangrams")
-          .doc(tangram.id)
-          .get()
-
-        if (!exists)
-          await firebase
-            .firestore()
-            .collection("users")
-            .doc(currentUser.uid)
-            .collection("tangrams")
-            .doc(tangram.id)
-            .set({
-              completionTime,
-            })
+          .set(
+            {
+              [tangram.id]: { completionTime },
+            },
+            { merge: true }
+          )
       }
     },
-    [currentUser]
+    [currentUser, completedTangrams]
   )
+
+  const startRandomPlaylist = useCallback(() => {
+    let currentUserCompletedTangrams =
+      currentUser != null && completedTangrams[currentUser.uid]
+        ? completedTangrams[currentUser.uid]
+        : {}
+
+    const randomPlaylist = shuffle([...approvedTangrams]).sort(
+      ({ id: idA, edges: edgesA }, { id: idB, edges: edgesB }) => {
+        const isTangramACompleted =
+          currentUserCompletedTangrams[idA] !== undefined
+        const isTangramBCompleted =
+          currentUserCompletedTangrams[idB] !== undefined
+        return !isTangramACompleted && !isTangramBCompleted
+          ? edgesB - edgesA
+          : isTangramACompleted - isTangramBCompleted
+      }
+    )
+    setPlaylist([...randomPlaylist])
+  }, [approvedTangrams, completedTangrams, currentUser])
 
   const contextValue = useMemo(
     () => ({
+      initialized,
       requestSave,
       saveRequestId,
       playlist,
       setPlaylist,
-      tangramsByCategory,
       markTangramAsComplete,
       completedTangrams,
       shareTangrams,
+      startRandomPlaylist,
     }),
     [
+      initialized,
       requestSave,
       saveRequestId,
       playlist,
-      tangramsByCategory,
       markTangramAsComplete,
       completedTangrams,
       shareTangrams,
+      startRandomPlaylist,
     ]
   )
 

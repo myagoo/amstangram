@@ -125,6 +125,23 @@ const importFirestore = async () => {
       const subCollections = data[collectionKey][documentId].collections
 
       for (const subCollectionId in subCollections) {
+        if (collectionKey === "users" && subCollectionId === "tangrams") {
+          const subCollection = subCollections[subCollectionId]
+          for (const subDocumentId in subCollection) {
+            const subDocument = subCollection[subDocumentId]
+            await firebase
+              .firestore()
+              .collection("stats")
+              .doc(documentId)
+              .set(
+                {
+                  [subDocumentId]: subDocument,
+                },
+                { merge: true }
+              )
+          }
+        }
+
         const subCollection = subCollections[subCollectionId]
         for (const subDocumentId in subCollection) {
           const subDocument = subCollection[subDocumentId]

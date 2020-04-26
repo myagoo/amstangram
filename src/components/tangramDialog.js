@@ -1,21 +1,22 @@
 import firebase from "gatsby-plugin-firebase"
-import React, { useContext, useMemo } from "react"
+import React, { useContext, useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
-import { CATEGORIES, DIGITS, LETTERS, DIALOG_CLOSED_REASON } from "../constants"
-import { useTranslate } from "../contexts/language"
+import { useIntl } from "react-intl"
+import { CATEGORIES, DIALOG_CLOSED_REASON, DIGITS, LETTERS } from "../constants"
 import { NotifyContext } from "../contexts/notify"
 import { UserContext } from "../contexts/user"
 import { getRandomEmoji } from "../utils/getRandomEmoji"
+import { recomputePathData } from "../utils/recomputePathData"
 import { PrimaryButton } from "./button"
 import { Card } from "./card"
 import { Dialog } from "./dialog"
 import { Input } from "./input"
-import { Similink, Title } from "./primitives"
+import { Error, Hint, Similink, Title } from "./primitives"
 import { Text } from "./text"
 import { View } from "./view"
 
 const ReadTangramDialog = ({ tangram, deferred }) => {
-  const t = useTranslate()
+  const intl = useIntl()
 
   return (
     <Dialog
@@ -25,9 +26,12 @@ const ReadTangramDialog = ({ tangram, deferred }) => {
       <View css={{ gap: 3, overflow: "auto", flex: "1", alignItems: "center" }}>
         <Card selected tangram={tangram}></Card>
         <Text>
-          {t("Earned {claps} 👏", {
-            claps: tangram.claps || 0,
-          })}
+          {intl.formatMessage(
+            { id: "Earned {claps} 👏" },
+            {
+              claps: tangram.claps || 0,
+            }
+          )}
         </Text>
       </View>
     </Dialog>
@@ -35,19 +39,21 @@ const ReadTangramDialog = ({ tangram, deferred }) => {
 }
 
 const SaveTangramDialog = ({ tangram, deferred }) => {
-  const { currentUser } = useContext(UserContext)
-  const isCreation = currentUser && !tangram.id
-
-  const t = useTranslate()
+  const intl = useIntl()
   const notify = useContext(NotifyContext)
+  const { currentUser } = useContext(UserContext)
+  const [tangramCopy, setTangramCopy] = useState({ ...tangram })
+
+  const isCreation = currentUser && !tangram.id
 
   const defaultValues = useMemo(
     () => ({
+      path: tangram.path,
       category: tangram.category,
       emoji:
         tangram.category !== "digits" && tangram.category !== "letters"
           ? tangram.emoji
-          : undefined,
+          : getRandomEmoji(),
       letterIndex:
         tangram.category === "letters"
           ? LETTERS.indexOf(tangram.emoji)
@@ -60,17 +66,33 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
     [tangram]
   )
 
-  const { handleSubmit, register, watch } = useForm({ defaultValues })
+  const {
+    handleSubmit,
+    register,
+    watch,
+    errors,
+    setError,
+    clearError,
+  } = useForm({
+    defaultValues,
+  })
 
-  const handleDelete = async () => {
-    if (window.confirm(t("Are you sure you want to delete this tangram ?"))) {
-      await firebase.firestore().collection("tangrams").doc(tangram.id).delete()
-      notify(t("Tangram sucessfuly deleted"))
-      deferred.resolve()
+  const { path, category, emoji, letterIndex, digitIndex } = watch()
+
+  useEffect(() => {
+    try {
+      const pathData = recomputePathData(path)
+      setTangramCopy((prevTangramCopy) => ({
+        ...prevTangramCopy,
+        ...pathData,
+      }))
+      clearError("path")
+    } catch (error) {
+      setError("path", "invalid", intl.formatMessage({ id: "Invalid path" }))
     }
-  }
+  }, [path, setError, clearError, intl])
 
-  const onSubmit = async ({ category, emoji, letterIndex, digitIndex }) => {
+  useEffect(() => {
     const computedEmoji =
       category === "letters"
         ? LETTERS[letterIndex]
@@ -80,42 +102,63 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
         ? emoji
         : getRandomEmoji()
 
-    const newTangram = {
-      ...tangram,
-      category,
+    setTangramCopy((prevTangramCopy) => ({
+      ...prevTangramCopy,
       emoji: computedEmoji,
-    }
+    }))
+  }, [category, emoji, letterIndex, digitIndex])
 
+  useEffect(() => {
+    setTangramCopy((prevTangramCopy) => ({
+      ...prevTangramCopy,
+      category,
+    }))
+  }, [category])
+
+  const handleDelete = async () => {
+    if (
+      window.confirm(
+        intl.formatMessage({
+          id: "Are you sure you want to delete this tangram ?",
+        })
+      )
+    ) {
+      await firebase.firestore().collection("tangrams").doc(tangram.id).delete()
+      notify(intl.formatMessage({ id: "Tangram sucessfuly deleted" }))
+      deferred.resolve()
+    }
+  }
+
+  const onSubmit = async () => {
     if (isCreation) {
       await firebase
         .firestore()
         .collection("tangrams")
         .add({
-          ...newTangram,
+          ...tangramCopy,
           uid: currentUser.uid,
           approved: false,
         })
-      notify(t("Tangram submitted for review"))
+      notify(intl.formatMessage({ id: "Tangram submitted for review" }))
     } else {
       await firebase
         .firestore()
         .collection("tangrams")
         .doc(tangram.id)
-        .update(newTangram)
-      notify(t("Tangram successfuly modified"))
+        .update(tangramCopy)
+      notify(intl.formatMessage({ id: "Tangram successfuly modified" }))
     }
 
     deferred.resolve()
   }
 
-  const completedEmoji = watch("emoji")
-  const category = watch("category")
-
   return (
     <Dialog
       title={
         <Title>
-          {isCreation ? t("Submit your tangram") : t("Edit your tangram")}
+          {isCreation
+            ? intl.formatMessage({ id: "Submit your tangram" })
+            : intl.formatMessage({ id: "Edit your tangram" })}
         </Title>
       }
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
@@ -126,24 +169,38 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
         <Card
           selected
-          tangram={{ ...tangram, emoji: completedEmoji }}
+          completed
+          tangram={tangramCopy}
           css={{ alignSelf: "center" }}
         ></Card>
 
         {tangram.approved && (
           <Text css={{ alignSelf: "center" }}>
-            {t("Earned {claps} 👏", {
-              claps: tangram.claps || 0,
-            })}
+            {intl.formatMessage(
+              { id: "Earned {claps} 👏" },
+              {
+                claps: tangram.claps || 0,
+              }
+            )}
           </Text>
         )}
 
+        {currentUser && currentUser.isAdmin && (
+          <>
+            <View css={{ gap: 2 }}>
+              <label>{intl.formatMessage({ id: "Path" })}</label>
+              <Input as="textarea" name="path" ref={register}></Input>
+              {errors.path && <Error>{errors.path.message}</Error>}
+            </View>
+          </>
+        )}
+
         <View css={{ gap: 2 }}>
-          <label>{t("Category")}</label>
+          <label>{intl.formatMessage({ id: "Category" })}</label>
           <Input as="select" name="category" ref={register}>
             {CATEGORIES.map((category) => (
               <option key={category} value={category}>
-                {t(category)}
+                {intl.formatMessage({ id: category })}
               </option>
             ))}
           </Input>
@@ -151,7 +208,7 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
 
         {category === "digits" ? (
           <View css={{ gap: 2 }}>
-            <label>{t("Victory emoji")}</label>
+            <label>{intl.formatMessage({ id: "Victory emoji" })}</label>
             <Input as="select" name="digitIndex" ref={register}>
               {DIGITS.map((digitEmoji, index) => (
                 <option key={index} value={index}>
@@ -162,7 +219,7 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
           </View>
         ) : category === "letters" ? (
           <View css={{ gap: 2 }}>
-            <label>{t("Victory emoji")}</label>
+            <label>{intl.formatMessage({ id: "Victory emoji" })}</label>
             <Input as="select" name="letterIndex" ref={register}>
               {LETTERS.map((letterEmoji, index) => (
                 <option key={index} value={index}>
@@ -173,17 +230,18 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
           </View>
         ) : (
           <View css={{ gap: 2 }}>
-            <label>{t("Victory emoji")}</label>
-            <Input
-              name="emoji"
-              ref={register}
-              placeholder={t("Leave empty for random emoji")}
-            />
+            <label>{intl.formatMessage({ id: "Victory emoji" })}</label>
+            <Input name="emoji" ref={register} />
+            <Hint>
+              {intl.formatMessage({ id: "Leave empty for random emoji" })}
+            </Hint>
           </View>
         )}
       </View>
       <PrimaryButton type="submit">
-        {isCreation ? t("Submit !") : t("Edit !")}
+        {isCreation
+          ? intl.formatMessage({ id: "Submit !" })
+          : intl.formatMessage({ id: "Edit !" })}
       </PrimaryButton>
       {!isCreation && (
         <View
@@ -191,7 +249,9 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
             alignItems: "center",
           }}
         >
-          <Similink onClick={handleDelete}>{t("Or delete tangram")}</Similink>
+          <Similink onClick={handleDelete}>
+            {intl.formatMessage({ id: "Or delete tangram" })}
+          </Similink>
         </View>
       )}
     </Dialog>

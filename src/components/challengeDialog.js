@@ -1,17 +1,17 @@
 import React, { useContext } from "react"
+import { useIntl } from "react-intl"
+import { DIALOG_CLOSED_REASON } from "../constants"
+import { DialogContext } from "../contexts/dialog"
 import { GalleryContext } from "../contexts/gallery"
-import { useTranslate } from "../contexts/language"
 import { UserContext } from "../contexts/user"
 import { PrimaryButton } from "./button"
 import { Card } from "./card"
 import { Dialog } from "./dialog"
 import { Title } from "./primitives"
 import { View } from "./view"
-import { DialogContext } from "../contexts/dialog"
-import { DIALOG_CLOSED_REASON } from "../constants"
 
 export const ChallengeDialog = ({ uid, tangrams, deferred }) => {
-  const t = useTranslate()
+  const intl = useIntl()
   const { showProfile, showTangram } = useContext(DialogContext)
   const { usersMetadata } = useContext(UserContext)
   const { setPlaylist } = useContext(GalleryContext)
@@ -22,8 +22,18 @@ export const ChallengeDialog = ({ uid, tangrams, deferred }) => {
       title={
         <Title>
           {username
-            ? t("{username} challenged you", { username })
-            : t("Rise to the challenge")}
+            ? intl.formatMessage(
+                { id: "{username} challenged you" },
+                {
+                  username,
+                }
+              )
+            : intl.formatMessage(
+                { id: "Rise to the challenge" },
+                {
+                  username,
+                }
+              )}
         </Title>
       }
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
@@ -59,7 +69,7 @@ export const ChallengeDialog = ({ uid, tangrams, deferred }) => {
           deferred.resolve()
         }}
       >
-        {t("Let's go !")}
+        {intl.formatMessage({ id: "Let's go !" })}
       </PrimaryButton>
     </Dialog>
   )

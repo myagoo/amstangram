@@ -1,11 +1,9 @@
 import { useSwitchTheme } from "@css-system/gatsby-plugin-css-system"
 import React, { useContext } from "react"
 import { FiMoon, FiSun, FiVolume2, FiVolumeX } from "react-icons/fi"
-import {
-  LanguageContext,
-  supportedLanguages,
-  useTranslate,
-} from "../contexts/language"
+import { useIntl } from "react-intl"
+import { DIALOG_CLOSED_REASON } from "../constants"
+import { LanguageContext, supportedLanguages } from "../contexts/language"
 import { useShowBackgroundPattern } from "../contexts/showBackgroundPattern"
 import { SoundContext } from "../contexts/sound"
 import { DangerButton } from "./button"
@@ -15,7 +13,6 @@ import { Title } from "./primitives"
 import { Text } from "./text"
 import { Toggle } from "./toggle"
 import { View } from "./view"
-import { DIALOG_CLOSED_REASON } from "../constants"
 
 export const SettingsDialog = ({ deferred }) => {
   const { soundEnabled, toggleSound } = useContext(SoundContext)
@@ -25,7 +22,7 @@ export const SettingsDialog = ({ deferred }) => {
   ] = useShowBackgroundPattern()
 
   const { language, setLanguage } = useContext(LanguageContext)
-  const t = useTranslate()
+  const intl = useIntl()
 
   const [themeKey, switchTheme] = useSwitchTheme()
 
@@ -36,45 +33,46 @@ export const SettingsDialog = ({ deferred }) => {
   const handleResetClick = () => {
     if (
       window.confirm(
-        t(
-          "You are about to delete all your completion data. Are you sure you want to proceed ?"
-        )
+        intl.formatMessage({
+          id:
+            "You are about to reset your settings and tips. Are you sure you want to proceed ?",
+        })
       )
     ) {
       window.localStorage.clear()
-      window.location.reload()
+      window.location.reload(true)
     }
   }
 
   return (
     <Dialog
-      title={<Title>{t("Settings")}</Title>}
+      title={<Title>{intl.formatMessage({ id: "Settings" })}</Title>}
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
       css={{ gap: 4, overflow: "auto", flex: "1", minWidth: "268px" }}
     >
       <View css={{ gap: 2 }}>
-        <label>{t("Language")}</label>
+        <label>{intl.formatMessage({ id: "Language" })}</label>
         <Input as="select" onChange={handleLanguageChange} value={language}>
           {supportedLanguages.map((language) => (
             <option key={language} value={language}>
-              {t(language)}
+              {intl.formatMessage({ id: language })}
             </option>
           ))}
         </Input>
       </View>
       <View css={{ gap: 2 }}>
-        <label>{t("Difficulty")}</label>
+        <label>{intl.formatMessage({ id: "Difficulty" })}</label>
         <Toggle
           value={showBackgroundPattern}
           onChange={toggleShowBackgroundPattern}
-          leftComponent={<Text>{t("Easy")}</Text>}
+          leftComponent={<Text>{intl.formatMessage({ id: "Easy" })}</Text>}
           leftValue={true}
-          rightComponent={<Text>{t("Hard")}</Text>}
+          rightComponent={<Text>{intl.formatMessage({ id: "Hard" })}</Text>}
           rightValue={false}
         ></Toggle>
       </View>
       <View css={{ gap: 2 }}>
-        <label>{t("Theme")}</label>
+        <label>{intl.formatMessage({ id: "Theme" })}</label>
         <Toggle
           value={themeKey}
           onChange={switchTheme}
@@ -85,7 +83,7 @@ export const SettingsDialog = ({ deferred }) => {
         ></Toggle>
       </View>
       <View css={{ gap: 2 }}>
-        <label>{t("Sounds")}</label>
+        <label>{intl.formatMessage({ id: "Sounds" })}</label>
         <Toggle
           invertSounds
           value={soundEnabled}
@@ -96,7 +94,9 @@ export const SettingsDialog = ({ deferred }) => {
           rightValue={true}
         ></Toggle>
       </View>
-      <DangerButton onClick={handleResetClick}>{t("Reset data")}</DangerButton>
+      <DangerButton onClick={handleResetClick}>
+        {intl.formatMessage({ id: "Clear storage" })}
+      </DangerButton>
     </Dialog>
   )
 }

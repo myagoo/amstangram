@@ -2,7 +2,6 @@ import { ThemeContext } from "css-system"
 import firebase from "gatsby-plugin-firebase"
 import paper from "paper/dist/paper-core"
 import React, {
-  useCallback,
   useContext,
   useEffect,
   useLayoutEffect,
@@ -10,6 +9,7 @@ import React, {
   useRef,
   useState,
 } from "react"
+import { useIntl } from "react-intl"
 import { View } from "../components/view"
 import {
   CLICK_TIMEOUT,
@@ -20,11 +20,13 @@ import {
   STRICT_ERROR_MARGIN,
   VICTORY_PARTICLES_DURATION,
 } from "../constants"
+import { DialogContext } from "../contexts/dialog"
 import { GalleryContext } from "../contexts/gallery"
-import { useTranslate } from "../contexts/language"
 import { NotifyContext } from "../contexts/notify"
 import { useShowBackgroundPattern } from "../contexts/showBackgroundPattern"
 import { SoundContext } from "../contexts/sound"
+import { TangramsContext } from "../contexts/tangrams"
+import { TipsContext } from "../contexts/tips"
 import { UserContext } from "../contexts/user"
 import { createPiecesGroup } from "../utils/createPiecesGroup"
 import { getPathData } from "../utils/getPathData"
@@ -37,15 +39,16 @@ import { updateColisionState } from "../utils/updateColisionState"
 import { Card } from "./card"
 import { TangramMenu } from "./tangramMenu"
 import { Victory } from "./victory"
-import { DialogContext } from "../contexts/dialog"
 
 export const Tangram = () => {
+  const intl = useIntl()
+  const showTip = useContext(TipsContext)
+  const { approvedTangrams } = useContext(TangramsContext)
   const { showLogin, showTangram } = useContext(DialogContext)
   const { playTangram } = useContext(SoundContext)
   const playTangramRef = useRef()
   playTangramRef.current = playTangram
 
-  const t = useTranslate()
   const { currentUser } = useContext(UserContext)
   const currentUserRef = useRef()
   currentUserRef.current = currentUser
@@ -78,11 +81,13 @@ export const Tangram = () => {
 
   const handleNext = () => {
     setCurrentTangramIndex(currentTangramIndex + 1)
+    showTip()
   }
 
-  const handleStop = useCallback(() => {
+  const handleStop = () => {
     setPlaylist(null)
-  }, [setPlaylist])
+    showTip()
+  }
 
   const handleApprove = async () => {
     await firebase
@@ -91,7 +96,7 @@ export const Tangram = () => {
       .doc(selectedTangram.id)
       .update({ approved: true })
 
-    notify(t("Tangram approved"))
+    notify(intl.formatMessage({ id: "Tangram approved" }))
   }
 
   useEffect(() => {
@@ -102,7 +107,7 @@ export const Tangram = () => {
   useEffect(() => {
     if (saveRequestId) {
       if (!isTangramValid(piecesGroupRef.current)) {
-        notify(t("You can't save an invalid tangram"))
+        notify(intl.formatMessage({ id: "You can't save an invalid tangram" }))
         return
       }
 
@@ -112,7 +117,27 @@ export const Tangram = () => {
       )
 
       if (pathData.edges === 23) {
-        notify(t("You can't save such an easy tangram"))
+        notify(
+          intl.formatMessage({ id: "You can't save such an easy tangram" })
+        )
+        return
+      }
+
+      const roundedLength = Math.round(pathData.length)
+      const roundedWidth = Math.round(pathData.width)
+      const roundedHeight = Math.round(pathData.height)
+
+      if (
+        approvedTangrams.find((tangram) => {
+          return (
+            tangram.edges === pathData.edges &&
+            Math.round(tangram.length) === roundedLength &&
+            Math.round(tangram.width) === roundedWidth &&
+            Math.round(tangram.height) === roundedHeight
+          )
+        })
+      ) {
+        notify(intl.formatMessage({ id: "This tangram already exists" }))
         return
       }
 
@@ -192,9 +217,7 @@ export const Tangram = () => {
           .map(({ children }) => children["display"])
 
         const coumpoundShapes =
-          playlist &&
-          showBackgroundPatternRef.current &&
-          coumpoundPathRef.current
+          showBackgroundPatternRef.current && coumpoundPathRef.current
             ? coumpoundPathRef.current.children
               ? coumpoundPathRef.current.children
               : [coumpoundPathRef.current]
@@ -255,7 +278,7 @@ export const Tangram = () => {
         ghostGroup && ghostGroup.remove()
         ghostGroup = null
 
-        if (playlist === null) {
+        if (!coumpoundPathRef.current) {
           return
         }
 
@@ -448,8 +471,8 @@ export const Tangram = () => {
     const PARTICLES_COUNT = 60
     const MAX_PARTICLE_SIZE = 5
     const MIN_PARTICLE_SIZE = 2
-    const MIN_OPACITY = 0.1
-    const MAX_OPACITY = 0.5
+    const MIN_OPACITY = 0.25
+    const MAX_OPACITY = 0.75
 
     const maxPoint = new paper.Point(
       canvasRef.current.width,
@@ -537,7 +560,7 @@ export const Tangram = () => {
             cursor: "pointer",
           }}
         >
-          <Card tangram={selectedTangram} selected></Card>
+          <Card tangram={selectedTangram} selected hideBadge></Card>
         </View>
       )}
       <View
@@ -574,7 +597,9 @@ export const Tangram = () => {
                   claps: firebase.firestore.FieldValue.increment(count),
                 })
             } else {
-              notify(t("Claps only count when logged in"))
+              notify(
+                intl.formatMessage({ id: "Claps only count when logged in" })
+              )
             }
           }}
         />

@@ -100,6 +100,7 @@ export const Button = ({
   })
 
   const className = useCss({
+    lineHeight: 0,
     animation: `${gradient} 20s linear infinite both`,
     backgroundSize: "2000% 2000%",
     boxShadow: "0px 5px 10px #00000080",

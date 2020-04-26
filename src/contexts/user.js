@@ -13,6 +13,14 @@ export const UserProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(undefined)
   const [usersMetadata, setUsersMetadata] = useState(null)
 
+  const [initialized, setInitialized] = useState(false)
+
+  useEffect(() => {
+    if (currentUser !== undefined && usersMetadata !== null) {
+      setInitialized(true)
+    }
+  }, [currentUser, usersMetadata])
+
   useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
       if (!user) {
@@ -26,7 +34,6 @@ export const UserProvider = ({ children }) => {
           .get()
 
         const userMetadata = snapshot.data()
-
         setCurrentUser({
           uid: user.uid,
           ...userMetadata,
@@ -95,13 +102,21 @@ export const UserProvider = ({ children }) => {
 
   const contextValue = useMemo(
     () => ({
+      initialized,
       currentUser,
       usersMetadata,
       updateUsername,
       updatePassword,
       updateEmail,
     }),
-    [currentUser, usersMetadata, updateUsername, updatePassword, updateEmail]
+    [
+      initialized,
+      currentUser,
+      usersMetadata,
+      updateUsername,
+      updatePassword,
+      updateEmail,
+    ]
   )
 
   return (

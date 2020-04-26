@@ -24,9 +24,11 @@ export const getPathData = (piecesGroup, scaleFactor) => {
 
   const path = compoundPath.exportSVG().getAttribute("d")
   const edges = compoundPath.curves.length
-  const width = Math.round(compoundPath.bounds.width * 100) / 100
-  const height = Math.round(compoundPath.bounds.height * 100) / 100
+  const width = Math.round(compoundPath.bounds.width)
+  const height = Math.round(compoundPath.bounds.height)
   const length = Math.round(compoundPath.length)
+
+  compoundPath.remove()
 
   return {
     width,

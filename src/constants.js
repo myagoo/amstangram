@@ -12,6 +12,7 @@ export const SCRAMBLE_PADDING = 100
 export const COLOR_TRANSITION_DURATION = 250
 export const FADE_TRANSITION_DURATION = 1000
 export const FADE_STAGGER_DURATION = 500
+export const MAX_CLAPS_COUNT = 15
 export const DIALOG_CLOSED_REASON = "DIALOG_CLOSED_REASON"
 export const CATEGORIES = [
   "animals",
