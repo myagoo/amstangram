@@ -319,6 +319,7 @@ export const Tangram = () => {
               {
                 "position.x": piecesGroupRef.current.position.x,
                 "position.y": piecesGroupRef.current.position.y,
+                opacity: 1,
               },
               {
                 duration: VICTORY_PARTICLES_DURATION,
@@ -342,9 +343,9 @@ export const Tangram = () => {
 
             for (const particle of particlesRef.current) {
               particle.data.animation.stop()
+
               const angle = Math.random() * Math.PI * 2
               const distance = Math.random() * maxDistance
-
               particle.tween(
                 {
                   "position.x":
