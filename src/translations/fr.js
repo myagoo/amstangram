@@ -120,7 +120,7 @@ export default {
     "Tu peux partager ta playlist avec tes amis en appuyant sur {shareIcon} dans la galerie {galleryIcon}",
   "tips.create":
     "Tu peux créer tes propres tangrams en appuyant sur {createIcon} dans le menu {menuIcon}",
-  "tips.claps": `T'as aimé ce tangram ? Envoies des claps à son créateur en appuyant sur 👏 (jusqu'à ${MAX_CLAPS_COUNT} fois).`,
+  "tips.claps": `T'as aimé ce tangram ? Envoies des claps à son créateur en appuyant sur 👏 (jusqu'à ${MAX_CLAPS_COUNT} fois)`,
   "tips.difficulty":
     "Trop facile pour toi ? Tu peux changer la difficulté en appuyant sur {settingsIcon} dans le menu {menuIcon}",
   "tips.theme":

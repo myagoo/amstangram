@@ -113,10 +113,10 @@ export default {
   "tips.gallery":
     "You can create your own tangram playlist by selecting tangrams in the gallery {galleryIcon}",
   "tips.share":
-    "You can share playlist with your friends by pressing {shareIcon} in the gallery {galleryIcon}, ",
+    "You can share playlist with your friends by pressing {shareIcon} in the gallery {galleryIcon}",
   "tips.create":
     "You can create your own tangram by pressing {createIcon} in the menu {menuIcon}",
-  "tips.claps": `Did you liked this tangram ? Send claps to its creator by pressing 👏 (up to ${MAX_CLAPS_COUNT} times).`,
+  "tips.claps": `Did you liked this tangram ? Send claps to its creator by pressing 👏 (up to ${MAX_CLAPS_COUNT} times)`,
   "tips.difficulty":
     "Having it too easy? You can change difficulty by pressing {settingsIcon} in the menu {menuIcon}",
   "tips.theme":
