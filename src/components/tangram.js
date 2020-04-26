@@ -19,6 +19,11 @@ import {
   SOFT_ERROR_MARGIN,
   STRICT_ERROR_MARGIN,
   VICTORY_PARTICLES_DURATION,
+  PARTICLES_COUNT,
+  MIN_PARTICLE_OPACITY,
+  MIN_PARTICLE_SIZE,
+  MAX_PARTICLE_SIZE,
+  MAX_PARTICLE_OPACITY,
 } from "../constants"
 import { DialogContext } from "../contexts/dialog"
 import { GalleryContext } from "../contexts/gallery"
@@ -319,7 +324,7 @@ export const Tangram = () => {
               {
                 "position.x": piecesGroupRef.current.position.x,
                 "position.y": piecesGroupRef.current.position.y,
-                opacity: 1,
+                opacity: MAX_PARTICLE_OPACITY,
               },
               {
                 duration: VICTORY_PARTICLES_DURATION,
@@ -469,12 +474,6 @@ export const Tangram = () => {
 
     particleGroup.sendToBack()
 
-    const PARTICLES_COUNT = 60
-    const MAX_PARTICLE_SIZE = 5
-    const MIN_PARTICLE_SIZE = 2
-    const MIN_OPACITY = 0.25
-    const MAX_OPACITY = 0.75
-
     const maxPoint = new paper.Point(
       canvasRef.current.width,
       canvasRef.current.height
@@ -485,7 +484,8 @@ export const Tangram = () => {
       MIN_PARTICLE_SIZE
 
     const getRandomOpacity = () =>
-      Math.random() * (MAX_OPACITY - MIN_OPACITY) + MIN_OPACITY
+      Math.random() * (MAX_PARTICLE_OPACITY - MIN_PARTICLE_OPACITY) +
+      MIN_PARTICLE_OPACITY
 
     particlesRef.current = new Array(PARTICLES_COUNT)
 

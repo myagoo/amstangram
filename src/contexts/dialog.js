@@ -108,7 +108,7 @@ export const DialogProvider = ({ children }) => {
                 if (error instanceof Error) {
                   throw error
                 }
-                startRandomPlaylist()
+                startRandomPlaylist(true)
               })
               .finally(() => setChallengeDialogData(null))
           }
@@ -116,7 +116,7 @@ export const DialogProvider = ({ children }) => {
       }
 
       if (!hasBeenChallenged) {
-        startRandomPlaylist()
+        startRandomPlaylist(true)
       }
 
       setInitialized(true)

@@ -110,25 +110,36 @@ export const GalleryProvider = ({ children }) => {
     [currentUser, completedTangrams]
   )
 
-  const startRandomPlaylist = useCallback(() => {
-    let currentUserCompletedTangrams =
-      currentUser != null && completedTangrams[currentUser.uid]
-        ? completedTangrams[currentUser.uid]
-        : {}
+  const startRandomPlaylist = useCallback(
+    (sortDifficulty) => {
+      let currentUserCompletedTangrams =
+        currentUser != null && completedTangrams[currentUser.uid]
+          ? completedTangrams[currentUser.uid]
+          : {}
 
-    const randomPlaylist = shuffle([...approvedTangrams]).sort(
-      ({ id: idA, edges: edgesA }, { id: idB, edges: edgesB }) => {
-        const isTangramACompleted =
-          currentUserCompletedTangrams[idA] !== undefined
-        const isTangramBCompleted =
-          currentUserCompletedTangrams[idB] !== undefined
-        return !isTangramACompleted && !isTangramBCompleted
-          ? edgesB - edgesA
-          : isTangramACompleted - isTangramBCompleted
-      }
-    )
-    setPlaylist([...randomPlaylist])
-  }, [approvedTangrams, completedTangrams, currentUser])
+      const sortFn = sortDifficulty
+        ? ({ id: idA, edges: edgesA }, { id: idB, edges: edgesB }) => {
+            const isTangramACompleted =
+              currentUserCompletedTangrams[idA] !== undefined
+            const isTangramBCompleted =
+              currentUserCompletedTangrams[idB] !== undefined
+            return !isTangramACompleted && !isTangramBCompleted
+              ? edgesB - edgesA
+              : isTangramACompleted - isTangramBCompleted
+          }
+        : ({ id: idA, edges: edgesA }, { id: idB, edges: edgesB }) => {
+            const isTangramACompleted =
+              currentUserCompletedTangrams[idA] !== undefined
+            const isTangramBCompleted =
+              currentUserCompletedTangrams[idB] !== undefined
+            return isTangramACompleted - isTangramBCompleted
+          }
+
+      const randomPlaylist = shuffle([...approvedTangrams]).sort(sortFn)
+      setPlaylist([...randomPlaylist])
+    },
+    [approvedTangrams, completedTangrams, currentUser]
+  )
 
   const contextValue = useMemo(
     () => ({

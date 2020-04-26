@@ -14,6 +14,13 @@ export const FADE_TRANSITION_DURATION = 1000
 export const FADE_STAGGER_DURATION = 500
 export const MAX_CLAPS_COUNT = 15
 export const DIALOG_CLOSED_REASON = "DIALOG_CLOSED_REASON"
+
+export const PARTICLES_COUNT = 60
+export const MAX_PARTICLE_SIZE = 5
+export const MIN_PARTICLE_SIZE = 2
+export const MIN_PARTICLE_OPACITY = 0.25
+export const MAX_PARTICLE_OPACITY = 0.75
+
 export const CATEGORIES = [
   "animals",
   "letters",
