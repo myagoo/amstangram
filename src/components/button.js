@@ -2,6 +2,27 @@ import { useCss, useKeyframes, createPrimitive } from "css-system"
 import React, { useContext } from "react"
 import { SoundContext } from "../contexts/sound"
 
+export const SecondaryButton = createPrimitive("button", {
+  minWidth: 0,
+  minHeight: 0,
+  flex: "none",
+  fontWeight: "bold",
+  border: "2px solid",
+  borderRadius: 2,
+  fontSize: "inherit",
+  color: "inherit",
+  background: "none",
+  cursor: "pointer",
+  p: 3,
+  "&:disabled": {
+    opacity: 0.3,
+    cursor: "not-allowed",
+  },
+  "&:focus": {
+    outline: "none",
+  },
+})
+
 export const DangerButton = createPrimitive("button", {
   minWidth: 0,
   minHeight: 0,

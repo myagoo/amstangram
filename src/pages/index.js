@@ -5,7 +5,6 @@ import { COLOR_TRANSITION_DURATION } from "../constants"
 import { GalleryProvider } from "../contexts/gallery"
 import { LanguageProvider } from "../contexts/language"
 import { NotifyProvider } from "../contexts/notify"
-import { SettingsProvider } from "../contexts/settings"
 import { ShowBackgroundPatternProvider } from "../contexts/showBackgroundPattern"
 import { SoundProvider } from "../contexts/sound"
 import { TangramsProvider } from "../contexts/tangrams"
@@ -67,13 +66,11 @@ export default () => {
             <TangramsProvider>
               <ShowBackgroundPatternProvider>
                 <GalleryProvider>
-                  <SettingsProvider>
+                  <TipsProvider>
                     <DialogProvider>
-                      <TipsProvider>
-                        <App></App>
-                      </TipsProvider>
+                      <App></App>
                     </DialogProvider>
-                  </SettingsProvider>
+                  </TipsProvider>
                 </GalleryProvider>
               </ShowBackgroundPatternProvider>
             </TangramsProvider>

@@ -1,5 +1,12 @@
 import { useSwitchTheme } from "@css-system/gatsby-plugin-css-system"
-import React, { createContext, useCallback, useContext, useState } from "react"
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+} from "react"
 import {
   FiGrid,
   FiMenu,
@@ -21,6 +28,7 @@ import { GalleryContext } from "./gallery"
 import { useShowBackgroundPattern } from "./showBackgroundPattern"
 import { SoundContext } from "./sound"
 import { UserContext } from "./user"
+import { NotifyContext } from "./notify"
 
 export const TipsContext = createContext()
 
@@ -41,6 +49,7 @@ const InlineIcon = ({ icon }) => {
 
 const TipDialog = ({ deferred, tip: { Content } }) => {
   const intl = useIntl()
+  const [hideTips, setHideTips] = useState(false)
   return (
     <Dialog
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
@@ -48,9 +57,22 @@ const TipDialog = ({ deferred, tip: { Content } }) => {
       css={{ gap: 3, maxWidth: "300px" }}
     >
       <Content></Content>
-      <PrimaryButton onClick={deferred.resolve}>
+      <PrimaryButton onClick={() => deferred.resolve(hideTips)}>
         {intl.formatMessage({ id: "Got it!" })}
       </PrimaryButton>
+      <View
+        as="label"
+        css={{ gap: 1, flexDirection: "row", cursor: "pointer" }}
+      >
+        <input
+          type="checkbox"
+          checked={hideTips}
+          onChange={() => setHideTips(!hideTips)}
+        ></input>
+        <Text as="small">
+          {intl.formatMessage({ id: "I don't want to see tips anymore" })}
+        </Text>
+      </View>
     </Dialog>
   )
 }
@@ -70,7 +92,11 @@ const tips = [
     id: "menu",
     Content: () => {
       const intl = useIntl()
-      return <Text>{intl.formatMessage({ id: "tips.menu" }, iconValues)}</Text>
+      return (
+        <Text css={{ textAlign: "justify" }}>
+          {intl.formatMessage({ id: "tips.menu" }, iconValues)}
+        </Text>
+      )
     },
   },
   {
@@ -78,7 +104,9 @@ const tips = [
     Content: () => {
       const intl = useIntl()
       return (
-        <Text>{intl.formatMessage({ id: "tips.gallery" }, iconValues)}</Text>
+        <Text css={{ textAlign: "justify" }}>
+          {intl.formatMessage({ id: "tips.gallery" }, iconValues)}
+        </Text>
       )
     },
   },
@@ -90,7 +118,9 @@ const tips = [
     Content: () => {
       const intl = useIntl()
       return (
-        <Text>{intl.formatMessage({ id: "tips.difficulty" }, iconValues)}</Text>
+        <Text css={{ textAlign: "justify" }}>
+          {intl.formatMessage({ id: "tips.difficulty" }, iconValues)}
+        </Text>
       )
     },
   },
@@ -101,7 +131,11 @@ const tips = [
     },
     Content: () => {
       const intl = useIntl()
-      return <Text>{intl.formatMessage({ id: "tips.theme" }, iconValues)}</Text>
+      return (
+        <Text css={{ textAlign: "justify" }}>
+          {intl.formatMessage({ id: "tips.theme" }, iconValues)}
+        </Text>
+      )
     },
   },
   {
@@ -111,7 +145,11 @@ const tips = [
     },
     Content: () => {
       const intl = useIntl()
-      return <Text>{intl.formatMessage({ id: "tips.sound" }, iconValues)}</Text>
+      return (
+        <Text css={{ textAlign: "justify" }}>
+          {intl.formatMessage({ id: "tips.sound" }, iconValues)}
+        </Text>
+      )
     },
   },
   {
@@ -122,7 +160,9 @@ const tips = [
     Content: () => {
       const intl = useIntl()
       return (
-        <Text>{intl.formatMessage({ id: "tips.account" }, iconValues)}</Text>
+        <Text css={{ textAlign: "justify" }}>
+          {intl.formatMessage({ id: "tips.account" }, iconValues)}
+        </Text>
       )
     },
   },
@@ -133,7 +173,11 @@ const tips = [
     },
     Content: () => {
       const intl = useIntl()
-      return <Text>{intl.formatMessage({ id: "tips.claps" }, iconValues)}</Text>
+      return (
+        <Text css={{ textAlign: "justify" }}>
+          {intl.formatMessage({ id: "tips.claps" }, iconValues)}
+        </Text>
+      )
     },
   },
   {
@@ -148,7 +192,9 @@ const tips = [
     Content: () => {
       const intl = useIntl()
       return (
-        <Text>{intl.formatMessage({ id: "tips.create" }, iconValues)}</Text>
+        <Text css={{ textAlign: "justify" }}>
+          {intl.formatMessage({ id: "tips.create" }, iconValues)}
+        </Text>
       )
     },
   },
@@ -156,14 +202,22 @@ const tips = [
     id: "share",
     Content: () => {
       const intl = useIntl()
-      return <Text>{intl.formatMessage({ id: "tips.share" }, iconValues)}</Text>
+      return (
+        <Text css={{ textAlign: "justify" }}>
+          {intl.formatMessage({ id: "tips.share" }, iconValues)}
+        </Text>
+      )
     },
   },
   {
     id: "card",
     Content: () => {
       const intl = useIntl()
-      return <Text>{intl.formatMessage({ id: "tips.card" }, iconValues)}</Text>
+      return (
+        <Text css={{ textAlign: "justify" }}>
+          {intl.formatMessage({ id: "tips.card" }, iconValues)}
+        </Text>
+      )
     },
   },
   {
@@ -171,7 +225,7 @@ const tips = [
     Content: () => {
       const intl = useIntl()
       return (
-        <Text>
+        <Text css={{ textAlign: "justify" }}>
           {intl.formatMessage({ id: "tips.leaderboard" }, iconValues)}
         </Text>
       )
@@ -180,13 +234,28 @@ const tips = [
 ]
 
 export const TipsProvider = ({ children }) => {
+  const intl = useIntl()
+  const notify = useContext(NotifyContext)
   const [tipDialogData, setTipDialogData] = useState(null)
+  const [tipsEnabled, setTipsEnabled] = useState(true)
 
   const { soundEnabled } = useContext(SoundContext)
   const [themeKey] = useSwitchTheme()
   const [showBackgroundPattern] = useShowBackgroundPattern()
   const { currentUser } = useContext(UserContext)
   const { completedTangrams } = useContext(GalleryContext)
+
+  useEffect(() => {
+    setTipsEnabled(window.localStorage.getItem("hideTips") === null)
+  }, [])
+
+  useEffect(() => {
+    if (tipsEnabled) {
+      window.localStorage.removeItem("hideTips")
+    } else {
+      window.localStorage.setItem("hideTips", true)
+    }
+  }, [tipsEnabled])
 
   const getSeenTips = () => {
     let seenTipsIds = []
@@ -206,6 +275,10 @@ export const TipsProvider = ({ children }) => {
   }
 
   const showTip = useCallback(() => {
+    if (!tipsEnabled) {
+      return
+    }
+
     const seenTipsId = getSeenTips()
 
     const unseenTips = tips.filter(
@@ -230,20 +303,50 @@ export const TipsProvider = ({ children }) => {
 
     setTipDialogData({ deferred, tip })
 
-    return deferred.promise.finally(() => {
-      localStorage.setItem("seenTips", JSON.stringify([...seenTipsId, tip.id]))
-      setTipDialogData(null)
-    })
+    return deferred.promise
+      .then((hideTips) => {
+        if (hideTips) {
+          window.localStorage.setItem("hideTips", true)
+        }
+      })
+      .finally(() => {
+        localStorage.setItem(
+          "seenTips",
+          JSON.stringify([...seenTipsId, tip.id])
+        )
+        setTipDialogData(null)
+      })
   }, [
     completedTangrams,
     themeKey,
     currentUser,
     showBackgroundPattern,
     soundEnabled,
+    tipsEnabled,
   ])
 
+  const toggleTips = useCallback(() => {
+    setTipsEnabled((prevTipsEnabled) => !prevTipsEnabled)
+  }, [])
+
+  const resetTips = useCallback(() => {
+    setTipsEnabled(true)
+    window.localStorage.removeItem("seenTips")
+    notify(intl.formatMessage({ id: "Tips reset successfuly" }))
+  }, [notify, intl])
+
+  const contextValue = useMemo(
+    () => ({
+      showTip,
+      tipsEnabled,
+      toggleTips,
+      resetTips,
+    }),
+    [showTip, tipsEnabled, toggleTips, resetTips]
+  )
+
   return (
-    <TipsContext.Provider value={showTip}>
+    <TipsContext.Provider value={contextValue}>
       {children}
       {tipDialogData && <TipDialog {...tipDialogData}></TipDialog>}
     </TipsContext.Provider>

@@ -47,7 +47,7 @@ import { Victory } from "./victory"
 
 export const Tangram = () => {
   const intl = useIntl()
-  const showTip = useContext(TipsContext)
+  const { showTip } = useContext(TipsContext)
   const { approvedTangrams } = useContext(TangramsContext)
   const { showLogin, showTangram } = useContext(DialogContext)
   const { playTangram } = useContext(SoundContext)

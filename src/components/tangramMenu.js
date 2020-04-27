@@ -11,7 +11,6 @@ import {
 import { FADE_STAGGER_DURATION, FADE_TRANSITION_DURATION } from "../constants"
 import { DialogContext } from "../contexts/dialog"
 import { GalleryContext } from "../contexts/gallery"
-import { SettingsContext } from "../contexts/settings"
 import { UserContext } from "../contexts/user"
 import { Button } from "./button"
 import { View } from "./view"
@@ -20,10 +19,13 @@ const DISTANCE = 100
 const STEP_ANGLE = 45
 
 export const TangramMenu = () => {
-  const { showSettingsDialog } = useContext(SettingsContext)
-  const { showProfile, showLeaderboard, showGallery, showLogin } = useContext(
-    DialogContext
-  )
+  const {
+    showProfile,
+    showLeaderboard,
+    showGallery,
+    showLogin,
+    showSettings,
+  } = useContext(DialogContext)
   const { currentUser } = useContext(UserContext)
 
   const [opened, setOpened] = useState(false)
@@ -52,7 +54,7 @@ export const TangramMenu = () => {
     >
       <View as={FiUser} css={{ m: "0 auto" }}></View>
     </Button>,
-    <Button onClick={() => showSettingsDialog()}>
+    <Button onClick={() => showSettings()}>
       <View as={FiSettings} css={{ m: "0 auto" }}></View>
     </Button>,
   ]

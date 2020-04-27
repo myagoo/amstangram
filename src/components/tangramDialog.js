@@ -124,7 +124,7 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
       )
     ) {
       await firebase.firestore().collection("tangrams").doc(tangram.id).delete()
-      notify(intl.formatMessage({ id: "Tangram sucessfuly deleted" }))
+      notify(intl.formatMessage({ id: "Tangram successfuly deleted" }))
       deferred.resolve()
     }
   }

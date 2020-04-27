@@ -11,9 +11,6 @@ export default {
   Difficulty: "Difficulty",
   Easy: "Easy",
   Hard: "Hard",
-  "Clear storage": "Clear storage",
-  "You are about to reset your settings and tips. Are you sure you want to proceed?":
-    "You are about to reset your settings and tips. Are you sure you want to proceed?",
 
   "Tangram approved": "Tangram approved",
   "You can't save an invalid tangram": "You can't save an invalid tangram",
@@ -77,17 +74,17 @@ export default {
   "Confirm new password": "Confirm new password",
   "New password": "New password",
   "Current password": "Current password",
-  "Password changed sucessfuly": "Password changed sucessfuly",
+  "Password changed successfuly": "Password changed successfuly",
   "New username": "New username",
-  "Username updated sucessfuly": "Username updated sucessfuly",
-  "Email address updated sucessfuly": "Email address updated sucessfuly",
+  "Username updated successfuly": "Username updated successfuly",
+  "Email address updated successfuly": "Email address updated successfuly",
   "New email address": "New email address",
   "An error occured, please retry later":
     "An error occured, please retry later",
   Sounds: "Sounds",
   "Are you sure you want to delete this tangram?":
     "Are you sure you want to delete this tangram?",
-  "Tangram sucessfuly deleted": "Tangram sucessfuly deleted",
+  "Tangram successfuly deleted": "Tangram successfuly deleted",
   "Challenge link copied to clipboard": "Challenge link copied to clipboard",
   "{username} challenged you": "{username} challenged you",
   "Rise to the challenge": "Rise to the challenge",
@@ -127,4 +124,11 @@ export default {
     "You can acces tangram details or edit your own tangrams by long pressing a card in the gallery {galleryIcon}",
   "tips.leaderboard":
     "Check the leaderboard to see who's the best by pressing {leaderboardIcon} in the menu {menuIcon}",
+
+  "I don't want to see tips anymore": "I don't want to see tips anymore",
+  "Show tips": "Show tips",
+  Yes: "Yes",
+  No: "No",
+  "Reset tips": "Reset tips",
+  "Tips reseted successfuly": "Tips reseted successfuly",
 }

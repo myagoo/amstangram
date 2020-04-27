@@ -6,16 +6,18 @@ import { DIALOG_CLOSED_REASON } from "../constants"
 import { LanguageContext, supportedLanguages } from "../contexts/language"
 import { useShowBackgroundPattern } from "../contexts/showBackgroundPattern"
 import { SoundContext } from "../contexts/sound"
-import { DangerButton } from "./button"
+import { DangerButton, SecondaryButton } from "./button"
 import { Dialog } from "./dialog"
 import { Input } from "./input"
 import { Title } from "./primitives"
 import { Text } from "./text"
 import { Toggle } from "./toggle"
 import { View } from "./view"
+import { TipsContext } from "../contexts/tips"
 
 export const SettingsDialog = ({ deferred }) => {
   const { soundEnabled, toggleSound } = useContext(SoundContext)
+  const { tipsEnabled, toggleTips, resetTips } = useContext(TipsContext)
   const [
     showBackgroundPattern,
     toggleShowBackgroundPattern,
@@ -28,20 +30,6 @@ export const SettingsDialog = ({ deferred }) => {
 
   const handleLanguageChange = (event) => {
     setLanguage(event.target.value)
-  }
-
-  const handleResetClick = () => {
-    if (
-      window.confirm(
-        intl.formatMessage({
-          id:
-            "You are about to reset your settings and tips. Are you sure you want to proceed?",
-        })
-      )
-    ) {
-      window.localStorage.clear()
-      window.location.reload(true)
-    }
   }
 
   return (
@@ -65,9 +53,17 @@ export const SettingsDialog = ({ deferred }) => {
         <Toggle
           value={showBackgroundPattern}
           onChange={toggleShowBackgroundPattern}
-          leftComponent={<Text>{intl.formatMessage({ id: "Easy" })}</Text>}
+          leftComponent={
+            <Text css={{ fontWeight: 500 }}>
+              {intl.formatMessage({ id: "Easy" })}
+            </Text>
+          }
           leftValue={true}
-          rightComponent={<Text>{intl.formatMessage({ id: "Hard" })}</Text>}
+          rightComponent={
+            <Text css={{ fontWeight: 500 }}>
+              {intl.formatMessage({ id: "Hard" })}
+            </Text>
+          }
           rightValue={false}
         ></Toggle>
       </View>
@@ -94,9 +90,28 @@ export const SettingsDialog = ({ deferred }) => {
           rightValue={true}
         ></Toggle>
       </View>
-      <DangerButton onClick={handleResetClick}>
-        {intl.formatMessage({ id: "Clear storage" })}
-      </DangerButton>
+      <View css={{ gap: 2 }}>
+        <label>{intl.formatMessage({ id: "Show tips" })}</label>
+        <Toggle
+          value={tipsEnabled}
+          onChange={toggleTips}
+          leftComponent={
+            <Text css={{ fontWeight: 500 }}>
+              {intl.formatMessage({ id: "Yes" })}
+            </Text>
+          }
+          leftValue={true}
+          rightComponent={
+            <Text css={{ fontWeight: 500 }}>
+              {intl.formatMessage({ id: "No" })}
+            </Text>
+          }
+          rightValue={false}
+        ></Toggle>
+      </View>
+      <SecondaryButton onClick={resetTips}>
+        {intl.formatMessage({ id: "Reset tips" })}
+      </SecondaryButton>
     </Dialog>
   )
 }

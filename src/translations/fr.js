@@ -10,9 +10,6 @@ export default {
   Difficulty: "Difficulté",
   Easy: "Facile",
   Hard: "Difficile",
-  "Clear storage": "Effacer le stockage",
-  "You are about to reset your settings and tips. Are you sure you want to proceed?":
-    "Tu es sur le point de réinitialiser tes réglages et astuces. Es-tu sûr.e de vouloir continuer ?",
 
   "Tangram approved": "Tangram approuvé",
   "You can't save an invalid tangram": "Tangram invalide",
@@ -79,17 +76,17 @@ export default {
   "Confirm new password": "Confirmer le nouveau mot de passe",
   "New password": "Nouveau mot de passe",
   "Current password": "Mot de passe actuel",
-  "Password changed sucessfuly": "Mot de passe changé avec succés",
+  "Password changed successfuly": "Mot de passe changé avec succés",
   "New username": "Nouveau nom d'utilisateur",
-  "Username updated sucessfuly": "Nom d'utilisateur changé avec succés",
-  "Email address updated sucessfuly": "Adresse email changé avec succés",
+  "Username updated successfuly": "Nom d'utilisateur changé avec succés",
+  "Email address updated successfuly": "Adresse email changé avec succés",
   "New email address": "Nouvelle adresse email",
   "An error occured, please retry later":
     "Une erreur est survenue, veuillez réessayer plus tard",
   Sounds: "Sons",
   "Are you sure you want to delete this tangram?":
     "Es-tu sûr.e de vouloir supprimer ce tangram ?",
-  "Tangram deleted sucessfuly": "Tangram supprimé avec succés",
+  "Tangram deleted successfuly": "Tangram supprimé avec succés",
   "Challenge link copied to clipboard":
     "Lien de défi copié dans le presse papier",
   "{username} challenged you": "{username} te met au défi",
@@ -131,4 +128,11 @@ export default {
     "Tu peux accéder aux détails d'un tangram ou même éditer les tiens en faisant un appuie long sur une carte dans la galerie {galleryIcon}",
   "tips.leaderboard":
     "Jette un oeil au classement pour savoir qui est le meilleur en appuyant sur {leaderboardIcon} dans le menu {menuIcon}",
+
+  "I don't want to see tips anymore": "Je ne veux plus voir les astuces",
+  "Show tips": "Afficher les astuces",
+  Yes: "Oui",
+  No: "Non",
+  "Reset tips": "Réinitialiser les astuces",
+  "Tips reseted successfuly": "Astuces réinitilisées avec succés",
 }

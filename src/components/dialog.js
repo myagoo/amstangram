@@ -36,6 +36,7 @@ export const Dialog = ({ children, title, onClose, css, ...props }) => {
           gap: 3,
           maxWidth: "95vw",
         }}
+        onClick={(e) => e.stopPropagation()}
       >
         <View
           css={{
@@ -58,7 +59,6 @@ export const Dialog = ({ children, title, onClose, css, ...props }) => {
           ></View>
         </View>
         <View
-          onClick={(e) => e.stopPropagation()}
           css={{
             flex: "1",
             ...css,

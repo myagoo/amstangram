@@ -28,7 +28,7 @@ const ChangeEmailForm = ({ currentUser, onClose }) => {
     async ({ password, newEmail }) => {
       try {
         await updateEmail(currentUser, password, newEmail)
-        notify(intl.formatMessage({ id: "Email address updated sucessfuly" }))
+        notify(intl.formatMessage({ id: "Email address updated successfuly" }))
         onClose()
       } catch (error) {
         switch (error.code) {
@@ -126,7 +126,7 @@ const ChangeUsernameForm = ({ currentUser, onClose }) => {
     async ({ newUsername }) => {
       try {
         await updateUsername(currentUser, newUsername)
-        notify(intl.formatMessage({ id: "Username updated sucessfuly" }))
+        notify(intl.formatMessage({ id: "Username updated successfuly" }))
         onClose()
       } catch (error) {
         notify(
@@ -198,7 +198,7 @@ const ChangePasswordForm = ({ currentUser, onClose }) => {
     async ({ password, newPassword }) => {
       try {
         await updateUsername(currentUser, password, newPassword)
-        notify(intl.formatMessage({ id: "Password changed sucessfuly" }))
+        notify(intl.formatMessage({ id: "Password changed successfuly" }))
         onClose()
       } catch (error) {
         switch (error.code) {
