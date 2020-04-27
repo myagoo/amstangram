@@ -14,10 +14,13 @@ export default function HTML(props) {
         <meta property="og:title" content="Amstangram" />
         <meta
           property="og:description"
-          content="The overgrowing tangrams collection."
+          content="The evergrowing tangrams collection."
         />
-        <meta property="og:image" content="/icons/icon-512x512.png" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://amstangr.am/banner.png" />
         <meta property="og:url" content="https://amstangr.am" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta property="fb:app_id" content="654214645128292" />
         <script src="/clipper_unminified.js"></script>
         <style
           dangerouslySetInnerHTML={{
