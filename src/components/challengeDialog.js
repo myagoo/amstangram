@@ -69,7 +69,7 @@ export const ChallengeDialog = ({ uid, tangrams, deferred }) => {
           deferred.resolve()
         }}
       >
-        {intl.formatMessage({ id: "Let's go !" })}
+        {intl.formatMessage({ id: "Let's go!" })}
       </PrimaryButton>
     </Dialog>
   )

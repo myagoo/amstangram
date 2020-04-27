@@ -12,8 +12,8 @@ export default {
   Easy: "Easy",
   Hard: "Hard",
   "Clear storage": "Clear storage",
-  "You are about to reset your settings and tips. Are you sure you want to proceed ?":
-    "You are about to reset your settings and tips. Are you sure you want to proceed ?",
+  "You are about to reset your settings and tips. Are you sure you want to proceed?":
+    "You are about to reset your settings and tips. Are you sure you want to proceed?",
 
   "Tangram approved": "Tangram approved",
   "You can't save an invalid tangram": "You can't save an invalid tangram",
@@ -26,9 +26,9 @@ export default {
   "Tangram gallery": "Tangram gallery",
   "Pending approbation": "Pending approbation",
   "{username}'s tangrams": "{username}'s tangrams",
-  "Play now !": "Play now !",
-  "Start 1 tangram !": "Start 1 tangram !",
-  "Start {count} tangrams !": "Start {count} tangrams !",
+  "Play now!": "Play now !",
+  "Start 1 tangram!": "Start 1 tangram !",
+  "Start {count} tangrams!": "Start {count} tangrams !",
   "Password is too weak": "Password is too weak",
   "Email address already in use": "Email address already in use",
   "Invalid email address": "Invalid email address",
@@ -40,11 +40,11 @@ export default {
   "Password is required": "Password is required",
   "Confirm password": "Confirm password",
   "Passwords must match": "Passwords must match",
-  "Sign me up !": "Sign me up !",
+  "Sign me up!": "Sign me up!",
   "I already have an account": "I already have an account",
   "Unknown email address": "Unknown email address",
   "Incorrect password": "Incorrect password",
-  "Sign me in !": "Sign me in !",
+  "Sign me in!": "Sign me in!",
   "I don't have an account": "I don't have an account",
   "Create your account": "Create your account",
   "Connect to your account": "Connect to your account",
@@ -56,8 +56,8 @@ export default {
   "Victory emoji": "Victory emoji",
   "Leave empty for random emoji": "Leave empty for random emoji",
   Order: "Order",
-  "Submit !": "Submit !",
-  "Edit !": "Edit !",
+  "Submit!": "Submit!",
+  "Edit!": "Edit!",
   "Or delete tangram": "Or delete tangram",
 
   animals: "Animals",
@@ -85,13 +85,13 @@ export default {
   "An error occured, please retry later":
     "An error occured, please retry later",
   Sounds: "Sounds",
-  "Are you sure you want to delete this tangram ?":
-    "Are you sure you want to delete this tangram ?",
+  "Are you sure you want to delete this tangram?":
+    "Are you sure you want to delete this tangram?",
   "Tangram sucessfuly deleted": "Tangram sucessfuly deleted",
   "Challenge link copied to clipboard": "Challenge link copied to clipboard",
   "{username} challenged you": "{username} challenged you",
   "Rise to the challenge": "Rise to the challenge",
-  "Let's go !": "Let's go !",
+  "Let's go!": "Let's go!",
 
   Leaderboard: "Leaderboard",
   "Completed {completed}/{total} tangrams":

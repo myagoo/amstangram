@@ -119,7 +119,7 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
     if (
       window.confirm(
         intl.formatMessage({
-          id: "Are you sure you want to delete this tangram ?",
+          id: "Are you sure you want to delete this tangram?",
         })
       )
     ) {
@@ -240,8 +240,8 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
       </View>
       <PrimaryButton type="submit">
         {isCreation
-          ? intl.formatMessage({ id: "Submit !" })
-          : intl.formatMessage({ id: "Edit !" })}
+          ? intl.formatMessage({ id: "Submit!" })
+          : intl.formatMessage({ id: "Edit!" })}
       </PrimaryButton>
       {!isCreation && (
         <View

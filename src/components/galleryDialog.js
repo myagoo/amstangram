@@ -170,11 +170,11 @@ export const GalleryDialog = ({ deferred }) => {
             <View css={{ flexDirection: "row", gap: 2 }}>
               <PrimaryButton onClick={handleStartClick} css={{ flex: "1" }}>
                 {selectedTangrams.length === 0
-                  ? intl.formatMessage({ id: "Play now !" })
+                  ? intl.formatMessage({ id: "Play now!" })
                   : selectedTangrams.length === 1
-                  ? intl.formatMessage({ id: "Start 1 tangram !" })
+                  ? intl.formatMessage({ id: "Start 1 tangram!" })
                   : intl.formatMessage(
-                      { id: "Start 1 tangram !" },
+                      { id: "Start {count} tangrams!" },
                       { count: selectedTangrams.length }
                     )}
               </PrimaryButton>

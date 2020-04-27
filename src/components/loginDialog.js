@@ -136,7 +136,7 @@ const SignupTab = ({ onSignup, switchTab }) => {
       </View>
 
       <PrimaryButton disabled={formState.isSubmitting} type="submit">
-        {intl.formatMessage({ id: "Sign me up !" })}
+        {intl.formatMessage({ id: "Sign me up!" })}
       </PrimaryButton>
 
       <View
@@ -237,7 +237,7 @@ const SignInTab = ({ onSignin, switchTab }) => {
       </View>
 
       <PrimaryButton type="submit" disabled={formState.isSubmitting}>
-        {intl.formatMessage({ id: "Sign me in !" })}
+        {intl.formatMessage({ id: "Sign me in!" })}
       </PrimaryButton>
 
       <View

@@ -35,7 +35,7 @@ export const SettingsDialog = ({ deferred }) => {
       window.confirm(
         intl.formatMessage({
           id:
-            "You are about to reset your settings and tips. Are you sure you want to proceed ?",
+            "You are about to reset your settings and tips. Are you sure you want to proceed?",
         })
       )
     ) {
