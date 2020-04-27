@@ -43,7 +43,7 @@ self.__precacheManifest = [
   },
   {
     "url": "offline-plugin-app-shell-fallback/index.html",
-    "revision": "e6095ff94983504851bff93514ac1609"
+    "revision": "d291865142ead965771e0e8c13dc47cc"
   },
   {
     "url": "clipper_unminified.js"
@@ -53,7 +53,7 @@ self.__precacheManifest = [
   },
   {
     "url": "manifest.webmanifest",
-    "revision": "24c5a89e398a7ca43c6646c9e4424d8a"
+    "revision": "1aa8b6f8e89d318c35768d70b8442fca"
   }
 ].concat(self.__precacheManifest || []);
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
