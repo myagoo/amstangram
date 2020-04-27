@@ -11,6 +11,13 @@ export default function HTML(props) {
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, shrink-to-fit=no, viewport-fit=cover"
         />
+        <meta property="og:title" content="Amstangram" />
+        <meta
+          property="og:description"
+          content="The overgrowing tangrams collection."
+        />
+        <meta property="og:image" content="/icons/icon-512x512.png" />
+        <meta property="og:url" content="https://amstangr.am" />
         <script src="/clipper_unminified.js"></script>
         <style
           dangerouslySetInnerHTML={{
