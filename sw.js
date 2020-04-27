@@ -43,7 +43,7 @@ self.__precacheManifest = [
   },
   {
     "url": "offline-plugin-app-shell-fallback/index.html",
-    "revision": "9e727431cadcc017246c059df212f65b"
+    "revision": "d8c9dd9b75f5c2ad2f5664e98c0ff3cf"
   },
   {
     "url": "clipper_unminified.js"
