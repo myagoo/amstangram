@@ -27,7 +27,8 @@ export const TangramsProvider = ({ children }) => {
         const newAllTangrams = []
         for (const doc of collectionSnapshot.docs) {
           const id = doc.id
-          const tangram = doc.data()
+          const { ...tangram } = doc.data()
+
           newAllTangrams.push({
             id,
             ...tangram,

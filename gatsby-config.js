@@ -6,7 +6,12 @@ const baseTheme = {
   },
   space: [0, 4, 8, 16, 32, 64, 128, 256, 512],
   sizes: {
-    button: 64,
+    menu: 40,
+    inline: 16,
+    logo: 128,
+    icon: 24,
+    badge: 32,
+    badgeBig: 86,
   },
   borderWidths: {
     loader: 8,

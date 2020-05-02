@@ -3,49 +3,36 @@ import React, {
   createContext,
   useCallback,
   useContext,
-  useState,
   useEffect,
   useMemo,
+  useState,
 } from "react"
 import {
+  FiAward,
   FiGrid,
   FiMenu,
   FiSave,
   FiSettings,
   FiShare2,
   FiUser,
-  FiAward,
+  FiStar,
 } from "react-icons/fi"
-import { useIntl } from "react-intl"
-import { Button, PrimaryButton } from "../components/button"
+import { FormattedMessage, useIntl } from "react-intl"
+import { PrimaryButton } from "../components/button"
 import { Dialog } from "../components/dialog"
-import { Title } from "../components/primitives"
+import { InlineIcon, Title } from "../components/primitives"
 import { Text } from "../components/text"
 import { View } from "../components/view"
 import { DIALOG_CLOSED_REASON } from "../constants"
 import { Deferred } from "../utils/deferred"
-import { GalleryContext } from "./gallery"
+import { NotifyContext } from "./notify"
 import { useShowBackgroundPattern } from "./showBackgroundPattern"
 import { SoundContext } from "./sound"
+import { TangramsContext } from "./tangrams"
 import { UserContext } from "./user"
-import { NotifyContext } from "./notify"
+import { GalleryContext } from "./gallery"
 
 export const TipsContext = createContext()
-
-const InlineIcon = ({ icon }) => {
-  return (
-    <Text css={{ position: "relative", top: "4px" }}>
-      <Button
-        css={{
-          size: "20px",
-          boxShadow: "none",
-        }}
-      >
-        <View as={icon} css={{ m: "auto", size: "16px" }} />
-      </Button>
-    </Text>
-  )
-}
 
 const TipDialog = ({ deferred, tip: { Content } }) => {
   const intl = useIntl()
@@ -62,7 +49,12 @@ const TipDialog = ({ deferred, tip: { Content } }) => {
       </PrimaryButton>
       <View
         as="label"
-        css={{ gap: 1, flexDirection: "row", cursor: "pointer" }}
+        css={{
+          gap: 1,
+          flexDirection: "row",
+          cursor: "pointer",
+          alignItems: "flex-end",
+        }}
       >
         <input
           type="checkbox"
@@ -85,16 +77,17 @@ const iconValues = {
   shareIcon: <InlineIcon icon={FiShare2} />,
   createIcon: <InlineIcon icon={FiSave} />,
   leaderboardIcon: <InlineIcon icon={FiAward} />,
+  starIcon: <InlineIcon icon={FiStar} />,
+  br: () => <br />,
 }
 
 const tips = [
   {
     id: "menu",
     Content: () => {
-      const intl = useIntl()
       return (
         <Text css={{ textAlign: "justify" }}>
-          {intl.formatMessage({ id: "tips.menu" }, iconValues)}
+          <FormattedMessage id="tips.menu" values={iconValues} />
         </Text>
       )
     },
@@ -102,10 +95,9 @@ const tips = [
   {
     id: "gallery",
     Content: () => {
-      const intl = useIntl()
       return (
         <Text css={{ textAlign: "justify" }}>
-          {intl.formatMessage({ id: "tips.gallery" }, iconValues)}
+          <FormattedMessage id="tips.gallery" values={iconValues} />
         </Text>
       )
     },
@@ -116,10 +108,9 @@ const tips = [
       return showBackgroundPattern
     },
     Content: () => {
-      const intl = useIntl()
       return (
         <Text css={{ textAlign: "justify" }}>
-          {intl.formatMessage({ id: "tips.difficulty" }, iconValues)}
+          <FormattedMessage id="tips.difficulty" values={iconValues} />
         </Text>
       )
     },
@@ -130,10 +121,9 @@ const tips = [
       return themeKey !== "dark"
     },
     Content: () => {
-      const intl = useIntl()
       return (
         <Text css={{ textAlign: "justify" }}>
-          {intl.formatMessage({ id: "tips.theme" }, iconValues)}
+          <FormattedMessage id="tips.theme" values={iconValues} />
         </Text>
       )
     },
@@ -144,56 +134,72 @@ const tips = [
       return soundEnabled
     },
     Content: () => {
-      const intl = useIntl()
       return (
         <Text css={{ textAlign: "justify" }}>
-          {intl.formatMessage({ id: "tips.sound" }, iconValues)}
+          <FormattedMessage id="tips.sound" values={iconValues} />
         </Text>
       )
     },
   },
   {
-    id: "account",
+    id: "account1",
     predicate: ({ currentUser }) => {
       return !currentUser
     },
     Content: () => {
-      const intl = useIntl()
       return (
         <Text css={{ textAlign: "justify" }}>
-          {intl.formatMessage({ id: "tips.account" }, iconValues)}
+          <FormattedMessage id="tips.account1" values={iconValues} />
         </Text>
       )
     },
   },
   {
-    id: "claps",
+    id: "account2",
+    predicate: ({ currentUser }) => {
+      return !currentUser
+    },
+    Content: () => {
+      return (
+        <Text css={{ textAlign: "justify" }}>
+          <FormattedMessage id="tips.account2" values={iconValues} />
+        </Text>
+      )
+    },
+  },
+  {
+    id: "stars",
     predicate: ({ currentUser }) => {
       return currentUser
     },
     Content: () => {
-      const intl = useIntl()
       return (
         <Text css={{ textAlign: "justify" }}>
-          {intl.formatMessage({ id: "tips.claps" }, iconValues)}
+          <FormattedMessage id="tips.stars" values={iconValues} />
         </Text>
       )
     },
   },
   {
     id: "create",
-    predicate: ({ currentUser, completedTangrams }) => {
-      return (
-        currentUser &&
-        completedTangrams[currentUser.uid] &&
-        Object.values(completedTangrams[currentUser.uid]).length >= 10
-      )
+    predicate: ({ currentUser, approvedTangrams, tangramsCompletedBy }) => {
+      if (currentUser) {
+        let completedTangrams = 0
+        for (const { id } of approvedTangrams) {
+          if (tangramsCompletedBy[id][currentUser.uid]) {
+            completedTangrams += 1
+            if (completedTangrams === 10) {
+              return true
+            }
+          }
+        }
+      }
+      return false
     },
     Content: () => {
-      const intl = useIntl()
       return (
         <Text css={{ textAlign: "justify" }}>
-          {intl.formatMessage({ id: "tips.create" }, iconValues)}
+          <FormattedMessage id="tips.create" values={iconValues} />
         </Text>
       )
     },
@@ -201,10 +207,9 @@ const tips = [
   {
     id: "share",
     Content: () => {
-      const intl = useIntl()
       return (
         <Text css={{ textAlign: "justify" }}>
-          {intl.formatMessage({ id: "tips.share" }, iconValues)}
+          <FormattedMessage id="tips.share" values={iconValues} />
         </Text>
       )
     },
@@ -212,10 +217,9 @@ const tips = [
   {
     id: "card",
     Content: () => {
-      const intl = useIntl()
       return (
         <Text css={{ textAlign: "justify" }}>
-          {intl.formatMessage({ id: "tips.card" }, iconValues)}
+          <FormattedMessage id="tips.card" values={iconValues} />
         </Text>
       )
     },
@@ -223,10 +227,9 @@ const tips = [
   {
     id: "leaderboard",
     Content: () => {
-      const intl = useIntl()
       return (
         <Text css={{ textAlign: "justify" }}>
-          {intl.formatMessage({ id: "tips.leaderboard" }, iconValues)}
+          <FormattedMessage id="tips.leaderboard" values={iconValues} />
         </Text>
       )
     },
@@ -243,7 +246,8 @@ export const TipsProvider = ({ children }) => {
   const [themeKey] = useSwitchTheme()
   const [showBackgroundPattern] = useShowBackgroundPattern()
   const { currentUser } = useContext(UserContext)
-  const { completedTangrams } = useContext(GalleryContext)
+  const { approvedTangrams } = useContext(TangramsContext)
+  const { tangramsCompletedBy } = useContext(GalleryContext)
 
   useEffect(() => {
     setTipsEnabled(window.localStorage.getItem("hideTips") === null)
@@ -288,7 +292,8 @@ export const TipsProvider = ({ children }) => {
           themeKey,
           showBackgroundPattern,
           currentUser,
-          completedTangrams,
+          approvedTangrams,
+          tangramsCompletedBy,
           soundEnabled,
         })
     )
@@ -306,7 +311,7 @@ export const TipsProvider = ({ children }) => {
     return deferred.promise
       .then((hideTips) => {
         if (hideTips) {
-          window.localStorage.setItem("hideTips", true)
+          setTipsEnabled(false)
         }
       })
       .finally(() => {
@@ -317,7 +322,8 @@ export const TipsProvider = ({ children }) => {
         setTipDialogData(null)
       })
   }, [
-    completedTangrams,
+    approvedTangrams,
+    tangramsCompletedBy,
     themeKey,
     currentUser,
     showBackgroundPattern,
@@ -332,7 +338,7 @@ export const TipsProvider = ({ children }) => {
   const resetTips = useCallback(() => {
     setTipsEnabled(true)
     window.localStorage.removeItem("seenTips")
-    notify(intl.formatMessage({ id: "Tips reset successfuly" }))
+    notify(intl.formatMessage({ id: "Tips reseted successfuly" }))
   }, [notify, intl])
 
   const contextValue = useMemo(

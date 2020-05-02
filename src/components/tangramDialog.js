@@ -1,7 +1,7 @@
 import firebase from "gatsby-plugin-firebase"
 import React, { useContext, useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
-import { useIntl } from "react-intl"
+import { useIntl, FormattedMessage } from "react-intl"
 import { CATEGORIES, DIALOG_CLOSED_REASON, DIGITS, LETTERS } from "../constants"
 import { NotifyContext } from "../contexts/notify"
 import { UserContext } from "../contexts/user"
@@ -11,27 +11,46 @@ import { PrimaryButton } from "./button"
 import { Card } from "./card"
 import { Dialog } from "./dialog"
 import { Input } from "./input"
-import { Error, Hint, Similink, Title } from "./primitives"
+import { Error, Hint, Similink, Title, InlineIcon } from "./primitives"
 import { Text } from "./text"
 import { View } from "./view"
+import { FiStar } from "react-icons/fi"
+import { TangramsContext } from "../contexts/tangrams"
+import { GalleryContext } from "../contexts/gallery"
 
 const ReadTangramDialog = ({ tangram, deferred }) => {
-  const intl = useIntl()
+  const { tangramsStarredBy } = useContext(GalleryContext)
+
+  const stars = useMemo(() => {
+    let stars = 0
+    for (const starredByUid in tangramsStarredBy[tangram.id]) {
+      if (tangramsStarredBy[tangram.id][starredByUid]) {
+        stars += 1
+      }
+    }
+    return stars
+  }, [tangram, tangramsStarredBy])
 
   return (
     <Dialog
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
-      css={{ gap: 3, minWidth: "268px" }}
+      css={{ gap: 3 }}
     >
       <View css={{ gap: 3, overflow: "auto", flex: "1", alignItems: "center" }}>
         <Card selected tangram={tangram}></Card>
-        <Text>
-          {intl.formatMessage(
-            { id: "Earned {claps} 👏" },
-            {
-              claps: tangram.claps || 0,
-            }
-          )}
+        <Text css={{ fontSize: 2 }}>
+          <FormattedMessage
+            id="Earned {stars}"
+            values={{
+              stars,
+              starIcon: () => (
+                <InlineIcon
+                  icon={FiStar}
+                  css={{ fill: "currentColor" }}
+                ></InlineIcon>
+              ),
+            }}
+          ></FormattedMessage>
         </Text>
       </View>
     </Dialog>
@@ -42,7 +61,8 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
   const intl = useIntl()
   const notify = useContext(NotifyContext)
   const { currentUser } = useContext(UserContext)
-  const [tangramCopy, setTangramCopy] = useState({ ...tangram })
+  const [tangramCopy, setTangramCopy] = useState(() => ({ ...tangram }))
+  const { tangramsStarredBy } = useContext(TangramsContext)
 
   const isCreation = currentUser && !tangram.id
 
@@ -152,6 +172,16 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
     deferred.resolve()
   }
 
+  const stars = useMemo(() => {
+    let stars = 0
+    for (const starredByUid in tangramsStarredBy[tangram.id]) {
+      if (tangramsStarredBy[tangram.id][starredByUid]) {
+        stars += 1
+      }
+    }
+    return stars
+  }, [tangram, tangramsStarredBy])
+
   return (
     <Dialog
       title={
@@ -164,7 +194,7 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
       as="form"
       onSubmit={handleSubmit(onSubmit)}
-      css={{ gap: 3, minWidth: "268px" }}
+      css={{ gap: 3 }}
     >
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
         <Card
@@ -175,13 +205,19 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
         ></Card>
 
         {tangram.approved && (
-          <Text css={{ alignSelf: "center" }}>
-            {intl.formatMessage(
-              { id: "Earned {claps} 👏" },
-              {
-                claps: tangram.claps || 0,
-              }
-            )}
+          <Text css={{ alignSelf: "center", fontSize: 2 }}>
+            <FormattedMessage
+              id="Earned {stars}"
+              values={{
+                stars,
+                starIcon: () => (
+                  <InlineIcon
+                    icon={FiStar}
+                    css={{ fill: "currentColor" }}
+                  ></InlineIcon>
+                ),
+              }}
+            ></FormattedMessage>
           </Text>
         )}
 

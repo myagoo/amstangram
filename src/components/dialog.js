@@ -1,13 +1,16 @@
-import React from "react"
+import React, { useContext } from "react"
 import { createPortal } from "react-dom"
 import { FiX } from "react-icons/fi"
 import {
   COLOR_TRANSITION_DURATION,
   FADE_TRANSITION_DURATION,
 } from "../constants"
+import { SoundContext } from "../contexts/sound"
 import { View } from "./view"
 
 export const Dialog = ({ children, title, onClose, css, ...props }) => {
+  const { playButton } = useContext(SoundContext)
+
   return createPortal(
     <View
       onClick={onClose}
@@ -35,6 +38,7 @@ export const Dialog = ({ children, title, onClose, css, ...props }) => {
           p: 3,
           gap: 3,
           maxWidth: "95vw",
+          minWidth: "300px",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -52,15 +56,20 @@ export const Dialog = ({ children, title, onClose, css, ...props }) => {
             as={FiX}
             css={{
               cursor: "pointer",
-              size: 32,
+              size: "badge",
               ml: title ? undefined : "auto",
             }}
-            onClick={onClose}
+            onClick={() => {
+              playButton()
+              onClose()
+            }}
           ></View>
         </View>
         <View
           css={{
+            overflow: "auto",
             flex: "1",
+            maxWidth: "100%",
             ...css,
           }}
           {...props}

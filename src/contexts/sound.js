@@ -7,17 +7,18 @@ import React, {
 } from "react"
 import useSound from "use-sound"
 
-import clapSound from "../sounds/clap.wav"
+import starSound from "../sounds/star.wav"
 import buttonSound from "../sounds/button.wav"
 import cardSound from "../sounds/card.wav"
 import tangramSound from "../sounds/pop.wav"
+import victorySound from "../sounds/victory.wav"
 
 export const SoundContext = createContext([true, () => {}])
 
 export const SoundProvider = ({ children }) => {
   const [soundEnabled, setSoundEnabled] = useState(true)
 
-  const [playClap] = useSound(clapSound, {
+  const [playStar] = useSound(starSound, {
     soundEnabled,
   })
   const [playButton] = useSound(buttonSound, {
@@ -31,6 +32,10 @@ export const SoundProvider = ({ children }) => {
   })
 
   const [playTangram] = useSound(tangramSound, {
+    soundEnabled,
+  })
+
+  const [playVictory] = useSound(victorySound, {
     soundEnabled,
   })
 
@@ -53,8 +58,9 @@ export const SoundProvider = ({ children }) => {
       playButton,
       playToggle,
       playCard,
-      playClap,
+      playStar,
       playTangram,
+      playVictory,
     }),
     [
       soundEnabled,
@@ -62,8 +68,9 @@ export const SoundProvider = ({ children }) => {
       playButton,
       playToggle,
       playCard,
-      playClap,
+      playStar,
       playTangram,
+      playVictory,
     ]
   )
 

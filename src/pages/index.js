@@ -11,6 +11,7 @@ import { TangramsProvider } from "../contexts/tangrams"
 import { UserProvider } from "../contexts/user"
 import { DialogProvider } from "../contexts/dialog"
 import { TipsProvider } from "../contexts/tips"
+import { View } from "../components/view"
 
 export default () => {
   useEffect(() => {
@@ -68,7 +69,15 @@ export default () => {
                 <GalleryProvider>
                   <TipsProvider>
                     <DialogProvider>
-                      <App></App>
+                      <View
+                        css={{
+                          flex: "1",
+                          color: "dialogText",
+                          fontSize: 3,
+                        }}
+                      >
+                        <App></App>
+                      </View>
                     </DialogProvider>
                   </TipsProvider>
                 </GalleryProvider>

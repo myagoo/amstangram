@@ -78,10 +78,23 @@ const SignupTab = ({ onSignup, switchTab }) => {
   return (
     <View
       as="form"
+      name="signup"
+      autoComplete="off"
       onSubmit={handleSubmit(onSubmit)}
-      css={{ flex: "1", gap: 3 }}
+      css={{ gap: 4 }}
     >
-      <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
+      <View css={{ gap: 3 }}>
+        <View css={{ gap: 2 }}>
+          <label>{intl.formatMessage({ id: "Username" })}</label>
+          <Input
+            name="username"
+            ref={register({
+              required: intl.formatMessage({ id: "Username is required" }),
+            })}
+          ></Input>
+          {errors.username && <Error>{errors.username.message}</Error>}
+        </View>
+
         <View css={{ gap: 2 }}>
           <label>{intl.formatMessage({ id: "Email address" })}</label>
           <Input
@@ -95,19 +108,9 @@ const SignupTab = ({ onSignup, switchTab }) => {
         </View>
 
         <View css={{ gap: 2 }}>
-          <label>{intl.formatMessage({ id: "Username" })}</label>
-          <Input
-            name="username"
-            ref={register({
-              required: intl.formatMessage({ id: "Username is required" }),
-            })}
-          ></Input>
-          {errors.username && <Error>{errors.username.message}</Error>}
-        </View>
-
-        <View css={{ gap: 2 }}>
           <label>{intl.formatMessage({ id: "Password" })}</label>
           <Input
+            autoComplete="new-password"
             type="password"
             name="password"
             ref={register({
@@ -120,6 +123,7 @@ const SignupTab = ({ onSignup, switchTab }) => {
         <View css={{ gap: 2 }}>
           <label>{intl.formatMessage({ id: "Confirm password" })}</label>
           <Input
+            autoComplete="off"
             type="password"
             name="passwordConfirm"
             ref={register({
@@ -135,18 +139,20 @@ const SignupTab = ({ onSignup, switchTab }) => {
         </View>
       </View>
 
-      <PrimaryButton disabled={formState.isSubmitting} type="submit">
-        {intl.formatMessage({ id: "Sign me up!" })}
-      </PrimaryButton>
+      <View css={{ gap: 3 }}>
+        <PrimaryButton disabled={formState.isSubmitting} type="submit">
+          {intl.formatMessage({ id: "Sign me up!" })}
+        </PrimaryButton>
 
-      <View
-        css={{
-          alignItems: "center",
-        }}
-      >
-        <Similink onClick={switchTab}>
-          {intl.formatMessage({ id: "I already have an account" })}
-        </Similink>
+        <View
+          css={{
+            alignItems: "center",
+          }}
+        >
+          <Similink onClick={switchTab}>
+            {intl.formatMessage({ id: "I already have an account" })}
+          </Similink>
+        </View>
       </View>
     </View>
   )
@@ -207,10 +213,11 @@ const SignInTab = ({ onSignin, switchTab }) => {
   return (
     <View
       as="form"
+      name="signin"
       onSubmit={handleSubmit(onSubmit)}
-      css={{ flex: "1", gap: 3 }}
+      css={{ gap: 4 }}
     >
-      <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
+      <View css={{ gap: 3 }}>
         <View css={{ gap: 2 }}>
           <label>{intl.formatMessage({ id: "Email address" })}</label>
           <Input
@@ -236,18 +243,20 @@ const SignInTab = ({ onSignin, switchTab }) => {
         </View>
       </View>
 
-      <PrimaryButton type="submit" disabled={formState.isSubmitting}>
-        {intl.formatMessage({ id: "Sign me in!" })}
-      </PrimaryButton>
+      <View css={{ gap: 3 }}>
+        <PrimaryButton type="submit" disabled={formState.isSubmitting}>
+          {intl.formatMessage({ id: "Sign me in!" })}
+        </PrimaryButton>
 
-      <View
-        css={{
-          alignItems: "center",
-        }}
-      >
-        <Similink onClick={switchTab}>
-          {intl.formatMessage({ id: "I don't have an account" })}
-        </Similink>
+        <View
+          css={{
+            alignItems: "center",
+          }}
+        >
+          <Similink onClick={switchTab}>
+            {intl.formatMessage({ id: "I don't have an account" })}
+          </Similink>
+        </View>
       </View>
     </View>
   )
@@ -280,7 +289,6 @@ export const LoginDialog = ({ deferred }) => {
         )
       }
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
-      css={{ gap: 3 }}
     >
       {tab === "signup" ? (
         <SignupTab

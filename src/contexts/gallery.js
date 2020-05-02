@@ -1,4 +1,5 @@
 import firebase from "gatsby-plugin-firebase"
+
 import React, {
   createContext,
   useCallback,
@@ -7,13 +8,12 @@ import React, {
   useMemo,
   useState,
 } from "react"
+import { useIntl } from "react-intl"
 import { copyToClipboard } from "../utils/copyToClipboard"
-
+import { shuffle } from "../utils/shuffle"
 import { NotifyContext } from "./notify"
 import { TangramsContext } from "./tangrams"
 import { UserContext } from "./user"
-import { shuffle } from "../utils/shuffle"
-import { useIntl } from "react-intl"
 
 export const GalleryContext = createContext(null)
 
@@ -24,55 +24,48 @@ export const GalleryProvider = ({ children }) => {
   const { currentUser } = useContext(UserContext)
   const { approvedTangrams } = useContext(TangramsContext)
 
+  const [tangramsCompletedBy, setTangramsCompletedBy] = useState(null)
+  const [tangramsStarredBy, setTangramsLikedBy] = useState(null)
+
   const [playlist, setPlaylist] = useState(null)
   const [saveRequestId, setSaveRequestId] = useState(0)
-  const [stats, setStats] = useState(null)
   const [initialized, setInitialized] = useState(false)
+
+  useEffect(() => {
+    if (tangramsCompletedBy && tangramsStarredBy) {
+      setInitialized(true)
+    }
+  }, [tangramsCompletedBy, tangramsStarredBy])
 
   useEffect(() => {
     const unsubscribe = firebase
       .firestore()
       .collection("stats")
       .onSnapshot((collectionSnapshot) => {
-        const newStats = {}
+        const newTangramsCompletedBy = {}
+        const newTangramsStarredBy = {}
+
         for (const doc of collectionSnapshot.docs) {
-          const id = doc.id
-          const completionStats = doc.data()
-          newStats[id] = completionStats
+          const tangramId = doc.id
+          const tangramStats = doc.data()
+
+          if (!newTangramsCompletedBy[tangramId]) {
+            newTangramsCompletedBy[tangramId] = {}
+            newTangramsStarredBy[tangramId] = {}
+          }
+          for (const userId in tangramStats) {
+            newTangramsCompletedBy[tangramId][userId] =
+              tangramStats[userId].completed
+            newTangramsStarredBy[tangramId][userId] =
+              tangramStats[userId].starred
+          }
         }
-        setStats(newStats)
+        setTangramsCompletedBy(newTangramsCompletedBy)
+        setTangramsLikedBy(newTangramsStarredBy)
       })
 
     return unsubscribe
   }, [])
-
-  const completedTangrams = useMemo(() => {
-    if (!approvedTangrams || !stats) {
-      return null
-    }
-
-    const approvedTangramsIds = approvedTangrams.map(({ id }) => id)
-
-    let newCompletedTangrams = {}
-
-    for (const userId in stats) {
-      if (!newCompletedTangrams[userId]) {
-        newCompletedTangrams[userId] = {}
-      }
-      for (const tangramId in stats[userId]) {
-        if (approvedTangramsIds.includes(tangramId)) {
-          newCompletedTangrams[userId][tangramId] = stats[userId][tangramId]
-        }
-      }
-    }
-    return newCompletedTangrams
-  }, [stats, approvedTangrams])
-
-  useEffect(() => {
-    if (completedTangrams) {
-      setInitialized(true)
-    }
-  }, [completedTangrams])
 
   const shareTangrams = useCallback(
     (tangrams) => {
@@ -92,53 +85,70 @@ export const GalleryProvider = ({ children }) => {
     setSaveRequestId((prevRequestId) => prevRequestId + 1)
   }, [])
 
-  const markTangramAsComplete = useCallback(
-    async (tangram, completionTime) => {
-      if (currentUser && tangram.approved && !completedTangrams[tangram.id]) {
-        await firebase
-          .firestore()
-          .collection("stats")
-          .doc(currentUser.uid)
-          .set(
-            {
-              [tangram.id]: { completionTime },
-            },
-            { merge: true }
-          )
-      }
-    },
-    [currentUser, completedTangrams]
-  )
-
   const startRandomPlaylist = useCallback(
     (sortDifficulty) => {
-      let currentUserCompletedTangrams =
-        currentUser != null && completedTangrams[currentUser.uid]
-          ? completedTangrams[currentUser.uid]
-          : {}
-
       const sortFn = sortDifficulty
         ? ({ id: idA, edges: edgesA }, { id: idB, edges: edgesB }) => {
             const isTangramACompleted =
-              currentUserCompletedTangrams[idA] !== undefined
+              tangramsCompletedBy[idA][currentUser && currentUser.uid] !==
+              undefined
             const isTangramBCompleted =
-              currentUserCompletedTangrams[idB] !== undefined
+              tangramsCompletedBy[idB][currentUser && currentUser.uid] !==
+              undefined
             return !isTangramACompleted && !isTangramBCompleted
               ? edgesB - edgesA
               : isTangramACompleted - isTangramBCompleted
           }
-        : ({ id: idA, edges: edgesA }, { id: idB, edges: edgesB }) => {
+        : ({ id: idA }, { id: idB }) => {
             const isTangramACompleted =
-              currentUserCompletedTangrams[idA] !== undefined
+              tangramsCompletedBy[idA][currentUser && currentUser.uid] !==
+              undefined
             const isTangramBCompleted =
-              currentUserCompletedTangrams[idB] !== undefined
+              tangramsCompletedBy[idB][currentUser && currentUser.uid] !==
+              undefined
             return isTangramACompleted - isTangramBCompleted
           }
 
       const randomPlaylist = shuffle([...approvedTangrams]).sort(sortFn)
       setPlaylist([...randomPlaylist])
     },
-    [approvedTangrams, completedTangrams, currentUser]
+    [approvedTangrams, tangramsCompletedBy, currentUser]
+  )
+
+  const markTangramAsComplete = useCallback(
+    async (tangram, completionTime) => {
+      if (
+        currentUser &&
+        tangram.approved &&
+        !tangramsCompletedBy[tangram.id][currentUser.uid]
+      ) {
+        await firebase
+          .firestore()
+          .collection("stats")
+          .doc(tangram.id)
+          .update({
+            [`${currentUser.uid}.completed`]: completionTime,
+          })
+      }
+    },
+    [currentUser, tangramsCompletedBy]
+  )
+
+  const toggleTangramStar = useCallback(
+    async (tangram) => {
+      if (currentUser && tangram.approved) {
+        const starred = tangramsStarredBy[tangram.id][currentUser.uid]
+
+        await firebase
+          .firestore()
+          .collection("stats")
+          .doc(tangram.id)
+          .update({
+            [`${currentUser.uid}.starred`]: !starred,
+          })
+      }
+    },
+    [currentUser, tangramsStarredBy]
   )
 
   const contextValue = useMemo(
@@ -148,20 +158,24 @@ export const GalleryProvider = ({ children }) => {
       saveRequestId,
       playlist,
       setPlaylist,
-      markTangramAsComplete,
-      completedTangrams,
       shareTangrams,
       startRandomPlaylist,
+      tangramsCompletedBy,
+      tangramsStarredBy,
+      toggleTangramStar,
+      markTangramAsComplete,
     }),
     [
       initialized,
       requestSave,
       saveRequestId,
       playlist,
-      markTangramAsComplete,
-      completedTangrams,
       shareTangrams,
       startRandomPlaylist,
+      tangramsCompletedBy,
+      tangramsStarredBy,
+      toggleTangramStar,
+      markTangramAsComplete,
     ]
   )
 

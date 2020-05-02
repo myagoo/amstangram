@@ -1,22 +1,36 @@
 import { useKeyframes } from "css-system"
-import React, { useContext, useState } from "react"
-import { FiCheck, FiPlay, FiSquare } from "react-icons/fi"
-import { Button } from "../components/button"
+import React, { useContext, useState, useMemo } from "react"
+import { FiCheck, FiPlay, FiX, FiStar } from "react-icons/fi"
+import { useIntl } from "react-intl"
+import { PrimaryButton } from "../components/button"
 import { View } from "../components/view"
-import { FADE_TRANSITION_DURATION, MAX_CLAPS_COUNT } from "../constants"
+import { FADE_TRANSITION_DURATION } from "../constants"
 import { SoundContext } from "../contexts/sound"
+import { Text } from "./text"
+import { GalleryContext } from "../contexts/gallery"
 
-export const Victory = ({ emoji, onStop, onNext, onApprove, onClap }) => {
-  const [clapCount, setClapCount] = useState(false)
-
+export const Victory = ({
+  tangram,
+  onStop,
+  onNext,
+  onApprove,
+  onStarToggle,
+  starred,
+}) => {
+  const intl = useIntl()
   const [emojiSpinEnded, setEmojiSpinEnded] = useState(false)
-  const [emojiFadeOutEnded, setEmojiFadeOutEnded] = useState(false)
-  const [clapFadeInEnded, setClapFadeInEnded] = useState(false)
+  const { playStar } = useContext(SoundContext)
+  const { tangramsStarredBy } = useContext(GalleryContext)
 
-  const [playbackRate, setPlaybackRate] = useState(1)
-  const { playClap } = useContext(SoundContext)
-  const [stagedClapsCount, setStagedClapsCount] = useState(0)
-  const [commitClapsTimeout, setCommitClapsTimeout] = useState()
+  const stars = useMemo(() => {
+    let stars = 0
+    for (const starredByUid in tangramsStarredBy[tangram.id]) {
+      if (tangramsStarredBy[tangram.id][starredByUid]) {
+        stars += 1
+      }
+    }
+    return stars
+  }, [tangram, tangramsStarredBy])
 
   const emojiSpin = useKeyframes({
     0: {
@@ -29,47 +43,8 @@ export const Victory = ({ emoji, onStop, onNext, onApprove, onClap }) => {
     },
   })
 
-  const clap = useKeyframes({
-    0: {
-      transform: "rotate(0) scale(1)",
-    },
-    50: {
-      transform: "rotate(5deg) scale(1.1)",
-    },
-    100: {
-      transform: "rotate(0) scale(1)",
-    },
-  })
-
   const handleEmojiSpinAnimationEnd = () => {
     setTimeout(() => setEmojiSpinEnded(true), 1000)
-  }
-
-  const handleEmojiFadeOutAnimationEnd = () => {
-    setEmojiFadeOutEnded(true)
-  }
-
-  const handleClapFadeInAnimationEnd = () => {
-    setClapFadeInEnded(true)
-  }
-
-  const commitClaps = () => {
-    onClap(stagedClapsCount)
-    setStagedClapsCount(0)
-  }
-
-  const handleClapClick = () => {
-    if (clapCount < MAX_CLAPS_COUNT) {
-      playClap({
-        playbackRate,
-      })
-      setClapCount(clapCount + 1)
-      setStagedClapsCount(stagedClapsCount + 1)
-      setPlaybackRate(playbackRate + 0.05)
-
-      clearTimeout(commitClapsTimeout)
-      setCommitClapsTimeout(setTimeout(commitClaps, 500))
-    }
   }
 
   return (
@@ -85,88 +60,108 @@ export const Victory = ({ emoji, onStop, onNext, onApprove, onClap }) => {
         gap: 3,
       }}
     >
-      {!emojiSpinEnded ? (
+      <View
+        css={{
+          position: "relative",
+        }}
+      >
         <View
           key="emojiSpin"
           onAnimationEnd={handleEmojiSpinAnimationEnd}
           css={{
+            textShadow: "0px 5px 10px #00000080",
             fontSize: "30vmin",
             animation: `2000ms ${emojiSpin} cubic-bezier(.6,1.56,.58,.92) forwards`,
           }}
         >
-          {emoji}
+          {tangram.emoji}
         </View>
-      ) : !emojiFadeOutEnded ? (
-        <View
-          key="emojiFadeOut"
-          onAnimationEnd={handleEmojiFadeOutAnimationEnd}
-          css={{
-            fontSize: "30vmin",
-            animation: `${FADE_TRANSITION_DURATION}ms ${emojiSpin} cubic-bezier(.6,1.56,.58,.92) forwards reverse`,
-          }}
-        >
-          {emoji}
-        </View>
-      ) : (
-        <>
-          {!clapFadeInEnded ? (
-            <View
-              key="clapFadeIn"
-              css={{
-                fontSize: "30vmin",
-                animation: `${FADE_TRANSITION_DURATION}ms fadeIn ease both`,
-              }}
-              onAnimationEnd={handleClapFadeInAnimationEnd}
-              onClick={handleClapClick}
-            >
-              {"👏"}
-            </View>
-          ) : clapCount < MAX_CLAPS_COUNT ? (
-            <View
-              key={`clap${clapCount}`}
-              css={{
-                fontSize: `30vmin`,
-                animation: clapCount ? `250ms ${clap} alternate` : undefined,
-              }}
-              onClick={handleClapClick}
-            >
-              {"👏"}
-            </View>
-          ) : (
-            <View
-              key={`clapOut`}
-              css={{
-                fontSize: `30vmin`,
-                animation: `${FADE_TRANSITION_DURATION}ms ${emojiSpin} cubic-bezier(.6,1.56,.58,.92) forwards reverse`,
-              }}
-            >
-              {"👏"}
-            </View>
-          )}
+        {emojiSpinEnded && (
           <View
             css={{
+              mt: 3,
+              position: "absolute",
+              top: "100%",
+              left: "50%",
+              transform: "translateX(-50%)",
               flexDirection: "row",
               gap: 3,
               animation: `${FADE_TRANSITION_DURATION}ms fadeIn ease both`,
             }}
           >
             {onApprove && (
-              <Button onClick={onApprove}>
-                <View as={FiCheck} css={{ m: "auto" }}></View>
-              </Button>
+              <View
+                as={PrimaryButton}
+                onClick={onApprove}
+                css={{
+                  boxShadow: "0px 5px 10px #00000080",
+                  flexDirection: "row",
+                  gap: 2,
+                  alignItems: "flex-end",
+                }}
+              >
+                <View as={FiCheck} css={{ size: "icon" }}></View>
+                <Text>{intl.formatMessage({ id: "Approve" })}</Text>
+              </View>
+            )}
+            {onStarToggle && (
+              <View
+                as={PrimaryButton}
+                mute
+                onClick={() => {
+                  playStar()
+                  onStarToggle()
+                }}
+                css={{
+                  boxShadow: "0px 5px 10px #00000080",
+                  flexDirection: "row",
+                  gap: 2,
+                  alignItems: "flex-end",
+                }}
+              >
+                <Text>{stars}</Text>
+                <View
+                  as={FiStar}
+                  css={{
+                    size: "icon",
+                    fill: starred ? "currentColor" : undefined,
+                  }}
+                  deps={[starred]}
+                ></View>
+              </View>
             )}
             {onNext ? (
-              <Button onClick={onNext}>
-                <View as={FiPlay} css={{ m: "auto" }}></View>
-              </Button>
+              <View
+                as={PrimaryButton}
+                onClick={onNext}
+                css={{
+                  boxShadow: "0px 5px 10px #00000080",
+                  flexDirection: "row",
+                  gap: 2,
+                  alignItems: "flex-end",
+                }}
+              >
+                <View as={FiPlay} css={{ size: "icon" }}></View>
+                <Text>{intl.formatMessage({ id: "Next" })}</Text>
+              </View>
             ) : (
-              <Button onClick={onStop}>
-                <View as={FiSquare} css={{ m: "auto" }}></View>
-              </Button>
+              <View
+                as={PrimaryButton}
+                onClick={onStop}
+                css={{
+                  boxShadow: "0px 5px 10px #00000080",
+                  flexDirection: "row",
+                  gap: 2,
+                  alignItems: "flex-end",
+                }}
+              >
+                <View as={FiX} css={{ size: "icon" }}></View>
+                <Text>{intl.formatMessage({ id: "Quit" })}</Text>
+              </View>
             )}
           </View>
-        </>
-      )}
+        )}
+      </View>
     </View>
   )
 }

@@ -2,7 +2,6 @@ import firebase from "gatsby-plugin-firebase"
 import React, { useCallback, useContext, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { DIALOG_CLOSED_REASON } from "../constants"
-import { GalleryContext } from "../contexts/gallery"
 import { LanguageContext } from "../contexts/language"
 import { NotifyContext } from "../contexts/notify"
 import { TangramsContext } from "../contexts/tangrams"
@@ -11,10 +10,12 @@ import { Badge } from "./badge"
 import { DangerButton, PrimaryButton } from "./button"
 import { Dialog } from "./dialog"
 import { Input } from "./input"
-import { Error, Similink, Title } from "./primitives"
+import { Error, Similink, Title, InlineIcon } from "./primitives"
 import { Text } from "./text"
 import { View } from "./view"
-import { useIntl } from "react-intl"
+import { useIntl, FormattedMessage } from "react-intl"
+import { FiStar } from "react-icons/fi"
+import { GalleryContext } from "../contexts/gallery"
 
 const ChangeEmailForm = ({ currentUser, onClose }) => {
   const intl = useIntl()
@@ -250,6 +251,7 @@ const ChangePasswordForm = ({ currentUser, onClose }) => {
           <Input
             type="password"
             name="newPassword"
+            autoComplete="new-password"
             ref={register({
               required: intl.formatMessage({ id: "Password is required" }),
             })}
@@ -297,31 +299,42 @@ export const ProfileDialog = ({ uid, deferred }) => {
   const notify = useContext(NotifyContext)
 
   const { language } = useContext(LanguageContext)
-  const { completedTangrams } = useContext(GalleryContext)
   const { currentUser, usersMetadata } = useContext(UserContext)
   const { username, signupDate } = usersMetadata[uid]
   const [changeEmailRequested, setChangeEmailRequested] = useState(false)
   const [changeUsernameRequested, setChangeUsernameRequested] = useState(false)
   const [changePasswordRequested, setChangePasswordRequested] = useState(false)
   const { approvedTangrams } = useContext(TangramsContext)
+  const { tangramsStarredBy, tangramsCompletedBy } = useContext(GalleryContext)
 
-  const { claps, completed, created } = useMemo(() => {
-    let claps = 0
+  const { stars, completed, created } = useMemo(() => {
+    let stars = 0
     let created = 0
+    let completed = 0
     for (const tangram of approvedTangrams) {
       if (tangram.uid === uid) {
-        claps += tangram.claps || 0
         created++
+        for (const starredByUid in tangramsStarredBy[tangram.id]) {
+          if (
+            starredByUid !== uid &&
+            tangramsStarredBy[tangram.id][starredByUid]
+          ) {
+            stars += 1
+          }
+        }
+      }
+      for (const completedByUid in tangramsCompletedBy[tangram.id]) {
+        if (completedByUid === uid) {
+          completed += 1
+        }
       }
     }
     return {
-      claps,
-      completed: completedTangrams[uid]
-        ? Object.keys(completedTangrams[uid]).length
-        : 0,
+      stars,
+      completed,
       created,
     }
-  }, [completedTangrams, approvedTangrams, uid])
+  }, [approvedTangrams, tangramsCompletedBy, tangramsStarredBy, uid])
 
   const handleLogout = async () => {
     if (
@@ -339,8 +352,6 @@ export const ProfileDialog = ({ uid, deferred }) => {
     <Dialog
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
       css={{
-        flex: "1",
-        minWidth: "268px",
         overflow: "auto",
         pt: 4,
         mt: -4,
@@ -365,15 +376,13 @@ export const ProfileDialog = ({ uid, deferred }) => {
       ) : (
         <View css={{ gap: 4 }}>
           <View css={{ gap: 3, alignItems: "center" }}>
-            <Badge uid={uid} size={86} css={{}}></Badge>
+            <Badge uid={uid} size="badgeBig"></Badge>
             <Title>{username}</Title>
             <View css={{ gap: 2, fontSize: 2, alignItems: "center" }}>
               {currentUser && uid === currentUser.uid && (
-                <Text css={{ fontSize: 2 }}>
-                  {currentUser.firebaseUser.email}
-                </Text>
+                <Text>{currentUser.firebaseUser.email}</Text>
               )}
-              <Text css={{ fontSize: 2 }}>
+              <Text>
                 {intl.formatMessage(
                   { id: "Joined {signupDate}" },
                   {
@@ -401,30 +410,40 @@ export const ProfileDialog = ({ uid, deferred }) => {
                 )}
               </Text>
               <Text>
-                {intl.formatMessage(
-                  { id: "Earned {claps} 👏" },
-                  {
-                    claps,
-                  }
-                )}
+                <FormattedMessage
+                  id="Earned {stars}"
+                  values={{
+                    stars,
+                    starIcon: () => (
+                      <InlineIcon
+                        icon={FiStar}
+                        css={{ fill: "currentColor" }}
+                      ></InlineIcon>
+                    ),
+                  }}
+                ></FormattedMessage>
               </Text>
             </View>
           </View>
-          <View css={{ gap: 3, alignItems: "center" }}>
-            <Similink onClick={() => setChangeEmailRequested(true)}>
-              {intl.formatMessage({ id: "Change email address" })}
-            </Similink>
-            <Similink onClick={() => setChangeUsernameRequested(true)}>
-              {intl.formatMessage({ id: "Change username" })}
-            </Similink>
-            <Similink onClick={() => setChangePasswordRequested(true)}>
-              {intl.formatMessage({ id: "Change password" })}
-            </Similink>
-          </View>
+          {currentUser && currentUser.uid === uid && (
+            <>
+              <View css={{ gap: 3, alignItems: "center" }}>
+                <Similink onClick={() => setChangeEmailRequested(true)}>
+                  {intl.formatMessage({ id: "Change email address" })}
+                </Similink>
+                <Similink onClick={() => setChangeUsernameRequested(true)}>
+                  {intl.formatMessage({ id: "Change username" })}
+                </Similink>
+                <Similink onClick={() => setChangePasswordRequested(true)}>
+                  {intl.formatMessage({ id: "Change password" })}
+                </Similink>
+              </View>
 
-          <DangerButton onClick={handleLogout}>
-            {intl.formatMessage({ id: "Log out" })}
-          </DangerButton>
+              <DangerButton onClick={handleLogout}>
+                {intl.formatMessage({ id: "Log out" })}
+              </DangerButton>
+            </>
+          )}
         </View>
       )}
     </Dialog>

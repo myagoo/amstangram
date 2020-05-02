@@ -1,29 +1,18 @@
+import React from "react"
+
 import { Text } from "./text"
-import { extendPrimitive } from "css-system"
+import { extendPrimitive, createPrimitive, useKeyframes } from "css-system"
+import { FiStar } from "react-icons/fi"
+import { View } from "./view"
 
-export const Error = extendPrimitive(
-  Text,
-  ({ as = "small", css, ...props }) => {
-    return {
-      as,
-      css: {
-        color: "errorText",
-        ...css,
-      },
-      ...props,
-    }
-  }
-)
+export const Error = extendPrimitive(Text, {
+  fontSize: 2,
+  color: "errorText",
+})
 
-export const Hint = extendPrimitive(Text, ({ as = "small", css, ...props }) => {
-  return {
-    as,
-    css: {
-      opacity: 0.5,
-      ...css,
-    },
-    ...props,
-  }
+export const Hint = extendPrimitive(Text, {
+  fontSize: 2,
+  opacity: 0.75,
 })
 
 export const Title = extendPrimitive(Text, {
@@ -36,7 +25,84 @@ export const SubTitle = extendPrimitive(Text, {
   fontWeight: "bold",
 })
 
+export const Link = createPrimitive("a", {
+  cursor: "pointer",
+  textDecoration: "underline",
+  color: "inherit",
+  "&:visited": {
+    color: "inherit",
+  },
+})
+
 export const Similink = extendPrimitive(Text, {
   cursor: "pointer",
   textDecoration: "underline",
 })
+
+export const InlineIcon = ({ icon, css }) => {
+  return (
+    <Text
+      as={icon}
+      css={{
+        position: "relative",
+        top: "0.1em",
+        size: "0.9em",
+        ...css,
+      }}
+    ></Text>
+  )
+}
+
+export const InlineStarIcon = ({ css }) => {
+  const gradient = useKeyframes({
+    0: { color: "pieces.lt2" },
+    14: { color: "pieces.rh" },
+    28: { color: "pieces.st2" },
+    42: { color: "pieces.mt1" },
+    57: { color: "pieces.st1" },
+    71: { color: "pieces.lt1" },
+    85: { color: "pieces.sq" },
+    100: { color: "pieces.lt2" },
+  })
+  return (
+    <Text
+      as={FiStar}
+      css={{
+        stroke: "currentColor",
+        fill: "currentColor",
+        animation: `${gradient} 20s linear infinite both`,
+        position: "relative",
+        top: "0.1em",
+        size: "0.9em",
+        ...css,
+      }}
+    ></Text>
+  )
+}
+
+export const StarIcon = ({ css, deps }) => {
+  const gradient = useKeyframes({
+    0: { color: "pieces.lt2" },
+    14: { color: "pieces.rh" },
+    28: { color: "pieces.st2" },
+    42: { color: "pieces.mt1" },
+    57: { color: "pieces.st1" },
+    71: { color: "pieces.lt1" },
+    85: { color: "pieces.sq" },
+    100: { color: "pieces.lt2" },
+  })
+  return (
+    <View
+      as={FiStar}
+      css={{
+        size: "icon",
+        m: "-2px",
+        stroke: "currentColor",
+        fill: "currentColor",
+        animation: `${gradient} 20s linear infinite both`,
+        ...css,
+      }}
+      deps={deps}
+    ></View>
+  )
+}

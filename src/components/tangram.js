@@ -42,17 +42,20 @@ import { restrictGroupWithinCanvas } from "../utils/restrictGroupWithinCanvas"
 import { scrambleGroup } from "../utils/scrambleGroup"
 import { updateColisionState } from "../utils/updateColisionState"
 import { Card } from "./card"
-import { TangramMenu } from "./tangramMenu"
 import { Victory } from "./victory"
 
 export const Tangram = () => {
   const intl = useIntl()
   const { showTip } = useContext(TipsContext)
   const { approvedTangrams } = useContext(TangramsContext)
+
   const { showLogin, showTangram } = useContext(DialogContext)
-  const { playTangram } = useContext(SoundContext)
-  const playTangramRef = useRef()
-  playTangramRef.current = playTangram
+  const { playTangram, playVictory } = useContext(SoundContext)
+  const playRef = useRef()
+  playRef.current = {
+    tangram: playTangram,
+    victory: playVictory,
+  }
 
   const { currentUser } = useContext(UserContext)
   const currentUserRef = useRef()
@@ -61,10 +64,12 @@ export const Tangram = () => {
   const notify = useContext(NotifyContext)
   const [showBackgroundPattern] = useShowBackgroundPattern()
   const {
-    markTangramAsComplete,
     saveRequestId,
     playlist,
     setPlaylist,
+    tangramsStarredBy,
+    markTangramAsComplete,
+    toggleTangramStar,
   } = useContext(GalleryContext)
 
   const markTangramAsCompleteRef = useRef()
@@ -269,7 +274,7 @@ export const Tangram = () => {
               pieceGroup.scale(-1, 1) // Horizontal flip
             }
           }
-          playTangramRef.current()
+          playRef.current.tangram()
 
           restrictGroupWithinCanvas(pieceGroup, canvasRef.current)
 
@@ -333,6 +338,7 @@ export const Tangram = () => {
             )
           }
           setTimeout(() => {
+            playRef.current.victory()
             paper.project.activeLayer.tween(
               {
                 opacity: 1,
@@ -575,37 +581,27 @@ export const Tangram = () => {
 
       {playlist && victoryPhase && (
         <Victory
-          emoji={selectedTangram.emoji}
+          tangram={selectedTangram}
           onStop={handleStop}
           onNext={
             currentTangramIndex < playlist.length - 1 ? handleNext : undefined
           }
           onApprove={
-            currentUser &&
-            currentUser.isAdmin &&
-            selectedTangram.uid &&
-            !selectedTangram.approved
+            currentUser && currentUser.isAdmin && !selectedTangram.approved
               ? handleApprove
               : undefined
           }
-          onClap={(count) => {
-            if (currentUser) {
-              firebase
-                .firestore()
-                .collection("tangrams")
-                .doc(selectedTangram.id)
-                .update({
-                  claps: firebase.firestore.FieldValue.increment(count),
-                })
-            } else {
-              notify(
-                intl.formatMessage({ id: "Claps only count when logged in" })
-              )
-            }
-          }}
+          starred={
+            currentUser &&
+            tangramsStarredBy[selectedTangram.id][currentUser.uid]
+          }
+          onStarToggle={
+            currentUser && selectedTangram.approved
+              ? () => toggleTangramStar(selectedTangram)
+              : undefined
+          }
         />
       )}
-      <TangramMenu></TangramMenu>
     </View>
   )
 }

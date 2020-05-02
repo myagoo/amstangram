@@ -33,16 +33,61 @@ const migrateFirestore = async () => {
       .get()
 
     if (tangramCollection.size) {
+      for (const doc of tangramCollection.docs) {
+        await doc.ref.delete()
+      }
+    }
+  }
+
+  const statsCollection = await firebase.firestore().collection("stats").get()
+
+  const tangramsCompletedBy = {}
+
+  for (const statDoc of statsCollection.docs) {
+    const userId = statDoc.id
+    const completedTangrams = statDoc.data()
+    for (const tangramId in completedTangrams) {
+      if (!tangramsCompletedBy[tangramId]) {
+        tangramsCompletedBy[tangramId] = {}
+      }
+      tangramsCompletedBy[tangramId][userId] = {
+        completed: completedTangrams[tangramId].completionTime,
+      }
+    }
+
+    statDoc.ref.delete()
+  }
+
+  for (const tangramId in tangramsCompletedBy) {
+    const tangramCompletedBy = tangramsCompletedBy[tangramId]
+    try {
       await firebase
         .firestore()
         .collection("stats")
-        .doc(userDoc.id)
-        .set(
-          tangramCollection.docs.reduce((acc, tangramDoc) => {
-            return { ...acc, [tangramDoc.id]: tangramDoc.data() }
-          }, {})
-        )
+        .doc(tangramId)
+        .set(tangramCompletedBy)
+    } catch (error) {
+      console.log(tangramCompletedBy)
     }
+  }
+
+  const tangramsCollection = await firebase
+    .firestore()
+    .collection("tangrams")
+    .get()
+  for (const tangramDoc of tangramsCollection.docs) {
+    const tangramId = tangramDoc.id
+    const tangram = tangramDoc.data()
+
+    delete tangram.claps
+
+    await firebase
+      .firestore()
+      .collection("tangrams")
+      .doc(tangramId)
+      .set({
+        ...tangram,
+      })
   }
 
   process.exit(0)

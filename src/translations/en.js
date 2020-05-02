@@ -1,6 +1,5 @@
-import { MAX_CLAPS_COUNT } from "../constants"
-
 export default {
+  Amstangram: "Amstangram",
   Language: "Language",
   en: "English",
   fr: "French",
@@ -94,32 +93,32 @@ export default {
   "Completed {completed}/{total} tangrams":
     "Completed {completed}/{total} tangrams",
   "Created {created} tangrams": "Created {created} tangrams",
-  "Earned {claps} 👏": "Earned {claps} 👏",
-  Claps: "Claps",
+  "Earned {stars}": "Earned {stars}",
+  "Stars earned": "Stars earned",
   "Completed tangrams": "Completed tangrams",
   "Created tangrams": "Created tangrams",
-
-  "Claps only count when logged in": "Claps only count when logged in",
 
   "Random tip": "Random tip",
   "Got it!": "Got it!",
   "tips.menu":
     "You can access the tangram gallery {galleryIcon}, settings {settingsIcon} and more by pressing {menuIcon}",
-  "tips.account":
+  "tips.account1":
     "You can create an account by pressing {accountIcon} in the menu {menuIcon}",
+  "tips.account2":
+    "Signup in order to save your progression and create your very own tangrams",
   "tips.gallery":
     "You can create your own tangram playlist by selecting tangrams in the gallery {galleryIcon}",
   "tips.share":
     "You can share playlist with your friends by pressing {shareIcon} in the gallery {galleryIcon}",
   "tips.create":
-    "You can create your own tangram by pressing {createIcon} in the menu {menuIcon}",
-  "tips.claps": `Did you liked this tangram ? Send claps to its creator by pressing 👏 (up to ${MAX_CLAPS_COUNT} times)`,
+    "You can create your own tangrams by pressing {createIcon} in the menu {menuIcon}",
+  "tips.stars": `Did you liked this tangram?<br></br>Give a star to its creator by pressing {starIcon}`,
   "tips.difficulty":
-    "Having it too easy? You can change difficulty by pressing {settingsIcon} in the menu {menuIcon}",
+    "Having it too easy?<br></br>You can change difficulty by pressing {settingsIcon} in the menu {menuIcon}",
   "tips.theme":
-    "Too bright for your eyes? You can toggle dark mode by pressing {settingsIcon} in the menu {menuIcon}",
+    "Too bright for your eyes?<br></br>You can toggle dark mode by pressing {settingsIcon} in the menu {menuIcon}",
   "tips.sound":
-    "Too much noise? You can disable sounds by pressing {settingsIcon} in the menu {menuIcon}",
+    "Too much noise?<br></br>You can disable sounds by pressing {settingsIcon} in the menu {menuIcon}",
   "tips.card":
     "You can acces tangram details or edit your own tangrams by long pressing a card in the gallery {galleryIcon}",
   "tips.leaderboard":
@@ -131,4 +130,17 @@ export default {
   No: "No",
   "Reset tips": "Reset tips",
   "Tips reseted successfuly": "Tips reseted successfuly",
+
+  "Loading...": "Loading...",
+
+  Approve: "Approve",
+  Next: "Next",
+  Quit: "Quit",
+
+  "See my profile": "See my profile",
+  "Log in": "Log in",
+  "Save tangram": "Save tangram",
+  "Contact 💌": "Contact 💌",
+  "A word about Amstangram": "A word about Amstangram",
+  "Version {code}": "Version {code}",
 }

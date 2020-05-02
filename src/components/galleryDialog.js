@@ -1,5 +1,5 @@
 import { extendPrimitive, ThemeContext } from "css-system"
-import React, { useContext, useState } from "react"
+import React, { useContext, useState, useCallback } from "react"
 import { FiShare2 } from "react-icons/fi"
 import { useIntl } from "react-intl"
 import { DIALOG_CLOSED_REASON } from "../constants"
@@ -39,14 +39,14 @@ export const GalleryDialog = ({ deferred }) => {
   const { currentUser } = useContext(UserContext)
   const {
     setPlaylist,
-    completedTangrams,
     shareTangrams,
     startRandomPlaylist,
+    tangramsCompletedBy,
   } = useContext(GalleryContext)
 
   const [selectedTangrams, setSelectedTangrams] = useState([])
 
-  const handleTangramClick = (clickedTangram) => {
+  const handleTangramClick = useCallback((clickedTangram) => {
     console.log(clickedTangram)
     setSelectedTangrams((prevPendingSelectedTangrams) => {
       if (
@@ -55,13 +55,13 @@ export const GalleryDialog = ({ deferred }) => {
             pendingSelectedTangram.id === clickedTangram.id
         )
       ) {
-        return selectedTangrams.filter(
+        return prevPendingSelectedTangrams.filter(
           (tangram) => tangram.id !== clickedTangram.id
         )
       }
-      return [...selectedTangrams, clickedTangram]
+      return [...prevPendingSelectedTangrams, clickedTangram]
     })
-  }
+  }, [])
 
   const handleStartClick = () => {
     if (selectedTangrams.length) {
@@ -81,8 +81,7 @@ export const GalleryDialog = ({ deferred }) => {
         title={<Title>{intl.formatMessage({ id: "Tangram gallery" })}</Title>}
         css={{
           gap: 3,
-          width: "500px",
-          maxWidth: "80vw",
+          width: "568px",
         }}
         onClose={handleCloseClick}
       >
@@ -112,15 +111,13 @@ export const GalleryDialog = ({ deferred }) => {
                         key={tangram.id}
                         tangram={tangram}
                         completed={
-                          currentUser &&
-                          completedTangrams[currentUser.uid] &&
-                          completedTangrams[currentUser.uid][tangram.id]
+                          currentUser && tangramsCompletedBy[currentUser.uid]
                         }
                         selected={selectedTangrams.some(
                           (pendingSelectedTangram) =>
                             pendingSelectedTangram.id === tangram.id
                         )}
-                        onClick={() => handleTangramClick(tangram)}
+                        onSelect={handleTangramClick}
                         onBadgeClick={showProfile}
                         onLongPress={showTangram}
                       />
@@ -150,9 +147,7 @@ export const GalleryDialog = ({ deferred }) => {
                         key={tangram.id}
                         tangram={tangram}
                         completed={
-                          currentUser &&
-                          completedTangrams[currentUser.uid] &&
-                          completedTangrams[currentUser.uid][tangram.id]
+                          currentUser && tangramsCompletedBy[currentUser.uid]
                         }
                         selected={selectedTangrams.some(
                           (pendingSelectedTangram) =>
@@ -182,7 +177,7 @@ export const GalleryDialog = ({ deferred }) => {
                 disabled={selectedTangrams.length === 0}
                 onClick={() => shareTangrams(selectedTangrams)}
               >
-                <View as={FiShare2} size={20}></View>
+                <View as={FiShare2} css={{ size: "icon", m: "-2px" }}></View>
               </PrimaryButton>
             </View>
           </>

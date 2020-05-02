@@ -13,7 +13,7 @@ export const Card = ({
   selected,
   css,
   onBadgeClick,
-  onClick,
+  onSelect,
   onLongPress,
   hideBadge,
   ...props
@@ -34,10 +34,10 @@ export const Card = ({
     <View
       css={css}
       onClick={
-        onClick
+        onSelect
           ? (e) => {
               playCard()
-              onClick(e)
+              onSelect(tangram)
             }
           : undefined
       }
@@ -57,7 +57,7 @@ export const Card = ({
           p: 3,
           textAlign: "center",
           position: "relative",
-          cursor: onClick || onLongPress ? "pointer" : undefined,
+          cursor: onSelect || onLongPress ? "pointer" : undefined,
           width: 128,
           height: 178,
         }}

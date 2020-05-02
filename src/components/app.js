@@ -1,14 +1,15 @@
-import React, { useContext, useState, useEffect } from "react"
+import React, { useContext, useEffect, useState } from "react"
+import { useIntl } from "react-intl"
 import { Logo } from "../components/logo"
 import { View } from "../components/view"
 import { FADE_STAGGER_DURATION, FADE_TRANSITION_DURATION } from "../constants"
 import { GalleryContext } from "../contexts/gallery"
-import { Loader } from "./loader"
-import { Tangram } from "./tangram"
-import { UserContext } from "../contexts/user"
 import { NotifyContext } from "../contexts/notify"
 import { TangramsContext } from "../contexts/tangrams"
-import { useIntl } from "react-intl"
+import { UserContext } from "../contexts/user"
+import { Menu } from "./menu"
+import { Title } from "./primitives"
+import { Tangram } from "./tangram"
 
 export const App = () => {
   const intl = useIntl()
@@ -37,11 +38,17 @@ export const App = () => {
   useEffect(() => {
     if (isEverythingInitialized) {
       clearTimeout(showLoaderTimeout)
+      setShowLoader(false)
     }
   }, [isEverythingInitialized])
 
   if (initialized) {
-    return <Tangram></Tangram>
+    return (
+      <>
+        <Tangram></Tangram>
+        <Menu></Menu>
+      </>
+    )
   }
 
   const handleAnimationEnd = () => {
@@ -64,6 +71,7 @@ export const App = () => {
         flex: "1",
         alignItems: "center",
         justifyContent: "center",
+        gap: 3,
         animation:
           isEverythingInitialized && waited
             ? `${FADE_TRANSITION_DURATION}ms fadeIn ease ${FADE_STAGGER_DURATION}ms reverse`
@@ -83,7 +91,7 @@ export const App = () => {
       >
         <Logo
           css={{
-            size: 128,
+            size: "logo",
             overflow: "visible",
             "& > g": {
               transition: `all ${FADE_TRANSITION_DURATION}ms ease`,
@@ -97,16 +105,15 @@ export const App = () => {
         />
       </View>
 
-      <Loader
-        css={
-          showLoader
-            ? {
-                animation: `${FADE_TRANSITION_DURATION}ms fadeIn ease`,
-              }
-            : { opacity: 0 }
-        }
+      <Title
+        css={{
+          transition: `opacity ${FADE_TRANSITION_DURATION}ms ease`,
+          opacity: showLoader ? 1 : 0,
+        }}
         deps={[showLoader]}
-      ></Loader>
+      >
+        {intl.formatMessage({ id: "Loading..." })}
+      </Title>
     </View>
   )
 }

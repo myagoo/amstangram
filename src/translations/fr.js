@@ -1,6 +1,6 @@
-import { MAX_CLAPS_COUNT } from "../constants"
-
 export default {
+  Amstangram: "Amstangram",
+
   Language: "Langage",
   en: "Anglais",
   fr: "Francais",
@@ -97,35 +97,34 @@ export default {
   "Completed {completed}/{total} tangrams":
     "{completed}/{total} tangrams complétés",
   "Created {created} tangrams": "{created} tangrams créés",
-  "Earned {claps} 👏": "{claps} 👏 gagnés",
-  Claps: "Claps",
+  "Earned {stars}": "{stars} <starIcon></starIcon> gagnées",
+  "Stars earned": "Étoiles gagnées",
   "Completed tangrams": "Tangrams complétés",
   "Created tangrams": "Tangrams créés",
-
-  "Claps only count when logged in":
-    "Les claps ne comptent que si tu es identifié.e",
 
   "Random tip": "Astuce",
   "Got it!": "J'ai compris !",
   "tips.menu":
     "Tu peux accéder à la galerie des tangrams {galleryIcon}, aux réglages {settingsIcon} et plus encore en appuyant sur {menuIcon}",
-  "tips.account":
-    "Tu peux créer ton compte utilisateur en appuyant sur {accountIcon} dans le menu {menuIcon}",
+  "tips.account1":
+    "Créer ton compte utilisateur en appuyant sur {accountIcon} dans le menu {menuIcon}",
+  "tips.account2":
+    "Créer ton compte utilisateur pour sauvegarder ta progression créer tes propres tangrams",
   "tips.gallery":
     "Tu peux créer ta propre playlist en sélectionnant les tangrams dans la galerie {galleryIcon}",
   "tips.share":
     "Tu peux partager ta playlist avec tes amis en appuyant sur {shareIcon} dans la galerie {galleryIcon}",
   "tips.create":
     "Tu peux créer tes propres tangrams en appuyant sur {createIcon} dans le menu {menuIcon}",
-  "tips.claps": `T'as aimé ce tangram ? Envoies des claps à son créateur en appuyant sur 👏 (jusqu'à ${MAX_CLAPS_COUNT} fois)`,
+  "tips.stars": `T'as aimé ce tangram ?<br></br>Envoies une étoile à son créateur en appuyant sur {starIcon}`,
   "tips.difficulty":
-    "Trop facile pour toi ? Tu peux changer la difficulté en appuyant sur {settingsIcon} dans le menu {menuIcon}",
+    "Trop facile pour toi ?<br></br>Essayes le mode difficile en appuyant sur {settingsIcon} dans le menu {menuIcon}",
   "tips.theme":
-    "Envie de passer du côté obscur ? Tu peux activer le mode sombre en appuyant sur {settingsIcon} dans le menu {menuIcon}",
+    "Envie de passer du côté obscur ?<br></br>Tu peux activer le mode sombre en appuyant sur {settingsIcon} dans le menu {menuIcon}",
   "tips.sound":
-    "Trop de bruits ? Tu peux désactiver les sons en appuyant sur {settingsIcon} dans le menu {menuIcon}",
+    "Trop de bruits ?<br></br>Tu peux désactiver les sons en appuyant sur {settingsIcon} dans le menu {menuIcon}",
   "tips.card":
-    "Tu peux accéder aux détails d'un tangram ou même éditer les tiens en faisant un appuie long sur une carte dans la galerie {galleryIcon}",
+    "Tu peux accéder aux détails d'un tangram ou même éditer les tiens en faisant un appui long sur une carte dans la galerie {galleryIcon}",
   "tips.leaderboard":
     "Jette un oeil au classement pour savoir qui est le meilleur en appuyant sur {leaderboardIcon} dans le menu {menuIcon}",
 
@@ -135,4 +134,17 @@ export default {
   No: "Non",
   "Reset tips": "Réinitialiser les astuces",
   "Tips reseted successfuly": "Astuces réinitilisées avec succés",
+
+  "Loading...": "Chargement...",
+
+  Approve: "Appouver",
+  Next: "Suivant",
+  Quit: "Quitter",
+
+  "See my profile": "Voir mon profil",
+  "Log in": "Se connecter",
+  "Save tangram": "Sauvegarder le tangram",
+  "Contact 💌": "Contact 💌",
+  "A word about Amstangram": "Quelques mots à propos d'Amstangram",
+  "Version {code}": "Version {code}",
 }
