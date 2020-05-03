@@ -98,17 +98,23 @@ export const Menu = () => {
   return (
     <>
       <View
-        as={FiMenu}
         css={{
           position: "fixed",
           top: 3,
           left: 3,
-          size: "menu",
           animation: `${gradient} 20s linear infinite both`,
-          cursor: "pointer",
         }}
-        onClick={handleMenuClick}
-      ></View>
+      >
+        <View
+          as={FiMenu}
+          css={{
+            size: "menu",
+            cursor: "pointer",
+          }}
+          onClick={handleMenuClick}
+        ></View>
+      </View>
+
       {menuDialogDeferred && (
         <Dialog
           onClose={() => menuDialogDeferred.reject(DIALOG_CLOSED_REASON)}
@@ -197,7 +203,7 @@ export const Menu = () => {
             >
               {intl.formatMessage(
                 { id: "Version {code}" },
-                { code: "⭐.🦆.🚀" }
+                { code: "⭐.🦆.👮" }
               )}
             </Hint>
           </View>

@@ -1,7 +1,6 @@
 import React, { useContext } from "react"
 import { useIntl } from "react-intl"
 import { DIALOG_CLOSED_REASON } from "../constants"
-import { DialogContext } from "../contexts/dialog"
 import { GalleryContext } from "../contexts/gallery"
 import { UserContext } from "../contexts/user"
 import { PrimaryButton } from "./button"
@@ -12,7 +11,6 @@ import { View } from "./view"
 
 export const ChallengeDialog = ({ uid, tangrams, deferred }) => {
   const intl = useIntl()
-  const { showProfile, showTangram } = useContext(DialogContext)
   const { usersMetadata } = useContext(UserContext)
   const { setPlaylist } = useContext(GalleryContext)
   const username = usersMetadata[uid] ? usersMetadata[uid].username : null
@@ -37,7 +35,7 @@ export const ChallengeDialog = ({ uid, tangrams, deferred }) => {
         </Title>
       }
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
-      css={{ gap: 3 }}
+      css={{ gap: 3, overflow: "initial", maxWidth: "568px" }}
     >
       <View
         css={{
@@ -57,8 +55,6 @@ export const ChallengeDialog = ({ uid, tangrams, deferred }) => {
             css={{
               m: 1,
             }}
-            onBadgeClick={showProfile}
-            onLongPress={showTangram}
           ></Card>
         ))}
       </View>

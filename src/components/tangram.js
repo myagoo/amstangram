@@ -13,7 +13,6 @@ import { useIntl } from "react-intl"
 import { View } from "../components/view"
 import {
   CLICK_TIMEOUT,
-  DEV,
   FADE_TRANSITION_DURATION,
   SNAP_DISTANCE,
   SOFT_ERROR_MARGIN,
@@ -67,7 +66,6 @@ export const Tangram = () => {
     saveRequestId,
     playlist,
     setPlaylist,
-    tangramsStarredBy,
     markTangramAsComplete,
     toggleTangramStar,
   } = useContext(GalleryContext)
@@ -90,11 +88,13 @@ export const Tangram = () => {
   }, [playlist, currentTangramIndex])
 
   const handleNext = () => {
+    setVictoryPhase(false)
     setCurrentTangramIndex(currentTangramIndex + 1)
     showTip()
   }
 
   const handleStop = () => {
+    setVictoryPhase(false)
     setPlaylist(null)
     showTip()
   }
@@ -177,10 +177,6 @@ export const Tangram = () => {
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
-  useEffect(() => {
-    setVictoryPhase(false)
-  }, [selectedTangram])
-
   // Init a game
   useLayoutEffect(() => {
     const start = Date.now()
@@ -246,13 +242,6 @@ export const Tangram = () => {
         }
 
         restrictGroupWithinCanvas(ghostGroup, canvasRef.current)
-
-        if (DEV) {
-          new paper.Path.Rectangle({
-            rectangle: ghostGroup.bounds,
-            strokeColor: "black",
-          }).removeOn({ drag: true, move: true })
-        }
 
         pieceGroup.position = ghostGroup.position
 
@@ -409,11 +398,6 @@ export const Tangram = () => {
 
         coumpoundPathRef.current.sendToBack()
         coumpoundPathRef.current.fillRule = "evenodd"
-
-        if (DEV) {
-          coumpoundPathRef.current.strokeWidth = 2
-          coumpoundPathRef.current.strokeColor = "red"
-        }
 
         coumpoundPathRef.current.closed = true
       }
@@ -579,7 +563,7 @@ export const Tangram = () => {
         }}
       />
 
-      {playlist && victoryPhase && (
+      {selectedTangram && victoryPhase && (
         <Victory
           tangram={selectedTangram}
           onStop={handleStop}
@@ -590,10 +574,6 @@ export const Tangram = () => {
             currentUser && currentUser.isAdmin && !selectedTangram.approved
               ? handleApprove
               : undefined
-          }
-          starred={
-            currentUser &&
-            tangramsStarredBy[selectedTangram.id][currentUser.uid]
           }
           onStarToggle={
             currentUser && selectedTangram.approved

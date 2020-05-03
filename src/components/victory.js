@@ -15,12 +15,11 @@ export const Victory = ({
   onNext,
   onApprove,
   onStarToggle,
-  starred,
 }) => {
   const intl = useIntl()
   const [emojiSpinEnded, setEmojiSpinEnded] = useState(false)
   const { playStar } = useContext(SoundContext)
-  const { tangramsStarredBy } = useContext(GalleryContext)
+  const { tangramsStarredBy, isTangramStarred } = useContext(GalleryContext)
 
   const stars = useMemo(() => {
     let stars = 0
@@ -31,6 +30,8 @@ export const Victory = ({
     }
     return stars
   }, [tangram, tangramsStarredBy])
+
+  const starred = isTangramStarred(tangram.id)
 
   const emojiSpin = useKeyframes({
     0: {

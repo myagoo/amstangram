@@ -1,6 +1,6 @@
 import { ThemeContext } from "css-system"
 import React, { useContext, useMemo, useCallback } from "react"
-import { COLOR_TRANSITION_DURATION, DEV } from "../constants"
+import { COLOR_TRANSITION_DURATION } from "../constants"
 import { SoundContext } from "../contexts/sound"
 import { Badge } from "./badge"
 import { View } from "./view"
@@ -8,12 +8,13 @@ import { useLongPress } from "../utils/useLongPress"
 import { getTangramDifficulty } from "../utils/getTangramDifficulty"
 
 export const Card = ({
+  showStroke,
   tangram,
   completed,
   selected,
   css,
   onBadgeClick,
-  onSelect,
+  onClick,
   onLongPress,
   hideBadge,
   ...props
@@ -34,10 +35,10 @@ export const Card = ({
     <View
       css={css}
       onClick={
-        onSelect
-          ? (e) => {
+        onClick
+          ? () => {
               playCard()
-              onSelect(tangram)
+              onClick(tangram)
             }
           : undefined
       }
@@ -57,7 +58,7 @@ export const Card = ({
           p: 3,
           textAlign: "center",
           position: "relative",
-          cursor: onSelect || onLongPress ? "pointer" : undefined,
+          cursor: onClick || onLongPress ? "pointer" : undefined,
           width: 128,
           height: 178,
         }}
@@ -69,14 +70,14 @@ export const Card = ({
             flex: "1",
             justifyContent: "center",
             fill: color,
-            stroke: DEV ? "red" : undefined,
-            strokeWidth: DEV ? 4 : undefined,
+            stroke: showStroke ? "lime" : undefined,
+            strokeWidth: showStroke ? 8 : undefined,
           }}
-          deps={[color]}
+          deps={[showStroke, color]}
           viewBox={`0 0 ${width} ${height}`}
           dangerouslySetInnerHTML={{ __html: `<path d="${path}" />` }}
         />
-        {completed && emoji && (
+        {completed && (
           <View
             css={{ position: "absolute", top: 1, left: 1, fontSize: "30px" }}
           >

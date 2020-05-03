@@ -67,6 +67,26 @@ export const GalleryProvider = ({ children }) => {
     return unsubscribe
   }, [])
 
+  const isTangramStarred = useCallback(
+    (tangramId) => {
+      if (!currentUser || !tangramsStarredBy[tangramId]) {
+        return false
+      }
+      return tangramsStarredBy[tangramId][currentUser.uid] === true
+    },
+    [currentUser, tangramsStarredBy]
+  )
+
+  const isTangramCompleted = useCallback(
+    (tangramId) => {
+      if (!currentUser || !tangramsCompletedBy[tangramId]) {
+        return false
+      }
+      return tangramsCompletedBy[tangramId][currentUser.uid]
+    },
+    [currentUser, tangramsCompletedBy]
+  )
+
   const shareTangrams = useCallback(
     (tangrams) => {
       let challengeLink = `${window.location.origin}/?tangrams=${tangrams
@@ -89,66 +109,74 @@ export const GalleryProvider = ({ children }) => {
     (sortDifficulty) => {
       const sortFn = sortDifficulty
         ? ({ id: idA, edges: edgesA }, { id: idB, edges: edgesB }) => {
-            const isTangramACompleted =
-              tangramsCompletedBy[idA][currentUser && currentUser.uid] !==
-              undefined
-            const isTangramBCompleted =
-              tangramsCompletedBy[idB][currentUser && currentUser.uid] !==
-              undefined
+            const isTangramACompleted = isTangramCompleted(idA)
+            const isTangramBCompleted = isTangramCompleted(idB)
             return !isTangramACompleted && !isTangramBCompleted
               ? edgesB - edgesA
               : isTangramACompleted - isTangramBCompleted
           }
         : ({ id: idA }, { id: idB }) => {
-            const isTangramACompleted =
-              tangramsCompletedBy[idA][currentUser && currentUser.uid] !==
-              undefined
-            const isTangramBCompleted =
-              tangramsCompletedBy[idB][currentUser && currentUser.uid] !==
-              undefined
+            const isTangramACompleted = isTangramCompleted(idA)
+            const isTangramBCompleted = isTangramCompleted(idB)
             return isTangramACompleted - isTangramBCompleted
           }
 
       const randomPlaylist = shuffle([...approvedTangrams]).sort(sortFn)
       setPlaylist([...randomPlaylist])
     },
-    [approvedTangrams, tangramsCompletedBy, currentUser]
+    [approvedTangrams, isTangramCompleted]
   )
 
   const markTangramAsComplete = useCallback(
     async (tangram, completionTime) => {
       if (
-        currentUser &&
-        tangram.approved &&
-        !tangramsCompletedBy[tangram.id][currentUser.uid]
+        approvedTangrams.some(
+          (approvedTangram) => approvedTangram.id === tangram.id
+        ) &&
+        !isTangramCompleted(tangram.id)
       ) {
         await firebase
           .firestore()
           .collection("stats")
           .doc(tangram.id)
-          .update({
-            [`${currentUser.uid}.completed`]: completionTime,
-          })
+          .set(
+            {
+              [currentUser.uid]: {
+                completed: completionTime,
+              },
+            },
+            { merge: true }
+          )
       }
     },
-    [currentUser, tangramsCompletedBy]
+    [approvedTangrams, currentUser, isTangramCompleted]
   )
 
   const toggleTangramStar = useCallback(
     async (tangram) => {
-      if (currentUser && tangram.approved) {
-        const starred = tangramsStarredBy[tangram.id][currentUser.uid]
+      if (
+        currentUser &&
+        approvedTangrams.some(
+          (approvedTangram) => approvedTangram.id === tangram.id
+        )
+      ) {
+        const starred = isTangramStarred(tangram.id)
 
         await firebase
           .firestore()
           .collection("stats")
           .doc(tangram.id)
-          .update({
-            [`${currentUser.uid}.starred`]: !starred,
-          })
+          .set(
+            {
+              [currentUser.uid]: {
+                starred: !starred,
+              },
+            },
+            { merge: true }
+          )
       }
     },
-    [currentUser, tangramsStarredBy]
+    [approvedTangrams, currentUser, isTangramStarred]
   )
 
   const contextValue = useMemo(
@@ -164,6 +192,8 @@ export const GalleryProvider = ({ children }) => {
       tangramsStarredBy,
       toggleTangramStar,
       markTangramAsComplete,
+      isTangramCompleted,
+      isTangramStarred,
     }),
     [
       initialized,
@@ -176,6 +206,8 @@ export const GalleryProvider = ({ children }) => {
       tangramsStarredBy,
       toggleTangramStar,
       markTangramAsComplete,
+      isTangramCompleted,
+      isTangramStarred,
     ]
   )
 

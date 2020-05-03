@@ -6,12 +6,12 @@ import { DIALOG_CLOSED_REASON } from "../constants"
 import { DialogContext } from "../contexts/dialog"
 import { GalleryContext } from "../contexts/gallery"
 import { TangramsContext } from "../contexts/tangrams"
-import { UserContext } from "../contexts/user"
 import { PrimaryButton } from "./button"
 import { Card } from "./card"
 import { Dialog } from "./dialog"
 import { SubTitle, Title } from "./primitives"
 import { View } from "./view"
+import { UserContext } from "../contexts/user"
 
 const FadedView = extendPrimitive(View, ({ css, ...props }) => {
   const theme = useContext(ThemeContext)
@@ -32,16 +32,17 @@ const FadedView = extendPrimitive(View, ({ css, ...props }) => {
 export const GalleryDialog = ({ deferred }) => {
   const intl = useIntl()
 
+  const { currentUser } = useContext(UserContext)
+
   const { pendingTangrams, approvedTangramsByCategory } = useContext(
     TangramsContext
   )
   const { showProfile, showTangram } = useContext(DialogContext)
-  const { currentUser } = useContext(UserContext)
   const {
     setPlaylist,
     shareTangrams,
     startRandomPlaylist,
-    tangramsCompletedBy,
+    isTangramCompleted,
   } = useContext(GalleryContext)
 
   const [selectedTangrams, setSelectedTangrams] = useState([])
@@ -108,16 +109,15 @@ export const GalleryDialog = ({ deferred }) => {
                   >
                     {pendingTangrams.map((tangram) => (
                       <Card
+                        showStroke={currentUser && currentUser.isAdmin}
                         key={tangram.id}
                         tangram={tangram}
-                        completed={
-                          currentUser && tangramsCompletedBy[currentUser.uid]
-                        }
+                        completed={isTangramCompleted(tangram.id)}
                         selected={selectedTangrams.some(
                           (pendingSelectedTangram) =>
                             pendingSelectedTangram.id === tangram.id
                         )}
-                        onSelect={handleTangramClick}
+                        onClick={handleTangramClick}
                         onBadgeClick={showProfile}
                         onLongPress={showTangram}
                       />
@@ -146,14 +146,12 @@ export const GalleryDialog = ({ deferred }) => {
                       <Card
                         key={tangram.id}
                         tangram={tangram}
-                        completed={
-                          currentUser && tangramsCompletedBy[currentUser.uid]
-                        }
+                        completed={isTangramCompleted(tangram.id)}
                         selected={selectedTangrams.some(
                           (pendingSelectedTangram) =>
                             pendingSelectedTangram.id === tangram.id
                         )}
-                        onClick={() => handleTangramClick(tangram)}
+                        onClick={handleTangramClick}
                         onBadgeClick={showProfile}
                         onLongPress={showTangram}
                       />

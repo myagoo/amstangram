@@ -53,6 +53,8 @@ export default {
   "Leave empty for random emoji": "Laisser vide pour un emoji au hasard",
 
   Order: "Ordre",
+  "A moderator will have to approve your tangram. It can be deleted or edited at any time.":
+    "Un modérateur doit approuver votre tangram.<br></br>Il peut être supprimé ou modifié n'importe quand.",
   "Submit!": "Envoyer !",
   "Edit!": "Éditer !",
   "Or delete tangram": "Ou supprimer le tangram",
@@ -87,6 +89,8 @@ export default {
   "Are you sure you want to delete this tangram?":
     "Es-tu sûr.e de vouloir supprimer ce tangram ?",
   "Tangram deleted successfuly": "Tangram supprimé avec succés",
+  "Tangram modified successfuly": "Tangram modifié avec succés",
+
   "Challenge link copied to clipboard":
     "Lien de défi copié dans le presse papier",
   "{username} challenged you": "{username} te met au défi",
@@ -116,7 +120,7 @@ export default {
     "Tu peux partager ta playlist avec tes amis en appuyant sur {shareIcon} dans la galerie {galleryIcon}",
   "tips.create":
     "Tu peux créer tes propres tangrams en appuyant sur {createIcon} dans le menu {menuIcon}",
-  "tips.stars": `T'as aimé ce tangram ?<br></br>Envoies une étoile à son créateur en appuyant sur {starIcon}`,
+  "tips.stars": `T'as aimé ce tangram ?<br></br>Envoie une étoile à son créateur en appuyant sur {starIcon}`,
   "tips.difficulty":
     "Trop facile pour toi ?<br></br>Essayes le mode difficile en appuyant sur {settingsIcon} dans le menu {menuIcon}",
   "tips.theme":

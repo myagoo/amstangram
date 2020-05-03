@@ -71,14 +71,14 @@ export const TangramsProvider = ({ children }) => {
       }
     }
 
-    const sortedTangramsByCategory = {}
+    const newSortedApprovedTangramsByCategory = {}
 
     for (const sortedCategory of Object.keys(
       newApprovedTangramsByCategory
     ).sort()) {
-      sortedTangramsByCategory[sortedCategory] = newApprovedTangramsByCategory[
+      newSortedApprovedTangramsByCategory[
         sortedCategory
-      ].sort(
+      ] = newApprovedTangramsByCategory[sortedCategory].sort(
         sortedCategory === "letters"
           ? sortLettersTangrams
           : sortedCategory === "digits"
@@ -91,7 +91,7 @@ export const TangramsProvider = ({ children }) => {
       initialized: true,
       approvedTangrams: newApprovedTangrams,
       pendingTangrams: newPendingTangrams,
-      approvedTangramsByCategory: newApprovedTangramsByCategory,
+      approvedTangramsByCategory: newSortedApprovedTangramsByCategory,
     }
   }, [currentUser, allTangrams])
 

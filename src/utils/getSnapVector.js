@@ -1,6 +1,5 @@
 import paper from "paper/dist/paper-core"
 import { getNearestPoint } from "./getNearestPoint"
-import { DEV } from "../constants"
 
 const getPrimarySnap = (shape, otherShapes, snap) => {
   for (const otherShape of otherShapes) {
@@ -31,14 +30,6 @@ const getPrimarySnap = (shape, otherShapes, snap) => {
             snap.shape = otherShape
             snap.segment = [startPoint, endPoint]
             snap.point = point
-
-            if (DEV) {
-              new paper.Path.Circle({
-                center: nearestPoint,
-                radius: 2,
-                fillColor: "red",
-              }).removeOn({ drag: true, move: true })
-            }
           }
         }
       }
@@ -55,14 +46,6 @@ const getPrimarySnap = (shape, otherShapes, snap) => {
             snap.vector = otherPoint.subtract(nearestPoint)
             snap.shape = shape
             snap.segment = [startPoint, endPoint]
-
-            if (DEV) {
-              new paper.Path.Circle({
-                center: nearestPoint,
-                radius: 2,
-                fillColor: "red",
-              }).removeOn({ drag: true, move: true })
-            }
           }
         }
       }
@@ -88,14 +71,6 @@ const getSecondarySnap = (shape, otherShapes, snap) => {
       startPoint.x - endPoint.x
     )
 
-    if (DEV) {
-      new paper.Path.Line({
-        from: startPoint,
-        to: endPoint,
-        strokeColor: "red",
-      }).removeOn({ drag: true, move: true })
-    }
-
     for (const angle of [angle1, angle2]) {
       for (const { point } of shape.segments) {
         if (point === snap.point) {
@@ -115,26 +90,10 @@ const getSecondarySnap = (shape, otherShapes, snap) => {
           insert: false,
         })
 
-        if (DEV) {
-          new paper.Path.Line({
-            from: startPoint,
-            to: endPoint,
-            strokeColor: "green",
-          }).removeOn({ drag: true, move: true })
-        }
-
         for (const otherShape of otherShapes) {
           const intersections = ray.getIntersections(otherShape)
 
           for (const { point: intersectionPoint } of intersections) {
-            if (DEV) {
-              new paper.Path.Circle({
-                center: intersectionPoint,
-                radius: 5,
-                fillColor: "blue",
-              }).removeOn({ drag: true, move: true })
-            }
-
             const newVector = intersectionPoint
               .subtract(startPoint)
               .add(snap.vector)

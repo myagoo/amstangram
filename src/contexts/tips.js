@@ -182,11 +182,11 @@ const tips = [
   },
   {
     id: "create",
-    predicate: ({ currentUser, approvedTangrams, tangramsCompletedBy }) => {
+    predicate: ({ currentUser, approvedTangrams, isTangramCompleted }) => {
       if (currentUser) {
         let completedTangrams = 0
         for (const { id } of approvedTangrams) {
-          if (tangramsCompletedBy[id][currentUser.uid]) {
+          if (isTangramCompleted(id)) {
             completedTangrams += 1
             if (completedTangrams === 10) {
               return true
@@ -247,7 +247,7 @@ export const TipsProvider = ({ children }) => {
   const [showBackgroundPattern] = useShowBackgroundPattern()
   const { currentUser } = useContext(UserContext)
   const { approvedTangrams } = useContext(TangramsContext)
-  const { tangramsCompletedBy } = useContext(GalleryContext)
+  const { isTangramCompleted } = useContext(GalleryContext)
 
   useEffect(() => {
     setTipsEnabled(window.localStorage.getItem("hideTips") === null)
@@ -293,7 +293,7 @@ export const TipsProvider = ({ children }) => {
           showBackgroundPattern,
           currentUser,
           approvedTangrams,
-          tangramsCompletedBy,
+          isTangramCompleted,
           soundEnabled,
         })
     )
@@ -323,7 +323,7 @@ export const TipsProvider = ({ children }) => {
       })
   }, [
     approvedTangrams,
-    tangramsCompletedBy,
+    isTangramCompleted,
     themeKey,
     currentUser,
     showBackgroundPattern,

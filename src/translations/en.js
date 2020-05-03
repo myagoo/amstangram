@@ -44,6 +44,8 @@ export default {
   "I don't have an account": "I don't have an account",
   "Create your account": "Create your account",
   "Connect to your account": "Connect to your account",
+  "A moderator will have to approve your tangram. It can be deleted or edited at any time.":
+    "A moderator will have to approve your tangram.<br></br>It can be deleted or edited at any time.",
   "Submit your tangram": "Submit your tangram",
   "Edit your tangram": "Edit your tangram",
   Path: "Path",
@@ -83,7 +85,8 @@ export default {
   Sounds: "Sounds",
   "Are you sure you want to delete this tangram?":
     "Are you sure you want to delete this tangram?",
-  "Tangram successfuly deleted": "Tangram successfuly deleted",
+  "Tangram deleted successfuly": "Tangram deleted successfuly",
+  "Tangram modified successfuly": "Tangram modified successfuly",
   "Challenge link copied to clipboard": "Challenge link copied to clipboard",
   "{username} challenged you": "{username} challenged you",
   "Rise to the challenge": "Rise to the challenge",

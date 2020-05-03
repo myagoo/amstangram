@@ -15,7 +15,6 @@ import { Error, Hint, Similink, Title, InlineIcon } from "./primitives"
 import { Text } from "./text"
 import { View } from "./view"
 import { FiStar } from "react-icons/fi"
-import { TangramsContext } from "../contexts/tangrams"
 import { GalleryContext } from "../contexts/gallery"
 
 const ReadTangramDialog = ({ tangram, deferred }) => {
@@ -62,7 +61,7 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
   const notify = useContext(NotifyContext)
   const { currentUser } = useContext(UserContext)
   const [tangramCopy, setTangramCopy] = useState(() => ({ ...tangram }))
-  const { tangramsStarredBy } = useContext(TangramsContext)
+  const { tangramsStarredBy } = useContext(GalleryContext)
 
   const isCreation = currentUser && !tangram.id
 
@@ -144,7 +143,7 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
       )
     ) {
       await firebase.firestore().collection("tangrams").doc(tangram.id).delete()
-      notify(intl.formatMessage({ id: "Tangram successfuly deleted" }))
+      notify(intl.formatMessage({ id: "Tangram deleted successfuly" }))
       deferred.resolve()
     }
   }
@@ -166,14 +165,19 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
         .collection("tangrams")
         .doc(tangram.id)
         .update(tangramCopy)
-      notify(intl.formatMessage({ id: "Tangram successfuly modified" }))
+      notify(intl.formatMessage({ id: "Tangram modified successfuly" }))
     }
 
     deferred.resolve()
   }
 
   const stars = useMemo(() => {
+    if (!tangram.approved) {
+      return 0
+    }
+
     let stars = 0
+
     for (const starredByUid in tangramsStarredBy[tangram.id]) {
       if (tangramsStarredBy[tangram.id][starredByUid]) {
         stars += 1
@@ -198,6 +202,7 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
     >
       <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
         <Card
+          showStroke={currentUser.isAdmin}
           selected
           completed
           tangram={tangramCopy}
@@ -219,6 +224,15 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
               }}
             ></FormattedMessage>
           </Text>
+        )}
+
+        {isCreation && !currentUser.isAdmin && (
+          <Hint>
+            <FormattedMessage
+              id="A moderator will have to approve your tangram. It can be deleted or edited at any time."
+              values={{ br: () => <br /> }}
+            ></FormattedMessage>
+          </Hint>
         )}
 
         {currentUser && currentUser.isAdmin && (
