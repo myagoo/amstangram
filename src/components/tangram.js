@@ -45,7 +45,7 @@ import { Victory } from "./victory"
 
 export const Tangram = () => {
   const intl = useIntl()
-  const { showTip } = useContext(TipsContext)
+  const { showRandomTip, showWelcome } = useContext(TipsContext)
   const { approvedTangrams } = useContext(TangramsContext)
 
   const { showLogin, showTangram } = useContext(DialogContext)
@@ -90,13 +90,13 @@ export const Tangram = () => {
   const handleNext = () => {
     setVictoryPhase(false)
     setCurrentTangramIndex(currentTangramIndex + 1)
-    showTip()
+    showRandomTip()
   }
 
   const handleStop = () => {
     setVictoryPhase(false)
     setPlaylist(null)
-    showTip()
+    showRandomTip()
   }
 
   const handleApprove = async () => {
@@ -531,6 +531,10 @@ export const Tangram = () => {
         pieceColors[Math.floor(Math.random() * pieceColors.length)]
     }
   }, [theme.colors, selectedTangram])
+
+  useEffect(() => {
+    showWelcome()
+  }, [])
 
   return (
     <View

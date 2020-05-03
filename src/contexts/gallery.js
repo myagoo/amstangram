@@ -82,7 +82,7 @@ export const GalleryProvider = ({ children }) => {
       if (!currentUser || !tangramsCompletedBy[tangramId]) {
         return false
       }
-      return tangramsCompletedBy[tangramId][currentUser.uid]
+      return tangramsCompletedBy[tangramId][currentUser.uid] !== undefined
     },
     [currentUser, tangramsCompletedBy]
   )
@@ -122,7 +122,7 @@ export const GalleryProvider = ({ children }) => {
           }
 
       const randomPlaylist = shuffle([...approvedTangrams]).sort(sortFn)
-      setPlaylist([...randomPlaylist])
+      setPlaylist(randomPlaylist)
     },
     [approvedTangrams, isTangramCompleted]
   )
@@ -130,6 +130,7 @@ export const GalleryProvider = ({ children }) => {
   const markTangramAsComplete = useCallback(
     async (tangram, completionTime) => {
       if (
+        currentUser &&
         approvedTangrams.some(
           (approvedTangram) => approvedTangram.id === tangram.id
         ) &&

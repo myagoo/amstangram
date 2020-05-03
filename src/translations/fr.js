@@ -108,6 +108,9 @@ export default {
 
   "Random tip": "Astuce",
   "Got it!": "J'ai compris !",
+  "Welcome to Amstangram": "Bienvenue sur Amstangram",
+  "tips.welcome":
+    "Reproduis la forme en arrangeant les pièces, tu peux faire tourner une pièce en appuyant dessus.<br></br><br></br>Amuse-toi bien !",
   "tips.menu":
     "Tu peux accéder à la galerie des tangrams {galleryIcon}, aux réglages {settingsIcon} et plus encore en appuyant sur {menuIcon}",
   "tips.account1":
@@ -141,7 +144,7 @@ export default {
 
   "Loading...": "Chargement...",
 
-  Approve: "Appouver",
+  Approve: "Approuver",
   Next: "Suivant",
   Quit: "Quitter",
 

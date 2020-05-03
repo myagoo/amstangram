@@ -34,37 +34,50 @@ import { GalleryContext } from "./gallery"
 
 export const TipsContext = createContext()
 
-const TipDialog = ({ deferred, tip: { Content } }) => {
+const TipDialog = ({
+  deferred,
+  tip: {
+    id,
+    title = (
+      <Title>
+        <FormattedMessage id="Random tip" />
+      </Title>
+    ),
+    content,
+  },
+}) => {
   const intl = useIntl()
   const [hideTips, setHideTips] = useState(false)
   return (
     <Dialog
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
-      title={<Title>{intl.formatMessage({ id: "Random tip" })}</Title>}
+      title={title}
       css={{ gap: 3, maxWidth: "300px" }}
     >
-      <Content></Content>
+      {content}
       <PrimaryButton onClick={() => deferred.resolve(hideTips)}>
         {intl.formatMessage({ id: "Got it!" })}
       </PrimaryButton>
-      <View
-        as="label"
-        css={{
-          gap: 1,
-          flexDirection: "row",
-          cursor: "pointer",
-          alignItems: "flex-end",
-        }}
-      >
-        <input
-          type="checkbox"
-          checked={hideTips}
-          onChange={() => setHideTips(!hideTips)}
-        ></input>
-        <Text as="small">
-          {intl.formatMessage({ id: "I don't want to see tips anymore" })}
-        </Text>
-      </View>
+      {id !== "welcome" && (
+        <View
+          as="label"
+          css={{
+            gap: 1,
+            flexDirection: "row",
+            cursor: "pointer",
+            alignItems: "flex-end",
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={hideTips}
+            onChange={() => setHideTips(!hideTips)}
+          ></input>
+          <Text as="small">
+            {intl.formatMessage({ id: "I don't want to see tips anymore" })}
+          </Text>
+        </View>
+      )}
     </Dialog>
   )
 }
@@ -84,101 +97,85 @@ const iconValues = {
 const tips = [
   {
     id: "menu",
-    Content: () => {
-      return (
-        <Text css={{ textAlign: "justify" }}>
-          <FormattedMessage id="tips.menu" values={iconValues} />
-        </Text>
-      )
-    },
+    content: (
+      <Text css={{ textAlign: "justify" }}>
+        <FormattedMessage id="tips.menu" values={iconValues} />
+      </Text>
+    ),
   },
   {
     id: "gallery",
-    Content: () => {
-      return (
-        <Text css={{ textAlign: "justify" }}>
-          <FormattedMessage id="tips.gallery" values={iconValues} />
-        </Text>
-      )
-    },
+    content: (
+      <Text css={{ textAlign: "justify" }}>
+        <FormattedMessage id="tips.gallery" values={iconValues} />
+      </Text>
+    ),
   },
   {
     id: "difficulty",
     predicate: ({ showBackgroundPattern }) => {
       return showBackgroundPattern
     },
-    Content: () => {
-      return (
-        <Text css={{ textAlign: "justify" }}>
-          <FormattedMessage id="tips.difficulty" values={iconValues} />
-        </Text>
-      )
-    },
+    content: (
+      <Text css={{ textAlign: "justify" }}>
+        <FormattedMessage id="tips.difficulty" values={iconValues} />
+      </Text>
+    ),
   },
   {
     id: "theme",
     predicate: ({ themeKey }) => {
       return themeKey !== "dark"
     },
-    Content: () => {
-      return (
-        <Text css={{ textAlign: "justify" }}>
-          <FormattedMessage id="tips.theme" values={iconValues} />
-        </Text>
-      )
-    },
+    content: (
+      <Text css={{ textAlign: "justify" }}>
+        <FormattedMessage id="tips.theme" values={iconValues} />
+      </Text>
+    ),
   },
   {
     id: "sound",
     predicate: ({ soundEnabled }) => {
       return soundEnabled
     },
-    Content: () => {
-      return (
-        <Text css={{ textAlign: "justify" }}>
-          <FormattedMessage id="tips.sound" values={iconValues} />
-        </Text>
-      )
-    },
+    content: (
+      <Text css={{ textAlign: "justify" }}>
+        <FormattedMessage id="tips.sound" values={iconValues} />
+      </Text>
+    ),
   },
   {
     id: "account1",
     predicate: ({ currentUser }) => {
       return !currentUser
     },
-    Content: () => {
-      return (
-        <Text css={{ textAlign: "justify" }}>
-          <FormattedMessage id="tips.account1" values={iconValues} />
-        </Text>
-      )
-    },
+    content: (
+      <Text css={{ textAlign: "justify" }}>
+        <FormattedMessage id="tips.account1" values={iconValues} />
+      </Text>
+    ),
   },
   {
     id: "account2",
     predicate: ({ currentUser }) => {
       return !currentUser
     },
-    Content: () => {
-      return (
-        <Text css={{ textAlign: "justify" }}>
-          <FormattedMessage id="tips.account2" values={iconValues} />
-        </Text>
-      )
-    },
+    content: (
+      <Text css={{ textAlign: "justify" }}>
+        <FormattedMessage id="tips.account2" values={iconValues} />
+      </Text>
+    ),
   },
   {
     id: "stars",
     predicate: ({ currentUser }) => {
       return currentUser
     },
-    Content: () => {
-      return (
-        <Text css={{ textAlign: "justify" }}>
-          <FormattedMessage id="tips.stars" values={iconValues} />
-        </Text>
-      )
-    },
+    content: (
+      <Text css={{ textAlign: "justify" }}>
+        <FormattedMessage id="tips.stars" values={iconValues} />
+      </Text>
+    ),
   },
   {
     id: "create",
@@ -196,43 +193,35 @@ const tips = [
       }
       return false
     },
-    Content: () => {
-      return (
-        <Text css={{ textAlign: "justify" }}>
-          <FormattedMessage id="tips.create" values={iconValues} />
-        </Text>
-      )
-    },
+    content: (
+      <Text css={{ textAlign: "justify" }}>
+        <FormattedMessage id="tips.create" values={iconValues} />
+      </Text>
+    ),
   },
   {
     id: "share",
-    Content: () => {
-      return (
-        <Text css={{ textAlign: "justify" }}>
-          <FormattedMessage id="tips.share" values={iconValues} />
-        </Text>
-      )
-    },
+    content: (
+      <Text css={{ textAlign: "justify" }}>
+        <FormattedMessage id="tips.share" values={iconValues} />
+      </Text>
+    ),
   },
   {
     id: "card",
-    Content: () => {
-      return (
-        <Text css={{ textAlign: "justify" }}>
-          <FormattedMessage id="tips.card" values={iconValues} />
-        </Text>
-      )
-    },
+    content: (
+      <Text css={{ textAlign: "justify" }}>
+        <FormattedMessage id="tips.card" values={iconValues} />
+      </Text>
+    ),
   },
   {
     id: "leaderboard",
-    Content: () => {
-      return (
-        <Text css={{ textAlign: "justify" }}>
-          <FormattedMessage id="tips.leaderboard" values={iconValues} />
-        </Text>
-      )
-    },
+    content: (
+      <Text css={{ textAlign: "justify" }}>
+        <FormattedMessage id="tips.leaderboard" values={iconValues} />
+      </Text>
+    ),
   },
 ]
 
@@ -278,7 +267,60 @@ export const TipsProvider = ({ children }) => {
     return seenTipsIds
   }
 
-  const showTip = useCallback(() => {
+  const showTip = useCallback((tip) => {
+    const seenTipsId = getSeenTips()
+
+    const deferred = new Deferred()
+
+    setTipDialogData({ deferred, tip })
+
+    return deferred.promise
+      .then((hideTips) => {
+        if (hideTips) {
+          setTipsEnabled(false)
+        }
+      })
+      .finally(() => {
+        localStorage.setItem(
+          "seenTips",
+          JSON.stringify([...seenTipsId, tip.id])
+        )
+        setTipDialogData(null)
+      })
+  }, [])
+
+  const showWelcome = useCallback(() => {
+    if (!tipsEnabled) {
+      return
+    }
+
+    const seenTipsId = getSeenTips()
+
+    if (seenTipsId.includes("welcome")) {
+      return
+    }
+
+    if (
+      !currentUser ||
+      !approvedTangrams.some((tangram) => isTangramCompleted(tangram.id))
+    ) {
+      showTip({
+        id: "welcome",
+        title: (
+          <Title>
+            <FormattedMessage id="Welcome to Amstangram" values={iconValues} />
+          </Title>
+        ),
+        content: (
+          <Text css={{ textAlign: "justify" }}>
+            <FormattedMessage id="tips.welcome" values={iconValues} />
+          </Text>
+        ),
+      })
+    }
+  }, [showTip, tipsEnabled, currentUser, approvedTangrams, isTangramCompleted])
+
+  const showRandomTip = useCallback(() => {
     if (!tipsEnabled) {
       return
     }
@@ -304,24 +346,9 @@ export const TipsProvider = ({ children }) => {
 
     const tip = unseenTips[0]
 
-    const deferred = new Deferred()
-
-    setTipDialogData({ deferred, tip })
-
-    return deferred.promise
-      .then((hideTips) => {
-        if (hideTips) {
-          setTipsEnabled(false)
-        }
-      })
-      .finally(() => {
-        localStorage.setItem(
-          "seenTips",
-          JSON.stringify([...seenTipsId, tip.id])
-        )
-        setTipDialogData(null)
-      })
+    showTip(tip)
   }, [
+    showTip,
     approvedTangrams,
     isTangramCompleted,
     themeKey,
@@ -343,12 +370,13 @@ export const TipsProvider = ({ children }) => {
 
   const contextValue = useMemo(
     () => ({
-      showTip,
+      showRandomTip,
+      showWelcome,
       tipsEnabled,
       toggleTips,
       resetTips,
     }),
-    [showTip, tipsEnabled, toggleTips, resetTips]
+    [showRandomTip, showWelcome, tipsEnabled, toggleTips, resetTips]
   )
 
   return (

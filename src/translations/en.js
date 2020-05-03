@@ -103,6 +103,9 @@ export default {
 
   "Random tip": "Random tip",
   "Got it!": "Got it!",
+  "Welcome to Amstangram": "Welcome to Amstangram",
+  "tips.welcome":
+    "Reproduce the shape by rearranging the pieces, you can rotate a piece by pressing it.<br>/<br><br></br>Have fun !",
   "tips.menu":
     "You can access the tangram gallery {galleryIcon}, settings {settingsIcon} and more by pressing {menuIcon}",
   "tips.account1":
