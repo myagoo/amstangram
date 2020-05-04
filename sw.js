@@ -39,11 +39,11 @@ self.__precacheManifest = [
     "url": "484bcb1e-893a2969fe5a77811640.js"
   },
   {
-    "url": "app-0a216ef359c192541113.js"
+    "url": "app-196388fef9c8dedb0243.js"
   },
   {
     "url": "offline-plugin-app-shell-fallback/index.html",
-    "revision": "21767f116f7eacba79b8a54cef0e5394"
+    "revision": "2fc8209c5d9839aaa1a6ac3bc1780441"
   },
   {
     "url": "clipper_unminified.js"
@@ -146,7 +146,7 @@ const navigationRoute = new NavigationRoute(async ({ event }) => {
   // Check for resources + the app bundle
   // The latter may not exist if the SW is updating to a new version
   const resources = await idbKeyval.get(`resources:${pathname}`)
-  if (!resources || !(await caches.match(`/app-0a216ef359c192541113.js`))) {
+  if (!resources || !(await caches.match(`/app-196388fef9c8dedb0243.js`))) {
     return await fetch(event.request)
   }
 
