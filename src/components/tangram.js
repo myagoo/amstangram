@@ -29,7 +29,6 @@ import { GalleryContext } from "../contexts/gallery"
 import { NotifyContext } from "../contexts/notify"
 import { useShowBackgroundPattern } from "../contexts/showBackgroundPattern"
 import { SoundContext } from "../contexts/sound"
-import { TangramsContext } from "../contexts/tangrams"
 import { TipsContext } from "../contexts/tips"
 import { UserContext } from "../contexts/user"
 import { createPiecesGroup } from "../utils/createPiecesGroup"
@@ -46,7 +45,6 @@ import { Victory } from "./victory"
 export const Tangram = () => {
   const intl = useIntl()
   const { showRandomTip, showWelcome } = useContext(TipsContext)
-  const { approvedTangrams } = useContext(TangramsContext)
 
   const { showLogin, showTangram } = useContext(DialogContext)
   const { playTangram, playVictory } = useContext(SoundContext)
@@ -130,24 +128,6 @@ export const Tangram = () => {
         notify(
           intl.formatMessage({ id: "You can't save such an easy tangram" })
         )
-        return
-      }
-
-      const roundedLength = Math.round(pathData.length)
-      const roundedWidth = Math.round(pathData.width)
-      const roundedHeight = Math.round(pathData.height)
-
-      if (
-        approvedTangrams.find((tangram) => {
-          return (
-            tangram.edges === pathData.edges &&
-            Math.round(tangram.length) === roundedLength &&
-            Math.round(tangram.width) === roundedWidth &&
-            Math.round(tangram.height) === roundedHeight
-          )
-        })
-      ) {
-        notify(intl.formatMessage({ id: "This tangram already exists" }))
         return
       }
 

@@ -14,12 +14,14 @@ export default {
   "Tangram approved": "Tangram approved",
   "You can't save an invalid tangram": "You can't save an invalid tangram",
   "You can't save such an easy tangram": "You can't save such an easy tangram",
-  "This tangram already exists": "This tangram already exists",
   "Tangram submitted for review": "Tangram submitted for review",
 
   "Logged out": "Logged out",
 
   "Tangram gallery": "Tangram gallery",
+  "All tangrams": "All tangrams",
+  "Uncompleted tangrams": "Uncompleted tangrams",
+  "★ Starred tangrams": "★ Starred tangrams",
   "Pending approbation": "Pending approbation",
   "{username}'s tangrams": "{username}'s tangrams",
   "Play now!": "Play now !",
@@ -96,7 +98,7 @@ export default {
   "Completed {completed}/{total} tangrams":
     "Completed {completed}/{total} tangrams",
   "Created {created} tangrams": "Created {created} tangrams",
-  "Earned {stars}": "Earned {stars}",
+  "Earned {stars}": "Earned {stars} <starIcon></starIcon>",
   "Stars earned": "Stars earned",
   "Completed tangrams": "Completed tangrams",
   "Created tangrams": "Created tangrams",
@@ -105,7 +107,7 @@ export default {
   "Got it!": "Got it!",
   "Welcome to Amstangram": "Welcome to Amstangram",
   "tips.welcome":
-    "Reproduce the shape by rearranging the pieces, you can rotate a piece by pressing it.<br>/<br><br></br>Have fun !",
+    "Reproduce the shape by rearranging the pieces, you can rotate a piece by pressing it.<br></br><br></br>Have fun !",
   "tips.menu":
     "You can access the tangram gallery {galleryIcon}, settings {settingsIcon} and more by pressing {menuIcon}",
   "tips.account1":

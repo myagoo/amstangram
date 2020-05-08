@@ -14,12 +14,15 @@ export default {
   "Tangram approved": "Tangram approuvé",
   "You can't save an invalid tangram": "Tangram invalide",
   "You can't save such an easy tangram": "Tangram trop facile",
-  "This tangram already exists": "Ce tangram existe déjà",
   "Tangram submitted for review": "Tangram soumis pour vérification",
 
   "Logged out": "Déconnecté.e",
 
   "Tangram gallery": "Galerie des tangrams",
+
+  "All tangrams": "Tous les tangrams",
+  "Uncompleted tangrams": "Tangrams non complétés",
+  "★ Starred tangrams": "Tangrams étoilés ★",
   "Pending approbation": "En attente d'approbation",
   "{username}'s tangrams": "Tangrams de {username}",
   "Play now!": "Commencer à jouer !",

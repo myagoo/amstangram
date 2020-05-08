@@ -52,17 +52,10 @@ export const TangramsProvider = ({ children }) => {
 
     const newApprovedTangrams = []
     const newPendingTangrams = []
-    const newApprovedTangramsByCategory = {}
 
     for (const tangram of allTangrams) {
       if (tangram.approved) {
         newApprovedTangrams.push(tangram)
-
-        if (!newApprovedTangramsByCategory[tangram.category]) {
-          newApprovedTangramsByCategory[tangram.category] = []
-        }
-
-        newApprovedTangramsByCategory[tangram.category].push(tangram)
       } else if (
         currentUser &&
         (currentUser.isAdmin || tangram.uid === currentUser.uid)
@@ -71,27 +64,10 @@ export const TangramsProvider = ({ children }) => {
       }
     }
 
-    const newSortedApprovedTangramsByCategory = {}
-
-    for (const sortedCategory of Object.keys(
-      newApprovedTangramsByCategory
-    ).sort()) {
-      newSortedApprovedTangramsByCategory[
-        sortedCategory
-      ] = newApprovedTangramsByCategory[sortedCategory].sort(
-        sortedCategory === "letters"
-          ? sortLettersTangrams
-          : sortedCategory === "digits"
-          ? sortDigitsTangrams
-          : sortTangrams
-      )
-    }
-
     return {
       initialized: true,
       approvedTangrams: newApprovedTangrams,
       pendingTangrams: newPendingTangrams,
-      approvedTangramsByCategory: newSortedApprovedTangramsByCategory,
     }
   }, [currentUser, allTangrams])
 

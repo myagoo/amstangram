@@ -1,5 +1,5 @@
 import { extendPrimitive, ThemeContext } from "css-system"
-import React, { useContext, useState, useCallback } from "react"
+import React, { useContext, useState, useCallback, useMemo } from "react"
 import { FiShare2 } from "react-icons/fi"
 import { useIntl } from "react-intl"
 import { DIALOG_CLOSED_REASON } from "../constants"
@@ -12,6 +12,12 @@ import { Dialog } from "./dialog"
 import { SubTitle, Title } from "./primitives"
 import { View } from "./view"
 import { UserContext } from "../contexts/user"
+import { Input } from "./input"
+import {
+  sortLettersTangrams,
+  sortTangrams,
+  sortDigitsTangrams,
+} from "../utils/sortTangrams"
 
 const FadedView = extendPrimitive(View, ({ css, ...props }) => {
   const theme = useContext(ThemeContext)
@@ -34,18 +40,34 @@ export const GalleryDialog = ({ deferred }) => {
 
   const { currentUser } = useContext(UserContext)
 
-  const { pendingTangrams, approvedTangramsByCategory } = useContext(
-    TangramsContext
-  )
+  const { pendingTangrams, approvedTangrams } = useContext(TangramsContext)
   const { showProfile, showTangram } = useContext(DialogContext)
   const {
     setPlaylist,
     shareTangrams,
     startRandomPlaylist,
     isTangramCompleted,
+    isTangramStarred,
   } = useContext(GalleryContext)
 
   const [selectedTangrams, setSelectedTangrams] = useState([])
+
+  const [selectedGalleryFilter, setSelectedGalleryFilter] = useState(() => {
+    const storedSelectedGalleryFilter = window.localStorage.getItem(
+      "selectedGalleryFilter"
+    )
+
+    return ["all", "uncompleted", "starred"].includes(
+      storedSelectedGalleryFilter
+    )
+      ? storedSelectedGalleryFilter
+      : "all"
+  })
+
+  const handleGalleryFilterChange = (e) => {
+    setSelectedGalleryFilter(e.target.value)
+    window.localStorage.setItem("selectedGalleryFilter", e.target.value)
+  }
 
   const handleTangramClick = useCallback((clickedTangram) => {
     console.log(clickedTangram)
@@ -76,6 +98,54 @@ export const GalleryDialog = ({ deferred }) => {
 
   const handleCloseClick = () => deferred.reject(DIALOG_CLOSED_REASON)
 
+  const approvedTangramsByCategory = useMemo(() => {
+    const newApprovedTangramsByCategory = {}
+
+    for (const tangram of approvedTangrams) {
+      if (
+        selectedGalleryFilter === "uncompleted" &&
+        isTangramCompleted(tangram.id)
+      ) {
+        continue
+      }
+      if (
+        selectedGalleryFilter === "starred" &&
+        !isTangramStarred(tangram.id)
+      ) {
+        continue
+      }
+
+      if (!newApprovedTangramsByCategory[tangram.category]) {
+        newApprovedTangramsByCategory[tangram.category] = []
+      }
+
+      newApprovedTangramsByCategory[tangram.category].push(tangram)
+    }
+
+    const newSortedApprovedTangramsByCategory = {}
+
+    for (const sortedCategory of Object.keys(
+      newApprovedTangramsByCategory
+    ).sort()) {
+      newSortedApprovedTangramsByCategory[
+        sortedCategory
+      ] = newApprovedTangramsByCategory[sortedCategory].sort(
+        sortedCategory === "letters"
+          ? sortLettersTangrams
+          : sortedCategory === "digits"
+          ? sortDigitsTangrams
+          : sortTangrams
+      )
+    }
+
+    return newSortedApprovedTangramsByCategory
+  }, [
+    approvedTangrams,
+    selectedGalleryFilter,
+    isTangramCompleted,
+    isTangramStarred,
+  ])
+
   return (
     <>
       <Dialog
@@ -88,6 +158,22 @@ export const GalleryDialog = ({ deferred }) => {
       >
         {
           <>
+            <Input
+              as="select"
+              value={selectedGalleryFilter}
+              onChange={handleGalleryFilterChange}
+            >
+              <option value="all">
+                {intl.formatMessage({ id: "All tangrams" })}
+              </option>
+              <option value="uncompleted">
+                {intl.formatMessage({ id: "Uncompleted tangrams" })}
+              </option>
+              <option value="starred">
+                {intl.formatMessage({ id: "★ Starred tangrams" })}
+              </option>
+            </Input>
+
             <View css={{ flex: "1", overflow: "auto", gap: 3 }}>
               {pendingTangrams.length > 0 && (
                 <View>
