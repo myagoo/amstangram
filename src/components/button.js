@@ -41,13 +41,17 @@ const BaseButton = createPrimitive(
 )
 
 export const SecondaryButton = extendPrimitive(BaseButton, {
-  border: "2px solid",
-  borderRadius: 2,
+  css: {
+    border: "2px solid",
+    borderRadius: 2,
+  },
 })
 
 export const DangerButton = extendPrimitive(BaseButton, {
-  border: "2px solid",
-  color: "errorText",
+  css: {
+    border: "2px solid",
+    color: "errorText",
+  },
 })
 
 export const PrimaryButton = extendPrimitive(

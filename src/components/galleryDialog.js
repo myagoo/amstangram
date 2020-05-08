@@ -23,13 +23,13 @@ const FadedView = extendPrimitive(View, ({ css, ...props }) => {
   const theme = useContext(ThemeContext)
   return {
     css: {
-      ...css,
       p: 3,
       alignItems: "center",
       position: "sticky",
       top: 0,
       zIndex: 1,
       background: `linear-gradient(0deg, rgba(0,0,0,0) 0%, ${theme.colors.dialogBackground} 50%)`,
+      ...css,
     },
     ...props,
   }

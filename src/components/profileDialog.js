@@ -374,7 +374,7 @@ export const ProfileDialog = ({ uid, deferred }) => {
           onClose={() => setChangePasswordRequested(false)}
         />
       ) : (
-        <View css={{ gap: 4 }}>
+        <View css={{ gap: 4, mt: -4 }}>
           <View css={{ gap: 3, alignItems: "center" }}>
             <Badge uid={uid} size="badgeBig"></Badge>
             <Title>{username}</Title>

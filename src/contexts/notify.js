@@ -5,13 +5,15 @@ import { FADE_TRANSITION_DURATION } from "../constants"
 import { extendPrimitive } from "css-system"
 
 const Notification = extendPrimitive(View, {
-  fontSize: 3,
-  p: 2,
-  borderRadius: 1,
-  bg: "notificationBackground",
-  color: "dialogText",
-  animation: `${FADE_TRANSITION_DURATION / 2}ms fadeIn both`,
-  boxShadow: "0px 0px 10px #00000080",
+  css: {
+    fontSize: 3,
+    p: 2,
+    borderRadius: 1,
+    bg: "notificationBackground",
+    color: "dialogText",
+    animation: `${FADE_TRANSITION_DURATION / 2}ms fadeIn both`,
+    boxShadow: "0px 0px 10px #00000080",
+  },
 })
 
 export const NotifyContext = createContext(null)

@@ -6,37 +6,49 @@ import { FiStar } from "react-icons/fi"
 import { View } from "./view"
 
 export const Error = extendPrimitive(Text, {
-  fontSize: 2,
-  color: "errorText",
+  css: {
+    fontSize: 2,
+    color: "errorText",
+  },
 })
 
 export const Hint = extendPrimitive(Text, {
-  fontSize: 2,
-  opacity: 0.75,
+  css: {
+    fontSize: 2,
+    opacity: 0.75,
+  },
 })
 
 export const Title = extendPrimitive(Text, {
-  fontSize: 4,
-  fontWeight: "bold",
+  css: {
+    fontSize: 4,
+    fontWeight: "bold",
+  },
 })
 
 export const SubTitle = extendPrimitive(Text, {
-  fontSize: 3,
-  fontWeight: "bold",
+  css: {
+    fontSize: 3,
+    fontWeight: "bold",
+  },
 })
 
 export const Link = createPrimitive("a", {
-  cursor: "pointer",
-  textDecoration: "underline",
-  color: "inherit",
-  "&:visited": {
+  css: {
+    cursor: "pointer",
+    textDecoration: "underline",
     color: "inherit",
+    "&:visited": {
+      color: "inherit",
+    },
   },
 })
 
 export const Similink = extendPrimitive(Text, {
-  cursor: "pointer",
-  textDecoration: "underline",
+  css: {
+    cursor: "pointer",
+    textDecoration: "underline",
+  },
 })
 
 export const InlineIcon = ({ icon, css }) => {
