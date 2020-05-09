@@ -22,8 +22,23 @@ export default {
   "All tangrams": "All tangrams",
   "Uncompleted tangrams": "Uncompleted tangrams",
   "★ Starred tangrams": "★ Starred tangrams",
-  "Pending approbation": "Pending approbation",
-  "{username}'s tangrams": "{username}'s tangrams",
+  "Pending approbation tangrams": "Pending approbation tangrams",
+
+  "You've completed all tangrams": "You've completed all tangrams",
+  "Come back later for more or create your own tangrams":
+    "Come back later for more or create your own tangrams",
+  "No tangram left to approve": "No tangram left to approve",
+  "Good job moderator {username}!": "Good job moderator {username}!",
+  "All your tangrams have been approved":
+    "All your tangrams have been approved",
+  "Create more tangrams and earn <starIcon></starIcon>":
+    "Create more tangrams and earn <starIcon></starIcon>",
+  "No starred tangrams yet": "No starred tangrams yet",
+  "Press <starIcon></starIcon> to star a tangram and show your love":
+    "Press <starIcon></starIcon> to star a tangram and show your love",
+  "Nothing to see here": "Nothing to see here",
+  "Something might have gone wrong": "Something might have gone wrong",
+
   "Play now!": "Play now !",
   "Start 1 tangram!": "Start 1 tangram !",
   "Start {count} tangrams!": "Start {count} tangrams !",

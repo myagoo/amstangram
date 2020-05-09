@@ -23,8 +23,22 @@ export default {
   "All tangrams": "Tous les tangrams",
   "Uncompleted tangrams": "Tangrams non complétés",
   "★ Starred tangrams": "Tangrams étoilés ★",
-  "Pending approbation": "En attente d'approbation",
-  "{username}'s tangrams": "Tangrams de {username}",
+  "Pending approbation tangrams": "Tangrams en attente d'approbation",
+
+  "You've completed all tangrams": "Tu as complété tous les tangrams",
+  "Come back later for more or create your own tangrams":
+    "Reviens plus tard ou créés tes propres tangrams",
+  "No tangram left to approve": "Il ne reste plus de tangram à approuver",
+  "Good job moderator {username}!": "Bon boulot modérateur {username} !",
+  "All your tangrams have been approved": "Tous tes tangrams ont été approuvés",
+  "Create more tangrams and earn <starIcon></starIcon>":
+    "Créés d'autres tangrams et gagne des <starIcon></starIcon>",
+  "No starred tangrams yet": "Tu n'as pas encore donné d'étoile",
+  "Press <starIcon></starIcon> to star a tangram and show your love":
+    "Appuie sur <starIcon></starIcon> pour donner une étoile et montrer que tu aimes un tangram",
+  "Nothing to see here": "Rien à voir",
+  "Something might have gone wrong": "Il semble y avoir un problème",
+
   "Play now!": "Commencer à jouer !",
   "Start 1 tangram!": "Lancer 1 tangram",
   "Start {count} tangrams!": "Lancer {count} tangrams",
