@@ -182,8 +182,9 @@ export const GalleryDialog = ({ deferred }) => {
               </option>
             </Input>
             <View css={{ flex: "1", overflow: "auto", gap: 3 }}>
-              {visibleCategories.length !== 0 ? (
+              {visibleCategories.length === 0 ? (
                 <View
+                  key="noresult"
                   css={{
                     gap: 3,
                     alignItems: "center",
@@ -277,7 +278,10 @@ export const GalleryDialog = ({ deferred }) => {
                   )}
                 </View>
               ) : (
-                <View css={{ flex: "1", overflow: "auto", gap: 3 }}>
+                <View
+                  key="results"
+                  css={{ flex: "1", overflow: "auto", gap: 3 }}
+                >
                   {visibleCategories.map((category) => (
                     <View key={category}>
                       <FadedView>
