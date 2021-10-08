@@ -1,7 +1,7 @@
 .cache/
 node_modules/
 public/
-
+.vscode/
 # misc
 .DS_Store
 yarn-debug.log*
