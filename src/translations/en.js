@@ -166,4 +166,9 @@ export default {
   "Contact 💌": "Contact 💌",
   "A word about Amstangram": "A word about Amstangram",
   "Version {code}": "Version {code}",
+
+  "Forgot password?": "Forgot password?",
+  "Reset your password": "Reset your password",
+  "Send the reset mail!": "Send the reset mail!",
+  "Reset password email sent" : "Reset password email sent"
 }

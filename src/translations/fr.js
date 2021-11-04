@@ -171,4 +171,9 @@ export default {
   "Contact 💌": "Contact 💌",
   "A word about Amstangram": "Quelques mots à propos d'Amstangram",
   "Version {code}": "Version {code}",
+
+  "Forgot password?": "Mot de passe oublié ?",
+  "Reset your password": "Réinitialiser le mot de passe",
+  "Send the reset mail!": "Envoyer le mail de réinitialisation",
+  "Reset password email sent" : "Email de réinitialisation envoyé"
 }

@@ -10,17 +10,85 @@ import { Input } from "./input"
 import { Error, Similink, Title } from "./primitives"
 import { View } from "./view"
 
-const SignupTab = ({ onSignup, switchTab }) => {
+const ResetPasswordTab = ({ setTab }) => {
+  const intl = useIntl()
+  const notify = useContext(NotifyContext)
+
+  const { handleSubmit, register, setError, errors, formState } = useForm()
+
+  const onSubmit = useCallback(
+    async ({ email }) => {
+      try {
+        await firebase.auth().sendPasswordResetEmail(email)
+        setTab("signin")
+        notify(intl.formatMessage({ id: "Reset password email sent" }))
+      } catch (error) {
+        switch (error.code) {
+          case "auth/invalid-email":
+          case "auth/user-not-found":
+          case "auth/user-disabled":
+            setError(
+              "email",
+              "invalid",
+              intl.formatMessage({ id: "Unknown email address" })
+            )
+            break
+          default:
+            notify(
+              intl.formatMessage(
+                { id: "An error occured, please retry later" },
+                { email }
+              )
+            )
+        }
+      }
+    },
+    [setError, intl]
+  )
+
+  return (
+    <View
+      as="form"
+      name="reset"
+      onSubmit={handleSubmit(onSubmit)}
+      css={{ gap: 4 }}
+    >
+      <View css={{ gap: 2 }}>
+        <label>{intl.formatMessage({ id: "Email address" })}</label>
+        <Input
+          type="email"
+          name="email"
+          ref={register({
+            required: intl.formatMessage({ id: "Email address is required" }),
+          })}
+        ></Input>
+        {errors.email && <Error>{errors.email.message}</Error>}
+      </View>
+
+      <View css={{ gap: 3 }}>
+        <PrimaryButton type="submit" disabled={formState.isSubmitting}>
+          {intl.formatMessage({ id: "Send the reset mail!" })}
+        </PrimaryButton>
+
+        <View
+          css={{
+            alignItems: "center",
+          }}
+        >
+          <Similink onClick={() => setTab("signin")}>
+            {intl.formatMessage({ id: "Back" })}
+          </Similink>
+        </View>
+      </View>
+    </View>
+  )
+}
+
+const SignUpTab = ({ onSignUp, setTab }) => {
   const intl = useIntl()
 
-  const {
-    handleSubmit,
-    register,
-    watch,
-    setError,
-    errors,
-    formState,
-  } = useForm()
+  const { handleSubmit, register, watch, setError, errors, formState } =
+    useForm()
 
   const password = watch("password")
 
@@ -39,7 +107,7 @@ const SignupTab = ({ onSignup, switchTab }) => {
           .doc(user.uid)
           .set(userMetadata)
 
-        onSignup({
+        onSignUp({
           uid: user.uid,
           ...userMetadata,
           firebaseUser: user,
@@ -72,7 +140,7 @@ const SignupTab = ({ onSignup, switchTab }) => {
         }
       }
     },
-    [onSignup, setError, intl]
+    [onSignUp, setError, intl]
   )
 
   return (
@@ -149,7 +217,7 @@ const SignupTab = ({ onSignup, switchTab }) => {
             alignItems: "center",
           }}
         >
-          <Similink onClick={switchTab}>
+          <Similink onClick={() => setTab("signin")}>
             {intl.formatMessage({ id: "I already have an account" })}
           </Similink>
         </View>
@@ -158,7 +226,7 @@ const SignupTab = ({ onSignup, switchTab }) => {
   )
 }
 
-const SignInTab = ({ onSignin, switchTab }) => {
+const SignInTab = ({ onSignIn, setTab }) => {
   const intl = useIntl()
 
   const { handleSubmit, register, setError, errors, formState } = useForm()
@@ -178,7 +246,7 @@ const SignInTab = ({ onSignin, switchTab }) => {
 
         const userMetadata = snapshot.data()
 
-        onSignin({
+        onSignIn({
           uid: user.uid,
           ...userMetadata,
           firebaseUser: user,
@@ -207,7 +275,7 @@ const SignInTab = ({ onSignin, switchTab }) => {
         }
       }
     },
-    [onSignin, setError, intl]
+    [onSignIn, setError, intl]
   )
 
   return (
@@ -240,6 +308,12 @@ const SignInTab = ({ onSignin, switchTab }) => {
             })}
           ></Input>
           {errors.password && <Error>{errors.password.message}</Error>}
+          <Similink
+            css={{ alignSelf: "flex-end", fontSize: 2 }}
+            onClick={() => setTab("reset")}
+          >
+            {intl.formatMessage({ id: "Forgot password?" })}
+          </Similink>
         </View>
       </View>
 
@@ -253,7 +327,7 @@ const SignInTab = ({ onSignin, switchTab }) => {
             alignItems: "center",
           }}
         >
-          <Similink onClick={switchTab}>
+          <Similink onClick={() => setTab("signup")}>
             {intl.formatMessage({ id: "I don't have an account" })}
           </Similink>
         </View>
@@ -284,22 +358,20 @@ export const LoginDialog = ({ deferred }) => {
       title={
         tab === "signup" ? (
           <Title>{intl.formatMessage({ id: "Create your account" })}</Title>
-        ) : (
+        ) : tab === "signin" ? (
           <Title>{intl.formatMessage({ id: "Connect to your account" })}</Title>
+        ) : (
+          <Title>{intl.formatMessage({ id: "Reset your password" })}</Title>
         )
       }
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
     >
       {tab === "signup" ? (
-        <SignupTab
-          onSignup={handleLogin}
-          switchTab={() => setTab("signin")}
-        ></SignupTab>
+        <SignUpTab onSignUp={handleLogin} setTab={setTab}></SignUpTab>
+      ) : tab === "signin" ? (
+        <SignInTab onSignIn={handleLogin} setTab={setTab}></SignInTab>
       ) : (
-        <SignInTab
-          onSignin={handleLogin}
-          switchTab={() => setTab("signup")}
-        ></SignInTab>
+        <ResetPasswordTab setTab={setTab} />
       )}
     </Dialog>
   )
