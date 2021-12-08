@@ -17,6 +17,7 @@ import { GalleryContext } from "./gallery"
 import { TangramsContext } from "./tangrams"
 import { UserContext } from "./user"
 import { SettingsDialog } from "../components/settingsDialog"
+import { DIALOG_CLOSED_REASON } from "../constants"
 
 export const DialogContext = createContext()
 
@@ -29,115 +30,171 @@ export const DialogProvider = ({ children }) => {
     initialized: galleryInitialized,
   } = useContext(GalleryContext)
 
-  const { initialized: tangramsInitialized, approvedTangrams } = useContext(
-    TangramsContext
-  )
+  const { initialized: tangramsInitialized, approvedTangrams } =
+    useContext(TangramsContext)
 
   const [initialized, setInitialized] = useState(false)
 
   const [profileDialogData, setProfileDialogData] = useState(null)
 
-  const showProfile = useCallback((uid) => {
+  const showProfile = useCallback(async (uid) => {
     const deferred = new Deferred()
     setProfileDialogData({ uid, deferred })
-    return deferred.promise.finally(() => setProfileDialogData(null))
+    try {
+      await deferred.promise
+    } catch (error) {
+      if (error !== DIALOG_CLOSED_REASON) {
+        throw error
+      }
+    } finally {
+      setProfileDialogData(null)
+    }
   }, [])
 
   const [leaderboardDeferred, setLeaderboardDeferred] = useState(null)
 
-  const showLeaderboard = useCallback(() => {
+  const showLeaderboard = useCallback(async () => {
     const deferred = new Deferred()
     setLeaderboardDeferred(deferred)
-    return deferred.promise.finally(() => setLeaderboardDeferred(null))
+
+    try {
+      await deferred.promise
+    } catch (error) {
+      if (error !== DIALOG_CLOSED_REASON) {
+        throw error
+      }
+    } finally {
+      setLeaderboardDeferred(null)
+    }
   }, [])
 
   const [galleryDeferred, setGalleryDeferred] = useState(null)
 
-  const showGallery = useCallback(() => {
+  const showGallery = useCallback(async () => {
     const deferred = new Deferred()
     setGalleryDeferred(deferred)
-    return deferred.promise.finally(() => setGalleryDeferred(null))
+
+    try {
+      await deferred.promise
+    } catch (error) {
+      if (error !== DIALOG_CLOSED_REASON) {
+        throw error
+      }
+    } finally {
+      setGalleryDeferred(null)
+    }
   }, [])
 
   const [loginDeferred, setLoginDeferred] = useState(null)
 
-  const showLogin = useCallback(() => {
+  const showLogin = useCallback(async () => {
     const deferred = new Deferred()
     setLoginDeferred(deferred)
-    return deferred.promise.finally(() => setLoginDeferred(null))
+    try {
+      await deferred.promise
+    } catch (error) {
+      if (error !== DIALOG_CLOSED_REASON) {
+        throw error
+      }
+    } finally {
+      setLoginDeferred(null)
+    }
   }, [])
 
   const [tangramDialogData, setTangramDialogData] = useState(null)
 
-  const showTangram = useCallback((tangram) => {
+  const showTangram = useCallback(async (tangram) => {
     const deferred = new Deferred()
     setTangramDialogData({ deferred, tangram })
-    return deferred.promise.finally(() => setTangramDialogData(null))
+    try {
+      await deferred.promise
+    } catch (error) {
+      if (error !== DIALOG_CLOSED_REASON) {
+        throw error
+      }
+    } finally {
+      setTangramDialogData(null)
+    }
   }, [])
 
   const [settingsDialogDeferred, setSettingsDialogDeferred] = useState(null)
 
-  const showSettings = useCallback(() => {
+  const showSettings = useCallback(async () => {
     const deferred = new Deferred()
 
     setSettingsDialogDeferred(deferred)
 
-    return deferred.promise.finally(() => setSettingsDialogDeferred(null))
+    try {
+      await deferred.promise
+    } catch (error) {
+      if (error !== DIALOG_CLOSED_REASON) {
+        throw error
+      }
+    } finally {
+      setSettingsDialogDeferred(null)
+    }
   }, [])
 
   const [challengeDialogData, setChallengeDialogData] = useState(null)
 
   useEffect(() => {
-    if (
-      tangramsInitialized &&
-      galleryInitialized &&
-      usersInitialized &&
-      !initialized
-    ) {
-      let hasBeenChallenged = false
+    const checkForChallenge = async () => {
+      if (
+        tangramsInitialized &&
+        galleryInitialized &&
+        usersInitialized &&
+        !initialized
+      ) {
+        let hasBeenChallenged = false
 
-      if (!playlist && window.location.search) {
-        const searchParams = new URLSearchParams(window.location.search)
+        if (!playlist && window.location.search) {
+          const searchParams = new URLSearchParams(window.location.search)
 
-        if (searchParams.has("tangrams")) {
-          const tangramIds = searchParams.get("tangrams").split(",")
-          const uid = searchParams.get("uid")
-          const challengeTangrams = approvedTangrams.filter((tangram) =>
-            tangramIds.includes(tangram.id)
-          )
-          if (challengeTangrams.length) {
-            hasBeenChallenged = true
-            window.history.replaceState(
-              {},
-              document.title,
-              window.location.origin
+          if (searchParams.has("tangrams")) {
+            const tangramIds = searchParams.get("tangrams").split(",")
+            const uid = searchParams.get("uid")
+            const challengeTangrams = approvedTangrams.filter((tangram) =>
+              tangramIds.includes(tangram.id)
             )
+            if (challengeTangrams.length) {
+              hasBeenChallenged = true
+              window.history.replaceState(
+                {},
+                document.title,
+                window.location.origin
+              )
 
-            const deferred = new Deferred()
+              const deferred = new Deferred()
 
-            setChallengeDialogData({
-              deferred,
-              tangrams: challengeTangrams,
-              uid,
-            })
-            deferred.promise
-              .catch((error) => {
-                if (error instanceof Error) {
+              setChallengeDialogData({
+                deferred,
+                tangrams: challengeTangrams,
+                uid,
+              })
+
+              try {
+                await deferred.promise
+                startRandomPlaylist(true)
+              } catch (error) {
+                if (error !== DIALOG_CLOSED_REASON) {
                   throw error
                 }
-                startRandomPlaylist(true)
-              })
-              .finally(() => setChallengeDialogData(null))
+              } finally {
+                setChallengeDialogData(null)
+              }
+            }
           }
         }
-      }
 
-      if (!hasBeenChallenged) {
-        startRandomPlaylist(true)
-      }
+        if (!hasBeenChallenged) {
+          startRandomPlaylist(true)
+        }
 
-      setInitialized(true)
+        setInitialized(true)
+      }
     }
+
+    checkForChallenge()
   }, [tangramsInitialized, galleryInitialized, usersInitialized, initialized])
 
   const contextValue = useMemo(

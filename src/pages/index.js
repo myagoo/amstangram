@@ -13,7 +13,7 @@ import { DialogProvider } from "../contexts/dialog"
 import { TipsProvider } from "../contexts/tips"
 import { View } from "../components/view"
 
-export default () => {
+const IndexPage =  () => {
   useEffect(() => {
     window.oncontextmenu = function () {
       return false
@@ -89,3 +89,4 @@ export default () => {
     </SoundProvider>
   )
 }
+export default IndexPage

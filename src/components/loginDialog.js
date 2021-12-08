@@ -14,7 +14,7 @@ const ResetPasswordTab = ({ setTab }) => {
   const intl = useIntl()
   const notify = useContext(NotifyContext)
 
-  const { handleSubmit, register, setError, errors, formState } = useForm()
+  const { handleSubmit, register, setError, formState } = useForm()
 
   const onSubmit = useCallback(
     async ({ email }) => {
@@ -27,11 +27,10 @@ const ResetPasswordTab = ({ setTab }) => {
           case "auth/invalid-email":
           case "auth/user-not-found":
           case "auth/user-disabled":
-            setError(
-              "email",
-              "invalid",
-              intl.formatMessage({ id: "Unknown email address" })
-            )
+            setError("email", {
+              type: "invalid",
+              message: intl.formatMessage({ id: "Unknown email address" }),
+            })
             break
           default:
             notify(
@@ -43,7 +42,7 @@ const ResetPasswordTab = ({ setTab }) => {
         }
       }
     },
-    [setError, intl]
+    [setError, intl, notify, setTab]
   )
 
   return (
@@ -57,12 +56,13 @@ const ResetPasswordTab = ({ setTab }) => {
         <label>{intl.formatMessage({ id: "Email address" })}</label>
         <Input
           type="email"
-          name="email"
-          ref={register({
+          {...register("email", {
             required: intl.formatMessage({ id: "Email address is required" }),
           })}
         ></Input>
-        {errors.email && <Error>{errors.email.message}</Error>}
+        {formState.errors.email && (
+          <Error>{formState.errors.email.message}</Error>
+        )}
       </View>
 
       <View css={{ gap: 3 }}>
@@ -87,8 +87,7 @@ const ResetPasswordTab = ({ setTab }) => {
 const SignUpTab = ({ onSignUp, setTab }) => {
   const intl = useIntl()
 
-  const { handleSubmit, register, watch, setError, errors, formState } =
-    useForm()
+  const { handleSubmit, register, watch, setError, formState } = useForm()
 
   const password = watch("password")
 
@@ -115,25 +114,24 @@ const SignUpTab = ({ onSignUp, setTab }) => {
       } catch (error) {
         switch (error.code) {
           case "auth/weak-password":
-            setError(
-              "password",
-              "weakPassword",
-              intl.formatMessage({ id: "Password is too weak" })
-            )
+            setError("password", {
+              type: "weakPassword",
+              message: intl.formatMessage({ id: "Password is too weak" }),
+            })
             break
           case "auth/email-already-in-use":
-            setError(
-              "email",
-              "alreadyExists",
-              intl.formatMessage({ id: "Email address already in use" })
-            )
+            setError("email", {
+              type: "alreadyExists",
+              message: intl.formatMessage({
+                id: "Email address already in use",
+              }),
+            })
             break
           case "auth/invalid-email":
-            setError(
-              "email",
-              "invalid",
-              intl.formatMessage({ id: "Invalid email address" })
-            )
+            setError("email", {
+              type: "invalid",
+              message: intl.formatMessage({ id: "Invalid email address" }),
+            })
             break
           default:
             return
@@ -155,24 +153,26 @@ const SignUpTab = ({ onSignUp, setTab }) => {
         <View css={{ gap: 2 }}>
           <label>{intl.formatMessage({ id: "Username" })}</label>
           <Input
-            name="username"
-            ref={register({
+            {...register("username", {
               required: intl.formatMessage({ id: "Username is required" }),
             })}
           ></Input>
-          {errors.username && <Error>{errors.username.message}</Error>}
+          {formState.errors.username && (
+            <Error>{formState.errors.username.message}</Error>
+          )}
         </View>
 
         <View css={{ gap: 2 }}>
           <label>{intl.formatMessage({ id: "Email address" })}</label>
           <Input
             type="email"
-            name="email"
-            ref={register({
+            {...register("email", {
               required: intl.formatMessage({ id: "Email address is required" }),
             })}
           ></Input>
-          {errors.email && <Error>{errors.email.message}</Error>}
+          {formState.errors.email && (
+            <Error>{formState.errors.email.message}</Error>
+          )}
         </View>
 
         <View css={{ gap: 2 }}>
@@ -180,12 +180,13 @@ const SignUpTab = ({ onSignUp, setTab }) => {
           <Input
             autoComplete="new-password"
             type="password"
-            name="password"
-            ref={register({
+            {...register("password", {
               required: intl.formatMessage({ id: "Password is required" }),
             })}
           ></Input>
-          {errors.password && <Error>{errors.password.message}</Error>}
+          {formState.errors.password && (
+            <Error>{formState.errors.password.message}</Error>
+          )}
         </View>
 
         <View css={{ gap: 2 }}>
@@ -193,16 +194,15 @@ const SignUpTab = ({ onSignUp, setTab }) => {
           <Input
             autoComplete="off"
             type="password"
-            name="passwordConfirm"
-            ref={register({
+            {...register("passwordConfirm", {
               required: "Password is required",
               validate: (passwordConfirm) =>
                 passwordConfirm === password ||
                 intl.formatMessage({ id: "Passwords must match" }),
             })}
           ></Input>
-          {errors.passwordConfirm && (
-            <Error>{errors.passwordConfirm.message}</Error>
+          {formState.errors.passwordConfirm && (
+            <Error>{formState.errors.passwordConfirm.message}</Error>
           )}
         </View>
       </View>
@@ -229,7 +229,7 @@ const SignUpTab = ({ onSignUp, setTab }) => {
 const SignInTab = ({ onSignIn, setTab }) => {
   const intl = useIntl()
 
-  const { handleSubmit, register, setError, errors, formState } = useForm()
+  const { handleSubmit, register, setError, formState } = useForm()
 
   const onSubmit = useCallback(
     async ({ email, password }) => {
@@ -256,18 +256,16 @@ const SignInTab = ({ onSignIn, setTab }) => {
           case "auth/invalid-email":
           case "auth/user-not-found":
           case "auth/user-disabled":
-            setError(
-              "email",
-              "invalid",
-              intl.formatMessage({ id: "Unknown email address" })
-            )
+            setError("email", {
+              type: "invalid",
+              message: intl.formatMessage({ id: "Unknown email address" }),
+            })
             break
           case "auth/wrong-password":
-            setError(
-              "password",
-              "mismatch",
-              intl.formatMessage({ id: "Incorrect password" })
-            )
+            setError("password", {
+              type: "mismatch",
+              message: intl.formatMessage({ id: "Incorrect password" }),
+            })
             break
 
           default:
@@ -290,24 +288,26 @@ const SignInTab = ({ onSignIn, setTab }) => {
           <label>{intl.formatMessage({ id: "Email address" })}</label>
           <Input
             type="email"
-            name="email"
-            ref={register({
+            {...register("email", {
               required: intl.formatMessage({ id: "Email address is required" }),
             })}
           ></Input>
-          {errors.email && <Error>{errors.email.message}</Error>}
+          {formState.errors.email && (
+            <Error>{formState.errors.email.message}</Error>
+          )}
         </View>
 
         <View css={{ gap: 2 }}>
           <label>{intl.formatMessage({ id: "Password" })}</label>
           <Input
             type="password"
-            name="password"
-            ref={register({
+            {...register("password", {
               required: intl.formatMessage({ id: "Password is required" }),
             })}
           ></Input>
-          {errors.password && <Error>{errors.password.message}</Error>}
+          {formState.errors.password && (
+            <Error>{formState.errors.password.message}</Error>
+          )}
           <Similink
             css={{ alignSelf: "flex-end", fontSize: 2 }}
             onClick={() => setTab("reset")}

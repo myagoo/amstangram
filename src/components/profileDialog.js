@@ -1,7 +1,10 @@
 import firebase from "gatsby-plugin-firebase"
 import React, { useCallback, useContext, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
+import { FiStar } from "react-icons/fi"
+import { FormattedMessage, useIntl } from "react-intl"
 import { DIALOG_CLOSED_REASON } from "../constants"
+import { GalleryContext } from "../contexts/gallery"
 import { LanguageContext } from "../contexts/language"
 import { NotifyContext } from "../contexts/notify"
 import { TangramsContext } from "../contexts/tangrams"
@@ -10,12 +13,9 @@ import { Badge } from "./badge"
 import { DangerButton, PrimaryButton } from "./button"
 import { Dialog } from "./dialog"
 import { Input } from "./input"
-import { Error, Similink, Title, InlineIcon } from "./primitives"
+import { Error, InlineIcon, Similink, Title } from "./primitives"
 import { Text } from "./text"
 import { View } from "./view"
-import { useIntl, FormattedMessage } from "react-intl"
-import { FiStar } from "react-icons/fi"
-import { GalleryContext } from "../contexts/gallery"
 
 const ChangeEmailForm = ({ currentUser, onClose }) => {
   const intl = useIntl()
@@ -23,7 +23,7 @@ const ChangeEmailForm = ({ currentUser, onClose }) => {
   const { updateEmail } = useContext(UserContext)
 
   const notify = useContext(NotifyContext)
-  const { handleSubmit, register, setError, errors, formState } = useForm()
+  const { handleSubmit, register, setError, formState } = useForm()
 
   const onSubmit = useCallback(
     async ({ password, newEmail }) => {
@@ -34,25 +34,24 @@ const ChangeEmailForm = ({ currentUser, onClose }) => {
       } catch (error) {
         switch (error.code) {
           case "auth/email-already-in-use":
-            setError(
-              "newEmail",
-              "alreadyExists",
-              intl.formatMessage({ id: "Email address already in use" })
-            )
+            setError("newEmail", {
+              type: "alreadyExists",
+              message: intl.formatMessage({
+                id: "Email address already in use",
+              }),
+            })
             break
           case "auth/invalid-email":
-            setError(
-              "newEmail",
-              "invalid",
-              intl.formatMessage({ id: "Invalid email address" })
-            )
+            setError("newEmail", {
+              type: "invalid",
+              message: intl.formatMessage({ id: "Invalid email address" }),
+            })
             break
           case "auth/wrong-password":
-            setError(
-              "password",
-              "mismatch",
-              intl.formatMessage({ id: "Incorrect password" })
-            )
+            setError("password", {
+              type: "mismatch",
+              message: intl.formatMessage({ id: "Incorrect password" }),
+            })
             break
           default:
             notify(
@@ -76,23 +75,25 @@ const ChangeEmailForm = ({ currentUser, onClose }) => {
           <label>{intl.formatMessage({ id: "Password" })}</label>
           <Input
             type="password"
-            name="password"
-            ref={register({
+            {...register("password", {
               required: intl.formatMessage({ id: "Password is required" }),
             })}
           ></Input>
-          {errors.password && <Error>{errors.password.message}</Error>}
+          {formState.errors.password && (
+            <Error>{formState.errors.password.message}</Error>
+          )}
         </View>
         <View css={{ gap: 2 }}>
           <label>{intl.formatMessage({ id: "New email address" })}</label>
           <Input
             type="email"
-            name="newEmail"
-            ref={register({
+            {...register("newEmail", {
               required: intl.formatMessage({ id: "Email address is required" }),
             })}
           ></Input>
-          {errors.newEmail && <Error>{errors.newEmail.message}</Error>}
+          {formState.errors.newEmail && (
+            <Error>{formState.errors.newEmail.message}</Error>
+          )}
         </View>
       </View>
 
@@ -121,7 +122,7 @@ const ChangeUsernameForm = ({ currentUser, onClose }) => {
   const { updateUsername } = useContext(UserContext)
 
   const notify = useContext(NotifyContext)
-  const { handleSubmit, register, errors, formState } = useForm()
+  const { handleSubmit, register, formState } = useForm()
 
   const onSubmit = useCallback(
     async ({ newUsername }) => {
@@ -150,12 +151,13 @@ const ChangeUsernameForm = ({ currentUser, onClose }) => {
           <label>{intl.formatMessage({ id: "New username" })}</label>
           <Input
             type="text"
-            name="newUsername"
-            ref={register({
+            {...register("newUsername", {
               required: intl.formatMessage({ id: "Username is required" }),
             })}
           ></Input>
-          {errors.newUsername && <Error>{errors.newUsername.message}</Error>}
+          {formState.errors.newUsername && (
+            <Error>{formState.errors.newUsername.message}</Error>
+          )}
         </View>
       </View>
 
@@ -184,14 +186,7 @@ const ChangePasswordForm = ({ currentUser, onClose }) => {
 
   const notify = useContext(NotifyContext)
 
-  const {
-    handleSubmit,
-    register,
-    watch,
-    setError,
-    errors,
-    formState,
-  } = useForm()
+  const { handleSubmit, register, watch, setError, formState } = useForm()
 
   const newPassword = watch("newPassword")
 
@@ -204,18 +199,16 @@ const ChangePasswordForm = ({ currentUser, onClose }) => {
       } catch (error) {
         switch (error.code) {
           case "auth/weak-password":
-            setError(
-              "newPassword",
-              "weakPassword",
-              intl.formatMessage({ id: "Password is too weak" })
-            )
+            setError("newPassword", {
+              type: "weakPassword",
+              message: intl.formatMessage({ id: "Password is too weak" }),
+            })
             break
           case "auth/wrong-password":
-            setError(
-              "password",
-              "mismatch",
-              intl.formatMessage({ id: "Incorrect password" })
-            )
+            setError("password", {
+              type: "mismatch",
+              message: intl.formatMessage({ id: "Incorrect password" }),
+            })
             break
           default:
             notify(
@@ -239,40 +232,41 @@ const ChangePasswordForm = ({ currentUser, onClose }) => {
           <label>{intl.formatMessage({ id: "Current password" })}</label>
           <Input
             type="password"
-            name="password"
-            ref={register({
+            {...register("password", {
               required: intl.formatMessage({ id: "Password is required" }),
             })}
           ></Input>
-          {errors.password && <Error>{errors.password.message}</Error>}
+          {formState.errors.password && (
+            <Error>{formState.errors.password.message}</Error>
+          )}
         </View>
         <View css={{ gap: 2 }}>
           <label>{intl.formatMessage({ id: "New password" })}</label>
           <Input
             type="password"
-            name="newPassword"
             autoComplete="new-password"
-            ref={register({
+            {...register("newPassword", {
               required: intl.formatMessage({ id: "Password is required" }),
             })}
           ></Input>
-          {errors.newPassword && <Error>{errors.newPassword.message}</Error>}
+          {formState.errors.newPassword && (
+            <Error>{formState.errors.newPassword.message}</Error>
+          )}
         </View>
 
         <View css={{ gap: 2 }}>
           <label>{intl.formatMessage({ id: "Confirm new password" })}</label>
           <Input
             type="password"
-            name="newPasswordConfirm"
-            ref={register({
+            {...register("newPasswordConfirm", {
               required: "Password is required",
               validate: (newPasswordConfirm) =>
                 newPasswordConfirm === newPassword ||
                 intl.formatMessage({ id: "Passwords must match" }),
             })}
           ></Input>
-          {errors.newPasswordConfirm && (
-            <Error>{errors.newPasswordConfirm.message}</Error>
+          {formState.errors.newPasswordConfirm && (
+            <Error>{formState.errors.newPasswordConfirm.message}</Error>
           )}
         </View>
       </View>

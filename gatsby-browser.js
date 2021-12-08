@@ -1,8 +1,9 @@
-require("firebase/auth")
-require("firebase/firestore")
+import "firebase/auth"
+import "firebase/firestore"
+
 const { getDefaultLanguage } = require("./src/contexts/language")
 
-exports.onServiceWorkerUpdateFound = () => {
+export const onServiceWorkerUpdateFound = () => {
   const defaultLanguage = getDefaultLanguage()
   if (
     window.confirm(
@@ -15,7 +16,7 @@ exports.onServiceWorkerUpdateFound = () => {
   }
 }
 
-exports.onClientEntry = () => {
+export const onClientEntry = () => {
   const Sentry = require("@sentry/browser")
   const { DIALOG_CLOSED_REASON } = require("./src/constants")
 

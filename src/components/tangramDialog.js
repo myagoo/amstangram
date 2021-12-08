@@ -1,8 +1,10 @@
 import firebase from "gatsby-plugin-firebase"
 import React, { useContext, useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
-import { useIntl, FormattedMessage } from "react-intl"
+import { FiStar } from "react-icons/fi"
+import { FormattedMessage, useIntl } from "react-intl"
 import { CATEGORIES, DIALOG_CLOSED_REASON, DIGITS, LETTERS } from "../constants"
+import { GalleryContext } from "../contexts/gallery"
 import { NotifyContext } from "../contexts/notify"
 import { UserContext } from "../contexts/user"
 import { getRandomEmoji } from "../utils/getRandomEmoji"
@@ -11,11 +13,9 @@ import { PrimaryButton } from "./button"
 import { Card } from "./card"
 import { Dialog } from "./dialog"
 import { Input } from "./input"
-import { Error, Hint, Similink, Title, InlineIcon } from "./primitives"
+import { Error, Hint, InlineIcon, Similink, Title } from "./primitives"
 import { Text } from "./text"
 import { View } from "./view"
-import { FiStar } from "react-icons/fi"
-import { GalleryContext } from "../contexts/gallery"
 
 const ReadTangramDialog = ({ tangram, deferred }) => {
   const { tangramsStarredBy } = useContext(GalleryContext)
@@ -85,16 +85,10 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
     [tangram]
   )
 
-  const {
-    handleSubmit,
-    register,
-    watch,
-    errors,
-    setError,
-    clearError,
-  } = useForm({
-    defaultValues,
-  })
+  const { handleSubmit, register, watch, setError, clearError, formState } =
+    useForm({
+      defaultValues,
+    })
 
   const { path, category, emoji, letterIndex, digitIndex } = watch()
 
@@ -107,7 +101,10 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
       }))
       clearError("path")
     } catch (error) {
-      setError("path", "invalid", intl.formatMessage({ id: "Invalid path" }))
+      setError("path", {
+        type: "invalid",
+        message: intl.formatMessage({ id: "Invalid path" }),
+      })
     }
   }, [path, setError, clearError, intl])
 
@@ -239,15 +236,17 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
           <>
             <View css={{ gap: 2 }}>
               <label>{intl.formatMessage({ id: "Path" })}</label>
-              <Input as="textarea" name="path" ref={register}></Input>
-              {errors.path && <Error>{errors.path.message}</Error>}
+              <Input as="textarea" {...register("path")}></Input>
+              {formState.errors.path && (
+                <Error>{formState.errors.path.message}</Error>
+              )}
             </View>
           </>
         )}
 
         <View css={{ gap: 2 }}>
           <label>{intl.formatMessage({ id: "Category" })}</label>
-          <Input as="select" name="category" ref={register}>
+          <Input as="select" {...register("category")}>
             {CATEGORIES.map((category) => (
               <option key={category} value={category}>
                 {intl.formatMessage({ id: category })}
@@ -259,7 +258,7 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
         {category === "digits" ? (
           <View css={{ gap: 2 }}>
             <label>{intl.formatMessage({ id: "Victory emoji" })}</label>
-            <Input as="select" name="digitIndex" ref={register}>
+            <Input as="select" {...register("digitIndex")}>
               {DIGITS.map((digitEmoji, index) => (
                 <option key={index} value={index}>
                   {digitEmoji}
@@ -270,7 +269,7 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
         ) : category === "letters" ? (
           <View css={{ gap: 2 }}>
             <label>{intl.formatMessage({ id: "Victory emoji" })}</label>
-            <Input as="select" name="letterIndex" ref={register}>
+            <Input as="select" {...register("letterIndex")}>
               {LETTERS.map((letterEmoji, index) => (
                 <option key={index} value={index}>
                   {letterEmoji}
@@ -281,7 +280,7 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
         ) : (
           <View css={{ gap: 2 }}>
             <label>{intl.formatMessage({ id: "Victory emoji" })}</label>
-            <Input name="emoji" ref={register} />
+            <Input {...register("emoji")} />
             <Hint>
               {intl.formatMessage({ id: "Leave empty for random emoji" })}
             </Hint>

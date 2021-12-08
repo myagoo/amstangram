@@ -54,13 +54,8 @@ export const Menu = () => {
   const { playButton } = useContext(SoundContext)
   const intl = useIntl()
 
-  const {
-    showLeaderboard,
-    showGallery,
-    showLogin,
-    showProfile,
-    showSettings,
-  } = useContext(DialogContext)
+  const { showLeaderboard, showGallery, showLogin, showProfile, showSettings } =
+    useContext(DialogContext)
 
   const [menuDialogDeferred, setMenuDialogDeferred] = useState()
 
@@ -70,11 +65,19 @@ export const Menu = () => {
 
   const { requestSave } = useContext(GalleryContext)
 
-  const handleMenuClick = () => {
+  const handleMenuClick = async () => {
     playButton()
     const deferred = new Deferred()
     setMenuDialogDeferred(deferred)
-    return deferred.promise.finally(() => setMenuDialogDeferred(null))
+    try {
+      await deferred.promise
+    } catch (error) {
+      if (error !== DIALOG_CLOSED_REASON) {
+        throw error
+      }
+    } finally {
+      setMenuDialogDeferred(null)
+    }
   }
 
   const gradient = useKeyframes({

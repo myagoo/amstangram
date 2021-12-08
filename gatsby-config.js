@@ -28,12 +28,13 @@ const firebaseConfig =
 module.exports = {
   plugins: [
     {
-      resolve: `gatsby-plugin-google-analytics`,
+      resolve: "gatsby-plugin-google-gtag",
       options: {
-        // The property ID; the tracking code won't be generated without it
-        trackingId: "UA-162030789-1",
-        anonymize: true,
-        respectDNT: true,
+        trackingIds: ["UA-162030789-1"],
+        gtagConfig: {
+          anonymize_ip: true,
+          cookie_expires: 0,
+        },
       },
     },
     {
@@ -105,7 +106,7 @@ module.exports = {
         display: "standalone",
         icon: "src/maskable_icon.png",
         icon_options: {
-          purpose: "maskable",
+          purpose: "any",
         },
         include_favicon: false,
       },
