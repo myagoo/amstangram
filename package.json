@@ -46,7 +46,7 @@
     "react-hook-form": "7.21.0",
     "react-icons": "4.3.1",
     "react-intl": "5.23.0",
-    "sharp": "0.29.3",
+    "sharp": "0.30.5",
     "use-sound": "4.0.1"
   }
 }
