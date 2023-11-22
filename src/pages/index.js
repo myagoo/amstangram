@@ -12,8 +12,9 @@ import { UserProvider } from "../contexts/user"
 import { DialogProvider } from "../contexts/dialog"
 import { TipsProvider } from "../contexts/tips"
 import { View } from "../components/view"
+import { ShowParticlesProvider } from "../contexts/particles"
 
-const IndexPage =  () => {
+const IndexPage = () => {
   useEffect(() => {
     window.oncontextmenu = function () {
       return false
@@ -66,21 +67,23 @@ const IndexPage =  () => {
           <UserProvider>
             <TangramsProvider>
               <ShowBackgroundPatternProvider>
-                <GalleryProvider>
-                  <TipsProvider>
-                    <DialogProvider>
-                      <View
-                        css={{
-                          flex: "1",
-                          color: "dialogText",
-                          fontSize: 3,
-                        }}
-                      >
-                        <App></App>
-                      </View>
-                    </DialogProvider>
-                  </TipsProvider>
-                </GalleryProvider>
+                <ShowParticlesProvider>
+                  <GalleryProvider>
+                    <TipsProvider>
+                      <DialogProvider>
+                        <View
+                          css={{
+                            flex: "1",
+                            color: "dialogText",
+                            fontSize: 3,
+                          }}
+                        >
+                          <App></App>
+                        </View>
+                      </DialogProvider>
+                    </TipsProvider>
+                  </GalleryProvider>
+                </ShowParticlesProvider>
               </ShowBackgroundPatternProvider>
             </TangramsProvider>
           </UserProvider>

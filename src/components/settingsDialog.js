@@ -14,6 +14,7 @@ import { Title } from "./primitives"
 import { Text } from "./text"
 import { Toggle } from "./toggle"
 import { View } from "./view"
+import { useShowParticles } from "../contexts/particles"
 
 export const SettingsDialog = ({ deferred }) => {
   const { soundEnabled, toggleSound } = useContext(SoundContext)
@@ -22,7 +23,7 @@ export const SettingsDialog = ({ deferred }) => {
     showBackgroundPattern,
     toggleShowBackgroundPattern,
   ] = useShowBackgroundPattern()
-
+  const [showParticles, toggleShowParticles] = useShowParticles()
   const { language, setLanguage } = useContext(LanguageContext)
   const intl = useIntl()
 
@@ -88,6 +89,17 @@ export const SettingsDialog = ({ deferred }) => {
           <Toggle
             value={tipsEnabled}
             onChange={toggleTips}
+            leftComponent={<Text>{intl.formatMessage({ id: "Yes" })}</Text>}
+            leftValue={true}
+            rightComponent={<Text>{intl.formatMessage({ id: "No" })}</Text>}
+            rightValue={false}
+          ></Toggle>
+        </View>
+        <View css={{ gap: 2 }}>
+          <label>{intl.formatMessage({ id: "Show particles" })}</label>
+          <Toggle
+            value={showParticles}
+            onChange={toggleShowParticles}
             leftComponent={<Text>{intl.formatMessage({ id: "Yes" })}</Text>}
             leftValue={true}
             rightComponent={<Text>{intl.formatMessage({ id: "No" })}</Text>}

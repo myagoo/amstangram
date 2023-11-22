@@ -127,7 +127,7 @@ export default {
   "Got it!": "J'ai compris !",
   "Welcome to Amstangram": "Bienvenue sur Amstangram",
   "tips.welcome":
-    "Reproduis la forme en arrangeant les pièces, tu peux faire tourner une pièce en appuyant dessus.<br></br><br></br>Amuse-toi bien !",
+    "Reproduis la forme noire en déplaçant les pièces, tu peux faire tourner une pièce en appuyant dessus.<br></br><br></br>Amuse-toi bien !",
   "tips.menu":
     "Tu peux accéder à la galerie des tangrams {galleryIcon}, aux réglages {settingsIcon} et plus encore en appuyant sur {menuIcon}",
   "tips.account1":
@@ -151,9 +151,10 @@ export default {
     "Tu peux accéder aux détails d'un tangram ou même éditer les tiens en faisant un appui long sur une carte dans la galerie {galleryIcon}",
   "tips.leaderboard":
     "Jette un oeil au classement pour savoir qui est le meilleur en appuyant sur {leaderboardIcon} dans le menu {menuIcon}",
-
+  "tips.particles": "Désactive les effets de particule en appuyant sur {settingsIcon} dans le menu {menuIcon}. Cela peut améliorer les performances.",
   "I don't want to see tips anymore": "Je ne veux plus voir les astuces",
   "Show tips": "Afficher les astuces",
+  "Show particles": "Afficher les particles",
   Yes: "Oui",
   No: "Non",
   "Reset tips": "Réinitialiser les astuces",

@@ -9,17 +9,19 @@ export const Badge = ({ uid, size = "badge", css, onClick, ...props }) => {
 
   const backgroundColor = useMemo(() => {
     const pieceColors = Object.values(theme.colors.pieces)
-    return pieceColors[uid.charCodeAt(0) % pieceColors.length]
+    console.log(uid)
+    return pieceColors[uid.charCodeAt(0) % pieceColors.length].slice(1)
   }, [theme, uid])
 
   return (
     <View
       as="img"
-      src={`https://avatars.dicebear.com/4.9/api/croodles-neutral/${uid}.svg?size=${theme.sizes[size]}&b=${encodeURIComponent(backgroundColor)}`}
+      src={`https://api.dicebear.com/7.x/croodles-neutral/svg?seed=${uid}&backgroundColor=${encodeURIComponent(backgroundColor)}`}
       css={{
         m: "2px",
         boxShadow: `0 0 0 2px ${theme.colors.dialogText}`,
         borderRadius: "50%",
+        backgroundColor,
         size,
         ...css,
       }}

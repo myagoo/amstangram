@@ -96,6 +96,17 @@ const iconValues = {
 
 const tips = [
   {
+    id: "particles",
+    predicate: ({ particles }) => {
+      return particles
+    },
+    content: (
+      <Text css={{ textAlign: "justify" }}>
+        <FormattedMessage id="tips.particles" values={iconValues} />
+      </Text>
+    ),
+  },
+  {
     id: "menu",
     content: (
       <Text css={{ textAlign: "justify" }}>
@@ -144,6 +155,7 @@ const tips = [
       </Text>
     ),
   },
+
   {
     id: "account1",
     predicate: ({ currentUser }) => {

@@ -41,6 +41,7 @@ import { scrambleGroup } from "../utils/scrambleGroup"
 import { updateColisionState } from "../utils/updateColisionState"
 import { Card } from "./card"
 import { Victory } from "./victory"
+import { useShowParticles } from "../contexts/particles"
 
 export const Tangram = () => {
   const intl = useIntl()
@@ -60,6 +61,7 @@ export const Tangram = () => {
   const theme = useContext(ThemeContext)
   const notify = useContext(NotifyContext)
   const [showBackgroundPattern] = useShowBackgroundPattern()
+  const [showParticles] = useShowParticles()
   const {
     saveRequestId,
     playlist,
@@ -80,6 +82,7 @@ export const Tangram = () => {
   const particlesRef = useRef()
   const coumpoundPathRef = useRef()
   const showBackgroundPatternRef = useRef()
+  const showParticlesRef = useRef()
 
   const selectedTangram = useMemo(() => {
     return playlist && playlist[currentTangramIndex]
@@ -281,6 +284,12 @@ export const Tangram = () => {
           }
           document.body.style.cursor = "default"
 
+          if (!showParticlesRef.current) {
+            playRef.current.victory()
+            setVictoryPhase(true)
+            return
+          }
+
           paper.project.activeLayer.tween(
             {
               opacity: 0,
@@ -440,6 +449,11 @@ export const Tangram = () => {
   }, [selectedTangram, showBackgroundPattern, theme])
 
   useLayoutEffect(() => {
+    showParticlesRef.current = showParticles
+
+    if(!showParticles){
+      return
+    }
     const particleGroup = new paper.Group()
 
     particleGroup.sendToBack()
@@ -493,8 +507,13 @@ export const Tangram = () => {
       randomize()
 
       particlesRef.current[i] = particle
+
     }
-  }, [selectedTangram])
+    return () => {
+      particleGroup.remove()
+      particlesRef.current = null
+    }
+  }, [selectedTangram, showParticles])
 
   useLayoutEffect(() => {
     for (const pieceGroup of piecesGroupRef.current.children) {
@@ -506,11 +525,15 @@ export const Tangram = () => {
 
     const pieceColors = Object.values(theme.colors.pieces)
 
+    if(!showParticles){
+      return
+    }
+
     for (const particle of particlesRef.current) {
       particle.fillColor =
         pieceColors[Math.floor(Math.random() * pieceColors.length)]
     }
-  }, [theme.colors, selectedTangram])
+  }, [theme.colors, selectedTangram, showParticles])
 
   useEffect(() => {
     showWelcome()

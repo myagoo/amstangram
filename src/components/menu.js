@@ -206,7 +206,7 @@ export const Menu = () => {
             >
               {intl.formatMessage(
                 { id: "Version {code}" },
-                { code: "⭐.🧠.🖼" }
+                { code: "✨.🥸.♿" }
               )}
             </Hint>
           </View>

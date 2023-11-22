@@ -122,7 +122,7 @@ export default {
   "Got it!": "Got it!",
   "Welcome to Amstangram": "Welcome to Amstangram",
   "tips.welcome":
-    "Reproduce the shape by rearranging the pieces, you can rotate a piece by pressing it.<br></br><br></br>Have fun !",
+    "Reproduce the black shape by moving the pieces, you can rotate a piece by pressing it.<br></br><br></br>Have fun !",
   "tips.menu":
     "You can access the tangram gallery {galleryIcon}, settings {settingsIcon} and more by pressing {menuIcon}",
   "tips.account1":
@@ -146,9 +146,11 @@ export default {
     "You can acces tangram details or edit your own tangrams by long pressing a card in the gallery {galleryIcon}",
   "tips.leaderboard":
     "Check the leaderboard to see who's the best by pressing {leaderboardIcon} in the menu {menuIcon}",
+  "tips.particles": "Disable particle effects by pressing {settingsIcon} in the menu {menuIcon}. It can improve performances.",
 
   "I don't want to see tips anymore": "I don't want to see tips anymore",
   "Show tips": "Show tips",
+  "Show particles": "Show particles",
   Yes: "Yes",
   No: "No",
   "Reset tips": "Reset tips",
@@ -170,5 +172,5 @@ export default {
   "Forgot password?": "Forgot password?",
   "Reset your password": "Reset your password",
   "Send the reset mail!": "Send the reset mail!",
-  "Reset password email sent" : "Reset password email sent"
+  "Reset password email sent": "Reset password email sent"
 }
