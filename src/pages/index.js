@@ -12,7 +12,7 @@ import { UserProvider } from "../contexts/user"
 import { DialogProvider } from "../contexts/dialog"
 import { TipsProvider } from "../contexts/tips"
 import { View } from "../components/view"
-import { ShowParticlesProvider } from "../contexts/particles"
+import { ShowParticlesProvider } from "../contexts/showParticles"
 
 const IndexPage = () => {
   useEffect(() => {

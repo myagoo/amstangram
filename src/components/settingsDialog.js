@@ -14,7 +14,7 @@ import { Title } from "./primitives"
 import { Text } from "./text"
 import { Toggle } from "./toggle"
 import { View } from "./view"
-import { useShowParticles } from "../contexts/particles"
+import { useShowParticles } from "../contexts/showParticles"
 
 export const SettingsDialog = ({ deferred }) => {
   const { soundEnabled, toggleSound } = useContext(SoundContext)
@@ -85,10 +85,10 @@ export const SettingsDialog = ({ deferred }) => {
           ></Toggle>
         </View>
         <View css={{ gap: 2 }}>
-          <label>{intl.formatMessage({ id: "Show tips" })}</label>
+          <label>{intl.formatMessage({ id: "Show particles" })}</label>
           <Toggle
-            value={tipsEnabled}
-            onChange={toggleTips}
+            value={showParticles}
+            onChange={toggleShowParticles}
             leftComponent={<Text>{intl.formatMessage({ id: "Yes" })}</Text>}
             leftValue={true}
             rightComponent={<Text>{intl.formatMessage({ id: "No" })}</Text>}
@@ -96,10 +96,10 @@ export const SettingsDialog = ({ deferred }) => {
           ></Toggle>
         </View>
         <View css={{ gap: 2 }}>
-          <label>{intl.formatMessage({ id: "Show particles" })}</label>
+          <label>{intl.formatMessage({ id: "Show tips" })}</label>
           <Toggle
-            value={showParticles}
-            onChange={toggleShowParticles}
+            value={tipsEnabled}
+            onChange={toggleTips}
             leftComponent={<Text>{intl.formatMessage({ id: "Yes" })}</Text>}
             leftValue={true}
             rightComponent={<Text>{intl.formatMessage({ id: "No" })}</Text>}

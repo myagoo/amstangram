@@ -41,7 +41,7 @@ import { scrambleGroup } from "../utils/scrambleGroup"
 import { updateColisionState } from "../utils/updateColisionState"
 import { Card } from "./card"
 import { Victory } from "./victory"
-import { useShowParticles } from "../contexts/particles"
+import { useShowParticles } from "../contexts/showParticles"
 
 export const Tangram = () => {
   const intl = useIntl()
