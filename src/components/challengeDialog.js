@@ -17,21 +17,22 @@ export const ChallengeDialog = ({ uid, tangrams, deferred }) => {
 
   return (
     <Dialog
+      big
       title={
         <Title>
           {username
             ? intl.formatMessage(
-                { id: "{username} challenged you" },
-                {
-                  username,
-                }
-              )
+              { id: "{username} challenged you" },
+              {
+                username,
+              }
+            )
             : intl.formatMessage(
-                { id: "Rise to the challenge" },
-                {
-                  username,
-                }
-              )}
+              { id: "Rise to the challenge" },
+              {
+                username,
+              }
+            )}
         </Title>
       }
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}

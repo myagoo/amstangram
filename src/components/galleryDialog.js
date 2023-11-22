@@ -134,8 +134,8 @@ export const GalleryDialog = ({ deferred }) => {
         sortedCategory === "letters"
           ? sortLettersTangrams
           : sortedCategory === "digits"
-          ? sortDigitsTangrams
-          : sortTangrams
+            ? sortDigitsTangrams
+            : sortTangrams
       )
     }
 
@@ -153,6 +153,7 @@ export const GalleryDialog = ({ deferred }) => {
   return (
     <>
       <Dialog
+        big
         title={<Title>{intl.formatMessage({ id: "Tangram gallery" })}</Title>}
         css={{
           gap: 3,
@@ -330,8 +331,8 @@ export const GalleryDialog = ({ deferred }) => {
                 {selectedTangrams.length === 0
                   ? intl.formatMessage({ id: "Play now!" })
                   : selectedTangrams.length === 1
-                  ? intl.formatMessage({ id: "Start 1 tangram!" })
-                  : intl.formatMessage(
+                    ? intl.formatMessage({ id: "Start 1 tangram!" })
+                    : intl.formatMessage(
                       { id: "Start {count} tangrams!" },
                       { count: selectedTangrams.length }
                     )}

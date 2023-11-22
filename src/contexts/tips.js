@@ -52,7 +52,7 @@ const TipDialog = ({
     <Dialog
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
       title={title}
-      css={{ gap: 3, maxWidth: "300px" }}
+      css={{ gap: 3 }}
     >
       {content}
       <PrimaryButton onClick={() => deferred.resolve(hideTips)}>

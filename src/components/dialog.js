@@ -8,7 +8,7 @@ import {
 import { SoundContext } from "../contexts/sound"
 import { View } from "./view"
 
-export const Dialog = ({ children, title, onClose, css, ...props }) => {
+export const Dialog = ({ children, title, onClose, big, css, ...props }) => {
   const { playButton } = useContext(SoundContext)
 
   return createPortal(
@@ -38,7 +38,7 @@ export const Dialog = ({ children, title, onClose, css, ...props }) => {
           p: 3,
           gap: 3,
           maxWidth: "95vw",
-          minWidth: "300px",
+          width: big ? "568px" : "400px"
         }}
         onClick={(e) => e.stopPropagation()}
       >
