@@ -9,7 +9,6 @@ export const Badge = ({ uid, size = "badge", css, onClick, ...props }) => {
 
   const backgroundColor = useMemo(() => {
     const pieceColors = Object.values(theme.colors.pieces)
-    console.log(uid)
     return pieceColors[uid.charCodeAt(0) % pieceColors.length].slice(1)
   }, [theme, uid])
 

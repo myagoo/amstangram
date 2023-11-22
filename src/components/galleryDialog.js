@@ -71,7 +71,6 @@ export const GalleryDialog = ({ deferred }) => {
   }
 
   const handleTangramClick = useCallback((clickedTangram) => {
-    console.log(clickedTangram)
     setSelectedTangrams((prevPendingSelectedTangrams) => {
       if (
         prevPendingSelectedTangrams.some(
