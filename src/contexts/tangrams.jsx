@@ -7,11 +7,6 @@ import React, {
   useContext,
 } from "react"
 import { UserContext } from "./user"
-import {
-  sortDigitsTangrams,
-  sortLettersTangrams,
-  sortTangrams,
-} from "../utils/sortTangrams"
 
 export const TangramsContext = createContext([])
 

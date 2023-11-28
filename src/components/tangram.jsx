@@ -399,14 +399,14 @@ export const Tangram = () => {
       if (outerBounds.width > outerBounds.height) {
         scaleFactorRef.current = Math.min(
           2,
-          Math.min(outerBounds.width * 0.8, 700) / innerBounds.width,
-          Math.min(outerBounds.height * 0.9, 600) / innerBounds.height
+          Math.min(outerBounds.width * 0.7, 700) / innerBounds.width,
+          Math.min(outerBounds.height * 0.8, 600) / innerBounds.height
         )
       } else {
         scaleFactorRef.current = Math.min(
           2,
-          Math.min(outerBounds.width * 0.9, 600) / innerBounds.width,
-          Math.min(outerBounds.height * 0.8, 700) / innerBounds.height
+          Math.min(outerBounds.width * 0.8, 600) / innerBounds.width,
+          Math.min(outerBounds.height * 0.7, 700) / innerBounds.height
         )
       }
 
