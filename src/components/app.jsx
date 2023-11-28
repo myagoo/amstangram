@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react"
 import { useIntl } from "react-intl"
-import { Logo } from "../components/logo"
-import { View } from "../components/view"
+import { Logo } from "./logo"
+import { View } from "./view"
 import { FADE_STAGGER_DURATION, FADE_TRANSITION_DURATION } from "../constants"
 import { GalleryContext } from "../contexts/gallery"
 import { NotifyContext } from "../contexts/notify"
@@ -74,7 +74,7 @@ export const App = () => {
         gap: 3,
         animation:
           isEverythingInitialized && waited
-            ? `${FADE_TRANSITION_DURATION}ms fadeIn ease ${FADE_STAGGER_DURATION}ms reverse`
+            ? `${FADE_TRANSITION_DURATION}ms fadeIn ease ${FADE_STAGGER_DURATION}ms forwards reverse`
             : undefined,
       }}
       deps={[isEverythingInitialized, waited]}

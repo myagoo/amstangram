@@ -7,11 +7,11 @@ import React, {
 } from "react"
 import useSound from "use-sound"
 
-import starSound from "../sounds/star.wav"
-import buttonSound from "../sounds/button.wav"
-import cardSound from "../sounds/card.wav"
-import tangramSound from "../sounds/pop.wav"
-import victorySound from "../sounds/victory.wav"
+import starSound from "../assets/star.wav"
+import buttonSound from "../assets/button.wav"
+import cardSound from "../assets/card.wav"
+import tangramSound from "../assets/pop.wav"
+import victorySound from "../assets/victory.wav"
 
 export const SoundContext = createContext([true, () => {}])
 

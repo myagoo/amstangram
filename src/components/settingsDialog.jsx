@@ -1,4 +1,3 @@
-import { useSwitchTheme } from "@css-system/gatsby-plugin-css-system"
 import React, { useContext } from "react"
 import { FiMoon, FiSun, FiVolume2, FiVolumeX } from "react-icons/fi"
 import { useIntl } from "react-intl"
@@ -15,14 +14,13 @@ import { Text } from "./text"
 import { Toggle } from "./toggle"
 import { View } from "./view"
 import { useShowParticles } from "../contexts/showParticles"
+import { useSwitchTheme } from "../contexts/switchTheme"
 
 export const SettingsDialog = ({ deferred }) => {
   const { soundEnabled, toggleSound } = useContext(SoundContext)
   const { tipsEnabled, toggleTips, resetTips } = useContext(TipsContext)
-  const [
-    showBackgroundPattern,
-    toggleShowBackgroundPattern,
-  ] = useShowBackgroundPattern()
+  const [showBackgroundPattern, toggleShowBackgroundPattern] =
+    useShowBackgroundPattern()
   const [showParticles, toggleShowParticles] = useShowParticles()
   const { language, setLanguage } = useContext(LanguageContext)
   const intl = useIntl()

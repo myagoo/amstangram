@@ -1,4 +1,4 @@
-import firebase from "gatsby-plugin-firebase"
+import firebase from "../utils/firebase"
 import React, { useCallback, useContext, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { FiStar } from "react-icons/fi"

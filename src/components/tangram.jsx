@@ -1,5 +1,5 @@
 import { ThemeContext } from "css-system"
-import firebase from "gatsby-plugin-firebase"
+import firebase from "../utils/firebase"
 import paper from "paper/dist/paper-core"
 import React, {
   useContext,
@@ -10,7 +10,7 @@ import React, {
   useState,
 } from "react"
 import { useIntl } from "react-intl"
-import { View } from "../components/view"
+import { View } from "./view"
 import {
   CLICK_TIMEOUT,
   FADE_TRANSITION_DURATION,
@@ -399,14 +399,14 @@ export const Tangram = () => {
       if (outerBounds.width > outerBounds.height) {
         scaleFactorRef.current = Math.min(
           2,
-          Math.min(outerBounds.width * 0.6, 700) / innerBounds.width,
-          Math.min(outerBounds.height * 0.8, 600) / innerBounds.height
+          Math.min(outerBounds.width * 0.8, 700) / innerBounds.width,
+          Math.min(outerBounds.height * 0.9, 600) / innerBounds.height
         )
       } else {
         scaleFactorRef.current = Math.min(
           2,
-          Math.min(outerBounds.width * 0.8, 600) / innerBounds.width,
-          Math.min(outerBounds.height * 0.6, 700) / innerBounds.height
+          Math.min(outerBounds.width * 0.9, 600) / innerBounds.width,
+          Math.min(outerBounds.height * 0.8, 700) / innerBounds.height
         )
       }
 
@@ -449,6 +449,7 @@ export const Tangram = () => {
   }, [selectedTangram, showBackgroundPattern, theme])
 
   useLayoutEffect(() => {
+
     showParticlesRef.current = showParticles
 
     if(!showParticles){

@@ -1,4 +1,4 @@
-import firebase from "gatsby-plugin-firebase"
+import firebase from "../utils/firebase"
 import React, { useContext, useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { FiStar } from "react-icons/fi"
@@ -85,7 +85,7 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
     [tangram]
   )
 
-  const { handleSubmit, register, watch, setError, clearError, formState } =
+  const { handleSubmit, register, watch, setError, clearErrors, formState } =
     useForm({
       defaultValues,
     })
@@ -99,14 +99,14 @@ const SaveTangramDialog = ({ tangram, deferred }) => {
         ...prevTangramCopy,
         ...pathData,
       }))
-      clearError("path")
+      clearErrors("path")
     } catch (error) {
       setError("path", {
         type: "invalid",
         message: intl.formatMessage({ id: "Invalid path" }),
       })
     }
-  }, [path, setError, clearError, intl])
+  }, [path, setError, clearErrors, intl])
 
   useEffect(() => {
     const computedEmoji =

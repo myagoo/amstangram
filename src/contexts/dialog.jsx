@@ -26,6 +26,7 @@ export const DialogProvider = ({ children }) => {
 
   const {
     playlist,
+    setPlaylist,
     startRandomPlaylist,
     initialized: galleryInitialized,
   } = useContext(GalleryContext)
@@ -157,7 +158,6 @@ export const DialogProvider = ({ children }) => {
               tangramIds.includes(tangram.id)
             )
             if (challengeTangrams.length) {
-              hasBeenChallenged = true
               window.history.replaceState(
                 {},
                 document.title,
@@ -174,7 +174,8 @@ export const DialogProvider = ({ children }) => {
 
               try {
                 await deferred.promise
-                startRandomPlaylist(true)
+                hasBeenChallenged = true
+                setPlaylist(challengeTangrams)
               } catch (error) {
                 if (error !== DIALOG_CLOSED_REASON) {
                   throw error

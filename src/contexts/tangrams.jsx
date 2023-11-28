@@ -1,4 +1,4 @@
-import firebase from "gatsby-plugin-firebase"
+import firebase from "../utils/firebase"
 import React, {
   createContext,
   useEffect,

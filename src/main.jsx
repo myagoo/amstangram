@@ -1,25 +1,39 @@
+import "./analytics"
+
 import { useGlobalCss } from "css-system"
 import React, { useEffect } from "react"
-import { App } from "../components/app"
-import { COLOR_TRANSITION_DURATION } from "../constants"
-import { GalleryProvider } from "../contexts/gallery"
-import { LanguageProvider } from "../contexts/language"
-import { NotifyProvider } from "../contexts/notify"
-import { ShowBackgroundPatternProvider } from "../contexts/showBackgroundPattern"
-import { SoundProvider } from "../contexts/sound"
-import { TangramsProvider } from "../contexts/tangrams"
-import { UserProvider } from "../contexts/user"
-import { DialogProvider } from "../contexts/dialog"
-import { TipsProvider } from "../contexts/tips"
-import { View } from "../components/view"
-import { ShowParticlesProvider } from "../contexts/showParticles"
+import ReactDOM from "react-dom/client"
+import { App } from "./components/app"
+import { View } from "./components/view"
+import { COLOR_TRANSITION_DURATION } from "./constants"
+import { DialogProvider } from "./contexts/dialog"
+import { GalleryProvider } from "./contexts/gallery"
+import { LanguageProvider } from "./contexts/language"
+import { NotifyProvider } from "./contexts/notify"
+import { ShowBackgroundPatternProvider } from "./contexts/showBackgroundPattern"
+import { ShowParticlesProvider } from "./contexts/showParticles"
+import { SoundProvider } from "./contexts/sound"
+import { SwitchThemeProvider } from "./contexts/switchTheme"
+import { TangramsProvider } from "./contexts/tangrams"
+import { TipsProvider } from "./contexts/tips"
+import { UserProvider } from "./contexts/user"
 
-const IndexPage = () => {
+// Try to remove service workers... Not sure this is useful
+navigator.serviceWorker.getRegistrations().then(function (registrations) {
+  for (let registration of registrations) {
+    registration.unregister()
+  }
+})
+
+const Main = () => {
   useEffect(() => {
-    window.oncontextmenu = function () {
-      return false
+    if (matchMedia("hover: none").matches) {
+      window.oncontextmenu = function () {
+        return false
+      }
     }
   }, [])
+
   useGlobalCss({
     body: {
       m: 0,
@@ -31,10 +45,10 @@ const IndexPage = () => {
       "-moz-osx-font-smoothing": "grayscale",
       transition: `background-color ${COLOR_TRANSITION_DURATION}ms`,
     },
-    "body, html, #___gatsby, #gatsby-focus-wrapper": {
+    "body, html, #root": {
       height: "100%",
     },
-    "#gatsby-focus-wrapper": {
+    "#root": {
       display: "flex",
       flexDirection: "column",
       padding: `
@@ -92,4 +106,9 @@ const IndexPage = () => {
     </SoundProvider>
   )
 }
-export default IndexPage
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <SwitchThemeProvider>
+    <Main />
+  </SwitchThemeProvider>
+)

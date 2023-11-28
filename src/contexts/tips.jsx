@@ -1,4 +1,3 @@
-import { useSwitchTheme } from "@css-system/gatsby-plugin-css-system"
 import React, {
   createContext,
   useCallback,
@@ -31,6 +30,7 @@ import { SoundContext } from "./sound"
 import { TangramsContext } from "./tangrams"
 import { UserContext } from "./user"
 import { GalleryContext } from "./gallery"
+import { useSwitchTheme } from "./switchTheme"
 
 export const TipsContext = createContext()
 

@@ -1,5 +1,5 @@
 import paper from "paper/dist/paper-core"
-import firebase from "gatsby-plugin-firebase"
+import firebase from "./firebase"
 
 export const recomputeEverything = async (tangrams) => {
   if (

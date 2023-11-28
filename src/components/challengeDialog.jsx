@@ -62,7 +62,6 @@ export const ChallengeDialog = ({ uid, tangrams, deferred }) => {
 
       <PrimaryButton
         onClick={() => {
-          setPlaylist(tangrams)
           deferred.resolve()
         }}
       >
