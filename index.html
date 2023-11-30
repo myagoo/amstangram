@@ -22,10 +22,18 @@
     <link rel="manifest" href="/manifest.webmanifest" crossorigin="anonymous" />
     <meta name="theme-color" content="#1DD1A1" />
     <script type="module">
+      import { DIALOG_CLOSED_REASON } from "./src/constants"
+
       window.sentryOnLoad = function () {
         Sentry.init({
           release: import.meta.env.VITE_APP_VERSION,
           environment: import.meta.env.MODE,
+          beforeSend: (event, hint) => {
+            if (hint.originalException === DIALOG_CLOSED_REASON) {
+              return null
+            }
+            return event
+          },
         })
       }
     </script>
