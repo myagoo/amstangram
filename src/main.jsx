@@ -1,5 +1,3 @@
-import "./analytics"
-
 import { useGlobalCss } from "css-system"
 import React, { useEffect } from "react"
 import ReactDOM from "react-dom/client"
@@ -19,11 +17,13 @@ import { TipsProvider } from "./contexts/tips"
 import { UserProvider } from "./contexts/user"
 
 // Try to remove service workers... Not sure this is useful
-navigator.serviceWorker.getRegistrations().then(function (registrations) {
-  for (let registration of registrations) {
-    registration.unregister()
-  }
-})
+if (window.isSecureContext) {
+  navigator.serviceWorker.getRegistrations().then(function (registrations) {
+    for (let registration of registrations) {
+      registration.unregister()
+    }
+  })
+}
 
 const Main = () => {
   useEffect(() => {
@@ -38,9 +38,7 @@ const Main = () => {
     body: {
       m: 0,
       bg: "background",
-      fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-        "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
-        "Helvetica Neue", sans-serif`,
+      fontFamily: `'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif`,
       "-webkit-font-smoothing": "antialiased",
       "-moz-osx-font-smoothing": "grayscale",
       transition: `background-color ${COLOR_TRANSITION_DURATION}ms`,

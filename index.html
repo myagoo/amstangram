@@ -21,10 +21,36 @@
     <meta property="fb:app_id" content="654214645128292" />
     <link rel="manifest" href="/manifest.webmanifest" crossorigin="anonymous" />
     <meta name="theme-color" content="#1DD1A1" />
+    <script type="module">
+      window.sentryOnLoad = function () {
+        Sentry.init({
+          release: import.meta.env.VITE_APP_VERSION,
+          environment: import.meta.env.MODE,
+        })
+      }
+    </script>
+    <script
+      src="https://js.sentry-cdn.com/1b2f34262d80460298da419637b59901.min.js"
+      crossorigin="anonymous"
+    ></script>
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=G-F7R3KZMTTS"
     ></script>
+    <script type="module">
+      if (import.meta.env.PROD) {
+        window.dataLayer = window.dataLayer || []
+        function gtag() {
+          dataLayer.push(arguments)
+        }
+        gtag("js", new Date())
+
+        gtag("config", "G-F7R3KZMTTS", {
+          anonymize_ip: true,
+          cookie_expires: 0,
+        })
+      }
+    </script>
     <script src="/clipper_unminified.js"></script>
     <style>
       @keyframes fadeIn {
@@ -36,21 +62,9 @@
         }
       }
     </style>
-    <link
-      rel="apple-touch-icon"
-      sizes="48x48"
-      href="/icons/icon-48x48.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="72x72"
-      href="/icons/icon-72x72.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="96x96"
-      href="/icons/icon-96x96.png"
-    />
+    <link rel="apple-touch-icon" sizes="48x48" href="/icons/icon-48x48.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="/icons/icon-72x72.png" />
+    <link rel="apple-touch-icon" sizes="96x96" href="/icons/icon-96x96.png" />
     <link
       rel="apple-touch-icon"
       sizes="144x144"
@@ -81,6 +95,6 @@
     <div id="root"></div>
     <div id="dialogContainer"></div>
     <div id="notificationContainer"></div>
-    <script async type="module" src="/src/main.jsx"></script>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

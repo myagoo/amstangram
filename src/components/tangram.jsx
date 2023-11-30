@@ -1,5 +1,4 @@
 import { ThemeContext } from "css-system"
-import firebase from "../utils/firebase"
 import paper from "paper/dist/paper-core"
 import React, {
   useContext,
@@ -10,28 +9,29 @@ import React, {
   useState,
 } from "react"
 import { useIntl } from "react-intl"
-import { View } from "./view"
 import {
   CLICK_TIMEOUT,
   FADE_TRANSITION_DURATION,
+  MAX_PARTICLE_OPACITY,
+  MAX_PARTICLE_SIZE,
+  MIN_PARTICLE_OPACITY,
+  MIN_PARTICLE_SIZE,
+  PARTICLES_COUNT,
   SNAP_DISTANCE,
   SOFT_ERROR_MARGIN,
   STRICT_ERROR_MARGIN,
   VICTORY_PARTICLES_DURATION,
-  PARTICLES_COUNT,
-  MIN_PARTICLE_OPACITY,
-  MIN_PARTICLE_SIZE,
-  MAX_PARTICLE_SIZE,
-  MAX_PARTICLE_OPACITY,
 } from "../constants"
 import { DialogContext } from "../contexts/dialog"
 import { GalleryContext } from "../contexts/gallery"
 import { NotifyContext } from "../contexts/notify"
 import { useShowBackgroundPattern } from "../contexts/showBackgroundPattern"
+import { useShowParticles } from "../contexts/showParticles"
 import { SoundContext } from "../contexts/sound"
 import { TipsContext } from "../contexts/tips"
 import { UserContext } from "../contexts/user"
 import { createPiecesGroup } from "../utils/createPiecesGroup"
+import firebase from "../utils/firebase"
 import { getPathData } from "../utils/getPathData"
 import { getSnapVector } from "../utils/getSnapVector"
 import { isTangramComplete } from "../utils/isTangramComplete"
@@ -41,7 +41,7 @@ import { scrambleGroup } from "../utils/scrambleGroup"
 import { updateColisionState } from "../utils/updateColisionState"
 import { Card } from "./card"
 import { Victory } from "./victory"
-import { useShowParticles } from "../contexts/showParticles"
+import { View } from "./view"
 
 export const Tangram = () => {
   const intl = useIntl()
@@ -79,6 +79,7 @@ export const Tangram = () => {
   const canvasRef = useRef()
   const scaleFactorRef = useRef()
   const piecesGroupRef = useRef()
+  const particlesGroupRef = useRef()
   const particlesRef = useRef()
   const coumpoundPathRef = useRef()
   const showBackgroundPatternRef = useRef()
@@ -449,10 +450,9 @@ export const Tangram = () => {
   }, [selectedTangram, showBackgroundPattern, theme])
 
   useLayoutEffect(() => {
-
     showParticlesRef.current = showParticles
 
-    if(!showParticles){
+    if (!showParticles) {
       return
     }
     const particleGroup = new paper.Group()
@@ -508,13 +508,16 @@ export const Tangram = () => {
       randomize()
 
       particlesRef.current[i] = particle
-
-    }
-    return () => {
-      particleGroup.remove()
-      particlesRef.current = null
     }
   }, [selectedTangram, showParticles])
+
+  useLayoutEffect(() => {
+    if (!showParticles && particlesGroupRef.current) {
+      particlesGroupRef.current.remove()
+      particlesGroupRef.current = null
+      particlesRef.current = null
+    }
+  }, [showParticles])
 
   useLayoutEffect(() => {
     for (const pieceGroup of piecesGroupRef.current.children) {
@@ -526,7 +529,7 @@ export const Tangram = () => {
 
     const pieceColors = Object.values(theme.colors.pieces)
 
-    if(!showParticles){
+    if (!showParticles) {
       return
     }
 
