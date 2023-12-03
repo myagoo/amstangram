@@ -38,7 +38,8 @@ const Main = () => {
     body: {
       m: 0,
       bg: "background",
-      fontFamily: `'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif`,
+      fontFamily: `'Comic Neue', cursive`,
+      fontWeight: "bolder",
       "-webkit-font-smoothing": "antialiased",
       "-moz-osx-font-smoothing": "grayscale",
       transition: `background-color ${COLOR_TRANSITION_DURATION}ms`,

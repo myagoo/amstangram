@@ -22,7 +22,7 @@ export const Hint = extendPrimitive(Text, {
 export const Title = extendPrimitive(Text, {
   css: {
     fontSize: 4,
-    fontWeight: "bold",
+    fontWeight: "bolder",
   },
 })
 

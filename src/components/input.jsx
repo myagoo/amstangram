@@ -4,6 +4,8 @@ export const Input = createPrimitive("input", {
   type: "text",
   css: {
     color: "inherit",
+    fontFamily: "inherit",
+    fontWeight: "bolder",
     fontSize: "inherit",
     bg: "inputBackground",
     border: "none",
