@@ -192,7 +192,7 @@ const SignUpTab = ({ onSignUp, setTab }) => {
         <View css={{ gap: 2 }}>
           <label>{intl.formatMessage({ id: "Confirm password" })}</label>
           <Input
-            autoComplete="off"
+            autoComplete="new-password"
             type="password"
             {...register("passwordConfirm", {
               required: "Password is required",
