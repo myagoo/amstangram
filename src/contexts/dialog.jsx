@@ -18,6 +18,7 @@ import { TangramsContext } from "./tangrams"
 import { UserContext } from "./user"
 import { SettingsDialog } from "../components/settingsDialog"
 import { DIALOG_CLOSED_REASON } from "../constants"
+import { MenuDialog } from "../components/menuDialog"
 
 export const DialogContext = createContext()
 
@@ -118,6 +119,23 @@ export const DialogProvider = ({ children }) => {
     }
   }, [])
 
+  const [menuDialogDeferred, setMenuDialogDeferred] = useState(null)
+
+  const showMenu = useCallback(async () => {
+    const deferred = new Deferred()
+
+    setMenuDialogDeferred(deferred)
+    try {
+      await deferred.promise
+    } catch (error) {
+      if (error !== DIALOG_CLOSED_REASON) {
+        throw error
+      }
+    } finally {
+      setMenuDialogDeferred(null)
+    }
+  }, [])
+
   const [settingsDialogDeferred, setSettingsDialogDeferred] = useState(null)
 
   const showSettings = useCallback(async () => {
@@ -198,28 +216,34 @@ export const DialogProvider = ({ children }) => {
     checkForChallenge()
   }, [tangramsInitialized, galleryInitialized, usersInitialized, initialized])
 
-  const contextValue = useMemo(
-    () => ({
+  const contextValue = useMemo(() => {
+    return {
+      menuDialogDeferred,
+      showMenu,
       showProfile,
       showLeaderboard,
       showGallery,
       showLogin,
       showTangram,
       showSettings,
-    }),
-    [
-      showProfile,
-      showLeaderboard,
-      showGallery,
-      showLogin,
-      showTangram,
-      showSettings,
-    ]
-  )
+    }
+  }, [
+    menuDialogDeferred,
+    showMenu,
+    showProfile,
+    showLeaderboard,
+    showGallery,
+    showLogin,
+    showTangram,
+    showSettings,
+  ])
 
   return (
     <DialogContext.Provider value={contextValue}>
       {children}
+      {menuDialogDeferred && (
+        <MenuDialog deferred={menuDialogDeferred}></MenuDialog>
+      )}
       {loginDeferred && <LoginDialog deferred={loginDeferred}></LoginDialog>}
       {galleryDeferred && (
         <GalleryDialog deferred={galleryDeferred}></GalleryDialog>
