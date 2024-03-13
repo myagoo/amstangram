@@ -70,6 +70,23 @@ export const DialogProvider = ({ children }) => {
     }
   }, [])
 
+  const [menuDialogDeferred, setMenuDialogDeferred] = useState(null)
+
+  const showMenu = useCallback(async () => {
+    const deferred = new Deferred()
+
+    setMenuDialogDeferred(deferred)
+    try {
+      await deferred.promise
+    } catch (error) {
+      if (error !== DIALOG_CLOSED_REASON) {
+        throw error
+      }
+    } finally {
+      setMenuDialogDeferred(null)
+    }
+  }, [])
+
   const [galleryDeferred, setGalleryDeferred] = useState(null)
 
   const showGallery = useCallback(async () => {
@@ -78,6 +95,7 @@ export const DialogProvider = ({ children }) => {
 
     try {
       await deferred.promise
+      menuDialogDeferred.resolve()
     } catch (error) {
       if (error !== DIALOG_CLOSED_REASON) {
         throw error
@@ -85,7 +103,7 @@ export const DialogProvider = ({ children }) => {
     } finally {
       setGalleryDeferred(null)
     }
-  }, [])
+  }, [menuDialogDeferred])
 
   const [loginDeferred, setLoginDeferred] = useState(null)
 
@@ -116,23 +134,6 @@ export const DialogProvider = ({ children }) => {
       }
     } finally {
       setTangramDialogData(null)
-    }
-  }, [])
-
-  const [menuDialogDeferred, setMenuDialogDeferred] = useState(null)
-
-  const showMenu = useCallback(async () => {
-    const deferred = new Deferred()
-
-    setMenuDialogDeferred(deferred)
-    try {
-      await deferred.promise
-    } catch (error) {
-      if (error !== DIALOG_CLOSED_REASON) {
-        throw error
-      }
-    } finally {
-      setMenuDialogDeferred(null)
     }
   }, [])
 

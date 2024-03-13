@@ -89,6 +89,10 @@ export const Tangram = () => {
     return playlist && playlist[currentTangramIndex]
   }, [playlist, currentTangramIndex])
 
+  useEffect(() => {
+    setVictoryPhase(false)
+  }, [selectedTangram])
+
   const handleNext = () => {
     setVictoryPhase(false)
     setCurrentTangramIndex(currentTangramIndex + 1)
@@ -408,7 +412,6 @@ export const Tangram = () => {
           Math.min(outerBounds.height * 0.7, 700) / innerBounds.height
         )
       }
-
 
       if (coumpoundPathRef.current) {
         coumpoundPathRef.current.scale(scaleFactorRef.current)

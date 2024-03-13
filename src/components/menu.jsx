@@ -1,5 +1,5 @@
 import { useKeyframes } from "css-system"
-import React, { useContext, useEffect } from "react"
+import React, { useContext } from "react"
 import { FiMenu } from "react-icons/fi"
 import { DialogContext } from "../contexts/dialog"
 import { GalleryContext } from "../contexts/gallery"
@@ -7,7 +7,6 @@ import { SoundContext } from "../contexts/sound"
 import { View } from "./view"
 
 export const Menu = () => {
-  const { playlist, saveRequestId } = useContext(GalleryContext)
   const { playButton } = useContext(SoundContext)
   const { showMenu } = useContext(DialogContext)
 
