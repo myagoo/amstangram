@@ -132,7 +132,7 @@ export const MenuDialog = ({ deferred }) => {
         <Hint
           as={Link}
           href={`mailto:millagou.benjamin@gmail.com?subject=${intl.formatMessage(
-            { id: "A word about Tangramix" }
+            { id: "A word about Amstangram" }
           )}`}
           target="_blank"
           rel="noopener, noreferrer"
@@ -141,7 +141,7 @@ export const MenuDialog = ({ deferred }) => {
         </Hint>
         <Hint
           as={Link}
-          href="https://github.com/myagoo/tangramix"
+          href="https://github.com/myagoo/amstangram"
           target="_blank"
           rel="noopener, noreferrer"
         >
