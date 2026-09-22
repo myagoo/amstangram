@@ -13,6 +13,19 @@ import { generationSeeds } from "./generationSeeds"
 
 const ids = ["lt1", "lt2", "mt1", "st1", "st2", "sq", "rh"]
 
+// Paper's interiorPoint can lie on a right triangle's diagonal. Sample strictly inside.
+function holePoint(hole: paper.Path) {
+  const point = hole.segments
+    .reduce((sum, segment) => sum.add(segment.point), new paper.Point(0, 0))
+    .divide(hole.segments.length)
+  if (
+    !hole.contains(point) ||
+    hole.getNearestPoint(point).getDistance(point) < 0.1
+  )
+    throw new Error("Hole sample must be strictly inside its boundary")
+  return point
+}
+
 function candidateFor(seed: number, edges: number) {
   const random = createRandom(seed)
   for (let i = 0; i < 100000; i++) {
@@ -25,7 +38,11 @@ function candidateFor(seed: number, edges: number) {
   throw new Error("Fixture search exhausted")
 }
 
-export function inspectConvertedFixtures() {
+export function inspectConvertedFixtures(
+  seeds?: number[],
+  rotation = 0,
+  scale = 1
+) {
   const previous = paper.project
   const project = new paper.Project(document.createElement("canvas"))
   project.view.viewSize = new paper.Size(627, 863)
@@ -35,15 +52,19 @@ export function inspectConvertedFixtures() {
   let rejected = 0
   const mirrors = new Set<number>()
   try {
-    const candidates = [
-      ...Array.from(
-        { length: 100 },
-        () => generateTangrams(1, undefined, random)[0]
-      ),
-      ...Object.values(generationSeeds).map(
-        (seed) => generateTangrams(1, undefined, createRandom(seed))[0]
-      ),
-    ]
+    const candidates = seeds
+      ? seeds.map(
+          (seed) => generateTangrams(1, undefined, createRandom(seed))[0]
+        )
+      : [
+          ...Array.from(
+            { length: 100 },
+            () => generateTangrams(1, undefined, random)[0]
+          ),
+          ...Object.values(generationSeeds).map(
+            (seed) => generateTangrams(1, undefined, createRandom(seed))[0]
+          ),
+        ]
     for (const [i, candidate] of candidates.entries()) {
       const puzzle = convertTangram(candidate)
       if (!puzzle) {
@@ -72,12 +93,22 @@ export function inspectConvertedFixtures() {
         // Match actual game tans by rigid transforms, never replace their geometry.
         fit(group, points)
       })
-      for (const piece of pieces.children) updateColisionState(piece, pieces)
       const target = new paper.CompoundPath({
         pathData: puzzle.path,
         insert: false,
       })
+      pieces.rotate(rotation, new paper.Point(0, 0))
+      target.rotate(rotation, new paper.Point(0, 0))
+      pieces.scale(scale, new paper.Point(0, 0))
+      target.scale(scale, new paper.Point(0, 0))
+      for (const piece of pieces.children) updateColisionState(piece, pieces)
       if (target.children.length > 1) holes++
+      if (target.children.length !== candidate.outline!.length)
+        throw new Error(`Fixture ${i} lost a boundary ring`)
+      for (const hole of target.children.slice(1) as paper.Path[]) {
+        if (target.contains(holePoint(hole)))
+          throw new Error(`Fixture ${i} filled its hole`)
+      }
       if (!isTangramComplete(target, pieces, 2))
         throw new Error(`Fixture ${i} is not completable`)
       const saved = recomputePathData(puzzle.path)
@@ -88,8 +119,17 @@ export function inspectConvertedFixtures() {
         throw new Error(
           `Game metadata mismatch at ${i}: saved ${JSON.stringify(saved)}, converted ${JSON.stringify(puzzle)}`
         )
-      if (Math.abs(Math.abs(target.area) - 40000) > 0.02)
+      if (Math.abs(Math.abs(target.area) - 40000 * scale * scale) > 0.1)
         throw new Error("Wrong scale or lost coverage")
+      if (target.children.length > 1) {
+        const displaced = pieces.children.find(
+          (piece) => piece.data.id === "st1"
+        )!
+        displaced.position = holePoint(target.children[1] as paper.Path)
+        for (const piece of pieces.children) updateColisionState(piece, pieces)
+        if (isTangramComplete(target, pieces, 2))
+          throw new Error(`Fixture ${i} accepted a tan covering its hole`)
+      }
       pieces.remove()
       target.remove()
     }
@@ -148,6 +188,57 @@ export function readGeneratedTarget() {
     (item) => item instanceof paper.Path || item instanceof paper.CompoundPath
   ) as Outline
   return { path: target.pathData, edges: target.curves.length }
+}
+
+// Read real canvas pixels, not just SVG subpath counts or Paper's fill-rule flag.
+export function readHoleRendering() {
+  const target = paper.project.activeLayer.children.find(
+    (item) => item instanceof paper.Path || item instanceof paper.CompoundPath
+  ) as Outline
+  const rings =
+    target instanceof paper.CompoundPath
+      ? [...(target.children as paper.Path[])].sort(
+          (a, b) => Math.abs(b.area) - Math.abs(a.area)
+        )
+      : [target]
+  paper.view.update()
+  const canvas = paper.view.element
+  const context = canvas.getContext("2d")!
+  const pixel = (point: paper.Point) => {
+    const viewPoint = paper.view.projectToView(point)
+    return [
+      ...context.getImageData(
+        Math.round((viewPoint.x * canvas.width) / paper.view.size.width),
+        Math.round((viewPoint.y * canvas.height) / paper.view.size.height),
+        1,
+        1
+      ).data,
+    ]
+  }
+  const pieces = paper.project.activeLayer.children.find(
+    (item) =>
+      item instanceof paper.Group &&
+      item.children.some((child) => child.data.id === "sq")
+  ) as PiecesGroup
+  const scale = Math.sqrt(Math.abs(target.area) / 40000)
+  return {
+    holes: rings.slice(1).map((ring) => ({
+      sides: ring.segments.length,
+      filled: target.contains(holePoint(ring)),
+      pixel: pixel(holePoint(ring)),
+    })),
+    solidPixel: pixel(pieces.children[0].children.display.interiorPoint),
+    preview: {
+      width: Math.round(target.bounds.width / scale),
+      height: Math.round(target.bounds.height / scale),
+      holes: rings.slice(1).map((ring) => {
+        const point = holePoint(ring)
+          .subtract(target.bounds.topLeft)
+          .divide(scale)
+        return { x: point.x, y: point.y }
+      }),
+    },
+  }
 }
 
 export function inspectGeneratedFit(seed = 1083814273, edges = 14) {

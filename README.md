@@ -70,6 +70,36 @@ mock completion check. Run it with:
 PLAYWRIGHT_CHANNEL=chrome bun run test:e2e --grep "seeded square"
 ```
 
+### Generated puzzles with holes
+
+`tests/generatedHoles.spec.ts` exercises 16 deterministic puzzles from the real
+TangramGenerator, including triangular and four-sided holes and both parallelogram
+orientations. Their seeds and exact difficulties live in `tests/generationSeeds.ts`;
+each seed's first worker candidate is a matching puzzle, so no random search or
+hole-only mode is added to production. For a manual example, open `/?seed=28` and
+choose the third slider position (two ArrowRight presses from Easy), then Start.
+
+The suite checks all 16 solutions at four rotations and two scales (128 geometry
+configurations), preserving boundary rings, empty hole interiors, total tan area
+and completion. Moving a tan into the hole must not count as a solution. Each
+puzzle also runs through the real generation modal and worker, renders its
+hard-mode SVG preview, and reaches victory using only mouse clicks/drags. Pixel
+checks verify transparent hole interiors and visible solid regions in both the
+preview and gameplay canvas; portrait and landscape layouts are covered.
+The geometry harness manipulates real tan transforms for the batch checks; the
+end-to-end solver only observes geometry and moves tans through browser input.
+Firebase is fixture-backed and remote requests are blocked throughout.
+
+Verification found no hole-rendering or completion defect in the existing engine;
+only the test solver needed recorded placement orders for obscured tans. This is
+a tests/documentation-only change, with no production behavior or release change.
+All 5 unit + 78 browser tests pass, as do typechecking, formatting and the production
+build (the existing 60 lint warnings remain).
+
+```sh
+PLAYWRIGHT_CHANNEL=chrome bun run test:e2e tests/generatedHoles.spec.ts
+```
+
 ### Styling and React/Vite upgrade
 
 React/DOM 19.3.0, Vite 8.3.0, its React plugin 6.1.1, Panda 1.12.1 and Vitest
