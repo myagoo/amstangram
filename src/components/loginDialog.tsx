@@ -9,7 +9,7 @@ import { PrimaryButton } from "./button"
 import { Dialog } from "./dialog"
 import { Input } from "./input"
 import { Error, Similink, Title } from "./primitives"
-import { View } from "./view"
+import { View, FormView } from "./view"
 
 const ResetPasswordTab = ({ setTab }: { setTab(tab: string): void }) => {
   const intl = useIntl()
@@ -47,13 +47,13 @@ const ResetPasswordTab = ({ setTab }: { setTab(tab: string): void }) => {
   )
 
   return (
-    <View
-      as="form"
+    <FormView
+
       name="reset"
       onSubmit={handleSubmit(onSubmit)}
-      css={{ gap: 4 }}
+      css={{ gap: "4" }}
     >
-      <View css={{ gap: 2 }}>
+      <View css={{ gap: "2" }}>
         <label>{intl.formatMessage({ id: "Email address" })}</label>
         <Input
           type="email"
@@ -66,7 +66,7 @@ const ResetPasswordTab = ({ setTab }: { setTab(tab: string): void }) => {
         )}
       </View>
 
-      <View css={{ gap: 3 }}>
+      <View css={{ gap: "3" }}>
         <PrimaryButton type="submit" disabled={formState.isSubmitting}>
           {intl.formatMessage({ id: "Send the reset mail!" })}
         </PrimaryButton>
@@ -81,7 +81,7 @@ const ResetPasswordTab = ({ setTab }: { setTab(tab: string): void }) => {
           </Similink>
         </View>
       </View>
-    </View>
+    </FormView>
   )
 }
 
@@ -143,15 +143,15 @@ const SignUpTab = ({ onSignUp, setTab }: { onSignUp(user: import("../types").Cur
   )
 
   return (
-    <View
-      as="form"
+    <FormView
+
       name="signup"
       autoComplete="off"
       onSubmit={handleSubmit(onSubmit)}
-      css={{ gap: 4 }}
+      css={{ gap: "4" }}
     >
-      <View css={{ gap: 3 }}>
-        <View css={{ gap: 2 }}>
+      <View css={{ gap: "3" }}>
+        <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "Username" })}</label>
           <Input
             {...register("username", {
@@ -163,7 +163,7 @@ const SignUpTab = ({ onSignUp, setTab }: { onSignUp(user: import("../types").Cur
           )}
         </View>
 
-        <View css={{ gap: 2 }}>
+        <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "Email address" })}</label>
           <Input
             type="email"
@@ -176,7 +176,7 @@ const SignUpTab = ({ onSignUp, setTab }: { onSignUp(user: import("../types").Cur
           )}
         </View>
 
-        <View css={{ gap: 2 }}>
+        <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "Password" })}</label>
           <Input
             autoComplete="new-password"
@@ -190,7 +190,7 @@ const SignUpTab = ({ onSignUp, setTab }: { onSignUp(user: import("../types").Cur
           )}
         </View>
 
-        <View css={{ gap: 2 }}>
+        <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "Confirm password" })}</label>
           <Input
             autoComplete="new-password"
@@ -208,7 +208,7 @@ const SignUpTab = ({ onSignUp, setTab }: { onSignUp(user: import("../types").Cur
         </View>
       </View>
 
-      <View css={{ gap: 3 }}>
+      <View css={{ gap: "3" }}>
         <PrimaryButton disabled={formState.isSubmitting} type="submit">
           {intl.formatMessage({ id: "Sign me up!" })}
         </PrimaryButton>
@@ -223,7 +223,7 @@ const SignUpTab = ({ onSignUp, setTab }: { onSignUp(user: import("../types").Cur
           </Similink>
         </View>
       </View>
-    </View>
+    </FormView>
   )
 }
 
@@ -278,14 +278,14 @@ const SignInTab = ({ onSignIn, setTab }: { onSignIn(user: import("../types").Cur
   )
 
   return (
-    <View
-      as="form"
+    <FormView
+
       name="signin"
       onSubmit={handleSubmit(onSubmit)}
-      css={{ gap: 4 }}
+      css={{ gap: "4" }}
     >
-      <View css={{ gap: 3 }}>
-        <View css={{ gap: 2 }}>
+      <View css={{ gap: "3" }}>
+        <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "Email address" })}</label>
           <Input
             type="email"
@@ -298,7 +298,7 @@ const SignInTab = ({ onSignIn, setTab }: { onSignIn(user: import("../types").Cur
           )}
         </View>
 
-        <View css={{ gap: 2 }}>
+        <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "Password" })}</label>
           <Input
             type="password"
@@ -310,7 +310,7 @@ const SignInTab = ({ onSignIn, setTab }: { onSignIn(user: import("../types").Cur
             <Error>{formState.errors.password.message}</Error>
           )}
           <Similink
-            css={{ alignSelf: "flex-end", fontSize: 2 }}
+            css={{ alignSelf: "flex-end", fontSize: "2" }}
             onClick={() => setTab("reset")}
           >
             {intl.formatMessage({ id: "Forgot password?" })}
@@ -318,7 +318,7 @@ const SignInTab = ({ onSignIn, setTab }: { onSignIn(user: import("../types").Cur
         </View>
       </View>
 
-      <View css={{ gap: 3 }}>
+      <View css={{ gap: "3" }}>
         <PrimaryButton type="submit" disabled={formState.isSubmitting}>
           {intl.formatMessage({ id: "Sign me in!" })}
         </PrimaryButton>
@@ -333,7 +333,7 @@ const SignInTab = ({ onSignIn, setTab }: { onSignIn(user: import("../types").Cur
           </Similink>
         </View>
       </View>
-    </View>
+    </FormView>
   )
 }
 

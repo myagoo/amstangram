@@ -1,4 +1,4 @@
-import { extendPrimitive, ThemeContext } from "../utils/styles"
+import { styled } from "../../styled-system/jsx"
 import React, { useCallback, useContext, useMemo, useState } from "react"
 import { FiShare2, FiStar } from "react-icons/fi"
 import { FormattedMessage, useIntl } from "react-intl"
@@ -15,25 +15,20 @@ import {
 import { PrimaryButton } from "./button"
 import { Card } from "./card"
 import { Dialog } from "./dialog"
-import { Input } from "./input"
+import { Select } from "./input"
 import { Hint, InlineIcon, SubTitle, Title } from "./primitives"
 import { Text } from "./text"
 import { View } from "./view"
 
-const FadedView = extendPrimitive(View, ({ css, ...props }) => {
-  const theme = useContext(ThemeContext)
-  return {
-    css: {
-      p: 3,
+const FadedView = styled(View, {
+    base: {
+      p: "3",
       alignItems: "center",
       position: "sticky",
-      top: 0,
+      top: "0",
       zIndex: 1,
-      background: `linear-gradient(0deg, rgba(0,0,0,0) 0%, ${theme.colors.dialogBackground} 50%)`,
-      ...css,
+      background: "linear-gradient(0deg, rgba(0,0,0,0) 0%, {colors.dialogBackground} 50%)",
     },
-    ...props,
-  }
 })
 
 export const GalleryDialog = ({ deferred }: { deferred: import("../utils/deferred").Deferred }) => {
@@ -156,15 +151,15 @@ export const GalleryDialog = ({ deferred }: { deferred: import("../utils/deferre
         big
         title={<Title>{intl.formatMessage({ id: "Tangram gallery" })}</Title>}
         css={{
-          gap: 3,
+          gap: "3",
           width: "568px",
         }}
         onClose={handleCloseClick}
       >
         {
           <>
-            <Input
-              as="select"
+            <Select
+
               value={selectedGalleryFilter}
               onChange={handleGalleryFilterChange}
             >
@@ -180,20 +175,20 @@ export const GalleryDialog = ({ deferred }: { deferred: import("../utils/deferre
               <option value="pending">
                 {intl.formatMessage({ id: "Pending approbation tangrams" })}
               </option>
-            </Input>
-            <View css={{ flex: "1", overflow: "auto", gap: 3 }}>
+            </Select>
+            <View css={{ flex: "1", overflow: "auto", gap: "3" }}>
               {visibleCategories.length === 0 ? (
                 <View
                   key="noresult"
                   css={{
-                    gap: 3,
+                    gap: "3",
                     alignItems: "center",
                   }}
                 >
                   {selectedGalleryFilter === "uncompleted" ? (
                     <>
                       <Text css={{ fontSize: "8em" }}>{"🍾"}</Text>
-                      <View css={{ gap: 2, alignItems: "center", px: 3 }}>
+                      <View css={{ gap: "2", alignItems: "center", px: "3" }}>
                         <SubTitle css={{ textAlign: "center" }}>
                           <FormattedMessage id="You've completed all tangrams" />
                         </SubTitle>
@@ -206,7 +201,7 @@ export const GalleryDialog = ({ deferred }: { deferred: import("../utils/deferre
                     currentUser && currentUser.isAdmin ? (
                       <>
                         <Text css={{ fontSize: "8em" }}>{"👮"}</Text>
-                        <View css={{ gap: 2, alignItems: "center", px: 3 }}>
+                        <View css={{ gap: "2", alignItems: "center", px: "3" }}>
                           <SubTitle css={{ textAlign: "center" }}>
                             <FormattedMessage id="No tangram left to approve" />
                           </SubTitle>
@@ -221,7 +216,7 @@ export const GalleryDialog = ({ deferred }: { deferred: import("../utils/deferre
                     ) : (
                       <>
                         <Text css={{ fontSize: "8em" }}>{"👍"}</Text>
-                        <View css={{ gap: 2, alignItems: "center", px: 3 }}>
+                        <View css={{ gap: "2", alignItems: "center", px: "3" }}>
                           <SubTitle css={{ textAlign: "center" }}>
                             <FormattedMessage id="All your tangrams have been approved" />
                           </SubTitle>
@@ -244,7 +239,7 @@ export const GalleryDialog = ({ deferred }: { deferred: import("../utils/deferre
                   ) : selectedGalleryFilter === "starred" ? (
                     <>
                       <Text css={{ fontSize: "8em" }}>{"🌃"}</Text>
-                      <View css={{ gap: 2, alignItems: "center", px: 3 }}>
+                      <View css={{ gap: "2", alignItems: "center", px: "3" }}>
                         <SubTitle css={{ textAlign: "center" }}>
                           <FormattedMessage id="No starred tangrams yet" />
                         </SubTitle>
@@ -266,7 +261,7 @@ export const GalleryDialog = ({ deferred }: { deferred: import("../utils/deferre
                   ) : (
                     <>
                       <Text css={{ fontSize: "8em" }}>{"🤷"}</Text>
-                      <View css={{ gap: 2, alignItems: "center", px: 3 }}>
+                      <View css={{ gap: "2", alignItems: "center", px: "3" }}>
                         <SubTitle css={{ textAlign: "center" }}>
                           <FormattedMessage id="Nothing to see here" />
                         </SubTitle>
@@ -280,7 +275,7 @@ export const GalleryDialog = ({ deferred }: { deferred: import("../utils/deferre
               ) : (
                 <View
                   key="results"
-                  css={{ flex: "1", overflow: "auto", gap: 3 }}
+                  css={{ flex: "1", overflow: "auto", gap: "3" }}
                 >
                   {visibleCategories.map((category) => (
                     <View key={category}>
@@ -293,8 +288,8 @@ export const GalleryDialog = ({ deferred }: { deferred: import("../utils/deferre
                         css={{
                           display: "grid",
                           gridTemplateColumns: "repeat(auto-fill, 136px)",
-                          gridColumnGap: 2,
-                          gridRowGap: 2,
+                          columnGap: "2",
+                          rowGap: "2",
                           justifyContent: "center",
                           justifyItems: "center",
                           alignItems: "center",
@@ -326,7 +321,7 @@ export const GalleryDialog = ({ deferred }: { deferred: import("../utils/deferre
               )}
             </View>
 
-            <View css={{ flexDirection: "row", gap: 2 }}>
+            <View css={{ flexDirection: "row", gap: "2" }}>
               <PrimaryButton onClick={handleStartClick} css={{ flex: "1" }}>
                 {selectedTangrams.length === 0
                   ? intl.formatMessage({ id: "Play now!" })
@@ -341,7 +336,7 @@ export const GalleryDialog = ({ deferred }: { deferred: import("../utils/deferre
                 disabled={selectedTangrams.length === 0}
                 onClick={() => shareTangrams(selectedTangrams)}
               >
-                <View as={FiShare2} css={{ size: "icon", m: "-2px" }}></View>
+                <View as={FiShare2} css={{ boxSize: "icon", m: "-2px" }}></View>
               </PrimaryButton>
             </View>
           </>

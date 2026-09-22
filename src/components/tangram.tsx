@@ -42,7 +42,7 @@ import { scrambleGroup } from "../utils/scrambleGroup"
 import { updateColisionState } from "../utils/updateColisionState"
 import { Card } from "./card"
 import { Victory } from "./victory"
-import { View } from "./view"
+import { View, CanvasView } from "./view"
 
 import type { TanGroup, PiecesGroup, Outline } from "../types"
 
@@ -555,7 +555,7 @@ export const Tangram = () => {
         flex: "1",
         position: "relative",
         color: "dialogText",
-        animation: `${FADE_TRANSITION_DURATION}ms fadeIn ease`,
+        animation: "{durations.fade} fadeIn ease",
       }}
     >
       {selectedTangram && showBackgroundPattern === false && (
@@ -563,16 +563,16 @@ export const Tangram = () => {
           css={{
             zIndex: -1,
             position: "absolute",
-            top: 3,
-            right: 3,
+            top: "3",
+            right: "3",
             cursor: "pointer",
           }}
         >
           <Card tangram={selectedTangram} selected hideBadge></Card>
         </View>
       )}
-      <View
-        as="canvas"
+      <CanvasView
+
         ref={canvasRef}
         css={{
           minHeight: "auto",

@@ -1,4 +1,3 @@
-import { useKeyframes } from "../utils/styles"
 import React, { useContext } from "react"
 import { FiMenu } from "react-icons/fi"
 import { DialogContext } from "../contexts/dialog"
@@ -15,31 +14,21 @@ export const Menu = () => {
     showMenu()
   }
 
-  const gradient = useKeyframes({
-    0: { color: "pieces.lt2" },
-    14: { color: "pieces.rh" },
-    28: { color: "pieces.st2" },
-    42: { color: "pieces.mt1" },
-    57: { color: "pieces.st1" },
-    71: { color: "pieces.lt1" },
-    85: { color: "pieces.sq" },
-    100: { color: "pieces.lt2" },
-  })
 
   return (
     <>
       <View
         css={{
           position: "fixed",
-          top: 3,
-          left: 3,
-          animation: `${gradient} 20s linear infinite both`,
+          top: "3",
+          left: "3",
+          animation: "pieceColor 20s linear infinite both",
         }}
       >
         <View
           as={FiMenu}
           css={{
-            size: "menu",
+            boxSize: "menu",
             cursor: "pointer",
           }}
           onClick={handleMenuClick}

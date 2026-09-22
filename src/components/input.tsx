@@ -1,17 +1,17 @@
-import { createPrimitive } from "../utils/styles"
+import { styled } from "../../styled-system/jsx"
+import { cva } from "../../styled-system/css"
 
-export const Input = createPrimitive("input", {
-  type: "text",
-  css: {
+const input = cva({
+  base: {
     color: "inherit",
     fontFamily: "inherit",
     fontWeight: "bolder",
     fontSize: "inherit",
     bg: "inputBackground",
     border: "none",
-    borderRadius: 2,
+    borderRadius: "2",
     borderColor: "currentColor",
-    p: 2,
+    p: "2",
     "&:disabled": {
       opacity: 0.5,
       cursor: "not-allowed",
@@ -21,3 +21,6 @@ export const Input = createPrimitive("input", {
     },
   },
 })
+
+export const Input = styled("input", input)
+export const Select = styled("select", input)

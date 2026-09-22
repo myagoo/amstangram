@@ -10,7 +10,7 @@ module.exports = {
   ignorePatterns: ['dist', '.eslintrc.cjs'],
   parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
   parser: '@typescript-eslint/parser',
-  settings: { react: { version: '18.2' } },
+  settings: { react: { version: 'detect' } },
   plugins: ['react-refresh', '@typescript-eslint'],
   rules: {
     'react/prop-types': 'off', // TypeScript checks component props.

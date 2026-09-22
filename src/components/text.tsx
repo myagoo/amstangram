@@ -1,7 +1,7 @@
-import { createPrimitive } from "../utils/styles"
+import { styled } from "../../styled-system/jsx"
 
-export const Text = createPrimitive("div", {
-  css: {
+export const Text = styled("div", {
+  base: {
     display: "inline",
     minWidth: 0,
     minHeight: 0,

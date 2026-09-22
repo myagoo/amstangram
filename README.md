@@ -13,6 +13,9 @@ scripts outside `src` remain JavaScript.
 - `bun run preview`: serve the production bundle locally.
 - `bun run lint`: application TypeScript (not vendored scripts); existing hook and
   unused-code warnings remain.
+- `bun run test:unit`: Vitest tests for seeded random streams.
+- `bun run test:e2e`: Playwright browser tests, including square completion,
+  theme/layout snapshots and real Web Audio playback. `bun run test` runs both suites.
 - `bun run --bun playwright install chromium`, then `bun run test`: gallery → play → tan
   geometry → save submission and rejected-login smoke tests. To use installed Chrome instead:
   `PLAYWRIGHT_CHANNEL=chrome bun run test`.
@@ -55,16 +58,42 @@ existing square fixture and a guest account, not direct geometry mutation or a
 mock completion check. Run it with:
 
 ```sh
-PLAYWRIGHT_CHANNEL=chrome bun run test --grep "seeded square"
+PLAYWRIGHT_CHANNEL=chrome bun run test:e2e --grep "seeded square"
 ```
+
+### Styling and React/Vite upgrade
+
+React/DOM 19.3.0, Vite 8.3.0, its React plugin 6.1.1, Panda 1.12.1 and Vitest
+5.0.1 run under the pinned Bun version. React Intl, React Hook Form, React Icons
+and use-sound were upgraded with React. TypeScript stays at 5.7.3 until the
+Biome task: TypeScript 7 removes the compiler API required by the existing
+ESLint parser (even the current parser's peer range excludes TypeScript 7).
+
+Panda replaces css-system; `bun install` generates the ignored `styled-system/`
+directory via `prepare`. Run `bun run prepare` after changing Panda configuration.
+Vite's PostCSS integration extracts CSS during development and production builds.
+No runtime stylesheet injection or old `deps` props remain.
+
+`src/theme.ts` holds plain TypeScript palettes/scales shared by Panda and Paper.js.
+The existing `css-system-theme` storage key is intentionally retained. The root
+`data-theme` attribute themes dialogs/notifications as well as the main page.
+Token indices are strings (`p: "3"` means 16px); `boxSize` sets width and height.
+Use literal style alternatives, token references, or inline `style` for values
+computed at runtime—Panda cannot extract arbitrary runtime values. Native flex
+gap replaces the old sibling-margin helper. These web components are not React
+Native components; the plain tokens can be reused in the later native UI port.
+
+Visual baselines were captured before replacing css-system on macOS/Chrome at
+627×863. Run visual tests on the same platform/browser; inspect intentional
+changes before updating snapshots. The existing large-bundle warning and a
+harmless misplaced PURE annotation warning from Panda's generated code remain.
 
 ## Migration baseline and known issues
 
 The TypeScript migration starts from `7003b42762d7c48eaec354720c641e8ce4fb4915`.
-Puzzle metadata/storage shapes and Paper.js algorithms are unchanged. The
-`css-system` declarations are adapted in `src/utils/styles.ts`; runtime functions
-are re-exported unchanged. `use-sound` needs a declaration path override because
-its export map hides the bundled types.
+Puzzle metadata/storage shapes and Paper.js algorithms are unchanged. Panda now
+supplies styling types; use-sound 5 exports its own declarations, so the old
+TypeScript path workaround has been removed.
 
 Existing defects found while typing, **not fixed by this migration**:
 

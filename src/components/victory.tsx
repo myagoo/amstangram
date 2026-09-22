@@ -1,10 +1,8 @@
-import { useKeyframes } from "../utils/styles"
 import React, { useContext, useState, useMemo } from "react"
 import { FiCheck, FiPlay, FiX, FiStar } from "react-icons/fi"
 import { useIntl } from "react-intl"
 import { PrimaryButton } from "./button"
 import { View } from "./view"
-import { FADE_TRANSITION_DURATION } from "../constants"
 import { SoundContext } from "../contexts/sound"
 import { Text } from "./text"
 import { GalleryContext } from "../contexts/gallery"
@@ -33,16 +31,6 @@ export const Victory = ({
 
   const starred = isTangramStarred(tangram.id)
 
-  const emojiSpin = useKeyframes({
-    0: {
-      opacity: "0",
-      transform: "rotate(0) scale(0)",
-    },
-    100: {
-      opacity: 1,
-      transform: `rotate(${360 * 5}deg) scale(1)`,
-    },
-  })
 
   const handleEmojiSpinAnimationEnd = () => {
     setTimeout(() => setEmojiSpinEnded(true), 1000)
@@ -52,13 +40,13 @@ export const Victory = ({
     <View
       css={{
         position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
+        top: "0",
+        left: "0",
+        right: "0",
+        bottom: "0",
         alignItems: "center",
         justifyContent: "center",
-        gap: 3,
+        gap: "3",
       }}
     >
       <View
@@ -72,7 +60,7 @@ export const Victory = ({
           css={{
             textShadow: "0px 5px 10px #00000080",
             fontSize: "30vmin",
-            animation: `2000ms ${emojiSpin} cubic-bezier(.6,1.56,.58,.92) forwards`,
+            animation: `2000ms emojiSpin cubic-bezier(.6,1.56,.58,.92) forwards`,
           }}
         >
           {tangram.emoji}
@@ -80,43 +68,45 @@ export const Victory = ({
         {emojiSpinEnded && (
           <View
             css={{
-              mt: 3,
+              mt: "3",
               position: "absolute",
               top: "100%",
               left: "50%",
               transform: "translateX(-50%)",
               flexDirection: "row",
-              gap: 3,
-              animation: `${FADE_TRANSITION_DURATION}ms fadeIn ease both`,
+              gap: "3",
+              animation: "{durations.fade} fadeIn ease both",
             }}
           >
             {onApprove && (
-              <View
-                as={PrimaryButton}
+              <PrimaryButton
+
                 onClick={onApprove}
                 css={{
+                  display: "flex",
                   boxShadow: "0px 5px 10px #00000080",
                   flexDirection: "row",
-                  gap: 2,
+                  gap: "2",
                   alignItems: "flex-end",
                 }}
               >
-                <View as={FiCheck} css={{ size: "icon" }}></View>
+                <View as={FiCheck} css={{ boxSize: "icon" }}></View>
                 <Text>{intl.formatMessage({ id: "Approve" })}</Text>
-              </View>
+              </PrimaryButton>
             )}
             {onStarToggle && (
-              <View
-                as={PrimaryButton}
+              <PrimaryButton
+
                 mute
                 onClick={() => {
                   playStar()
                   onStarToggle()
                 }}
                 css={{
+                  display: "flex",
                   boxShadow: "0px 5px 10px #00000080",
                   flexDirection: "row",
-                  gap: 2,
+                  gap: "2",
                   alignItems: "flex-end",
                 }}
               >
@@ -124,41 +114,42 @@ export const Victory = ({
                 <View
                   as={FiStar}
                   css={{
-                    size: "icon",
+                    boxSize: "icon",
                     fill: starred ? "currentColor" : undefined,
                   }}
-                  deps={[starred]}
                 ></View>
-              </View>
+              </PrimaryButton>
             )}
             {onNext ? (
-              <View
-                as={PrimaryButton}
+              <PrimaryButton
+
                 onClick={onNext}
                 css={{
+                  display: "flex",
                   boxShadow: "0px 5px 10px #00000080",
                   flexDirection: "row",
-                  gap: 2,
+                  gap: "2",
                   alignItems: "flex-end",
                 }}
               >
-                <View as={FiPlay} css={{ size: "icon" }}></View>
+                <View as={FiPlay} css={{ boxSize: "icon" }}></View>
                 <Text>{intl.formatMessage({ id: "Next" })}</Text>
-              </View>
+              </PrimaryButton>
             ) : (
-              <View
-                as={PrimaryButton}
+              <PrimaryButton
+
                 onClick={onStop}
                 css={{
+                  display: "flex",
                   boxShadow: "0px 5px 10px #00000080",
                   flexDirection: "row",
-                  gap: 2,
+                  gap: "2",
                   alignItems: "flex-end",
                 }}
               >
-                <View as={FiX} css={{ size: "icon" }}></View>
+                <View as={FiX} css={{ boxSize: "icon" }}></View>
                 <Text>{intl.formatMessage({ id: "Quit" })}</Text>
-              </View>
+              </PrimaryButton>
             )}
           </View>
         )}

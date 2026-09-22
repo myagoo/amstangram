@@ -1,9 +1,8 @@
-import { useGlobalCss } from "./utils/styles"
+import "./index.css"
 import React, { useEffect } from "react"
 import ReactDOM from "react-dom/client"
 import { App } from "./components/app"
 import { View } from "./components/view"
-import { COLOR_TRANSITION_DURATION } from "./constants"
 import { DialogProvider } from "./contexts/dialog"
 import { GalleryProvider } from "./contexts/gallery"
 import { LanguageProvider } from "./contexts/language"
@@ -34,44 +33,6 @@ const Main = () => {
     }
   }, [])
 
-  useGlobalCss({
-    body: {
-      m: 0,
-      bg: "background",
-      fontFamily: `'Comic Neue', cursive`,
-      fontWeight: "bolder",
-      "-webkit-font-smoothing": "antialiased",
-      "-moz-osx-font-smoothing": "grayscale",
-      transition: `background-color ${COLOR_TRANSITION_DURATION}ms`,
-    },
-    "body, html, #root": {
-      height: "100%",
-    },
-    "#root": {
-      display: "flex",
-      flexDirection: "column",
-      padding: `
-        env(safe-area-inset-top, 0)
-        env(safe-area-inset-right, 0)
-        env(safe-area-inset-bottom, 0)
-        env(safe-area-inset-left, 0)
-      `,
-    },
-    "*": {
-      boxSizing: "border-box",
-      userSelect: "none",
-      "-moz-user-select": "none",
-      "-khtml-user-select": "none",
-      "-webkit-user-select": "none",
-      "-webkit-tap-highlight-color": "rgba(0,0,0,0)",
-    },
-    "input, textarea": {
-      "-webkit-user-select": "initial",
-      "-moz-user-select": "initial",
-      "-ms-user-select": "initial",
-      userSelect: "initial",
-    },
-  })
 
   return (
     <SoundProvider>
@@ -88,7 +49,7 @@ const Main = () => {
                           css={{
                             flex: "1",
                             color: "dialogText",
-                            fontSize: 3,
+                            fontSize: "3",
                           }}
                         >
                           <App></App>

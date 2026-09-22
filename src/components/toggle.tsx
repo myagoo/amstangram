@@ -1,4 +1,3 @@
-import { ThemeContext } from "../utils/styles"
 import React, { useContext, useMemo } from "react"
 import { SoundContext } from "../contexts/sound"
 import { View } from "./view"
@@ -16,7 +15,6 @@ export const Toggle = <T extends string | boolean>({
 }: { leftComponent: React.ReactNode; rightComponent: React.ReactNode; leftValue: T; rightValue: T; value: T; onChange(value: T): void; invertSounds?: boolean }) => {
   const { playToggle, soundEnabled } = useContext(SoundContext)
 
-  const theme = useContext(ThemeContext)
 
   const selectedSide = useMemo(
     () => (value === rightValue ? "right" : "left"),
@@ -57,7 +55,7 @@ export const Toggle = <T extends string | boolean>({
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
-        gap: 3,
+        gap: "3",
       }}
     >
       <View
@@ -80,10 +78,10 @@ export const Toggle = <T extends string | boolean>({
         <View
           css={{
             position: "absolute",
-            size: `${SIZE}px`,
+            boxSize: `${SIZE}px`,
             borderRadius: "99999px",
             bg: "dialogText",
-            boxShadow: `0 0 0 2px ${theme.colors.inputBackground}`,
+            boxShadow: "0 0 0 2px {colors.inputBackground}",
             transition: "left 250ms ease-in-out",
           }}
           style={{ left: selectedSide === "left" ? 0 : SIZE }}

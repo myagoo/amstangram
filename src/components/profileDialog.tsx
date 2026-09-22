@@ -16,7 +16,7 @@ import { Dialog } from "./dialog"
 import { Input } from "./input"
 import { Error, InlineIcon, Similink, Title } from "./primitives"
 import { Text } from "./text"
-import { View } from "./view"
+import { View, FormView } from "./view"
 
 const ChangeEmailForm = ({ currentUser, onClose }: { currentUser: import("../types").CurrentUser; onClose(): void }) => {
   const intl = useIntl()
@@ -66,13 +66,13 @@ const ChangeEmailForm = ({ currentUser, onClose }: { currentUser: import("../typ
   )
 
   return (
-    <View
-      as="form"
+    <FormView
+
       onSubmit={handleSubmit(onSubmit)}
-      css={{ flex: "1", gap: 4 }}
+      css={{ flex: "1", gap: "4" }}
     >
-      <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
-        <View css={{ gap: 2 }}>
+      <View css={{ gap: "3", overflow: "auto", flex: "1" }}>
+        <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "Password" })}</label>
           <Input
             type="password"
@@ -84,7 +84,7 @@ const ChangeEmailForm = ({ currentUser, onClose }: { currentUser: import("../typ
             <Error>{formState.errors.password.message}</Error>
           )}
         </View>
-        <View css={{ gap: 2 }}>
+        <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "New email address" })}</label>
           <Input
             type="email"
@@ -98,7 +98,7 @@ const ChangeEmailForm = ({ currentUser, onClose }: { currentUser: import("../typ
         </View>
       </View>
 
-      <View css={{ gap: 3 }}>
+      <View css={{ gap: "3" }}>
         <PrimaryButton disabled={formState.isSubmitting} type="submit">
           {intl.formatMessage({ id: "Change email address" })}
         </PrimaryButton>
@@ -113,7 +113,7 @@ const ChangeEmailForm = ({ currentUser, onClose }: { currentUser: import("../typ
           </Similink>
         </View>
       </View>
-    </View>
+    </FormView>
   )
 }
 
@@ -142,13 +142,13 @@ const ChangeUsernameForm = ({ currentUser, onClose }: { currentUser: import("../
   )
 
   return (
-    <View
-      as="form"
+    <FormView
+
       onSubmit={handleSubmit(onSubmit)}
-      css={{ flex: "1", gap: 4 }}
+      css={{ flex: "1", gap: "4" }}
     >
-      <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
-        <View css={{ gap: 2 }}>
+      <View css={{ gap: "3", overflow: "auto", flex: "1" }}>
+        <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "New username" })}</label>
           <Input
             type="text"
@@ -162,7 +162,7 @@ const ChangeUsernameForm = ({ currentUser, onClose }: { currentUser: import("../
         </View>
       </View>
 
-      <View css={{ gap: 3 }}>
+      <View css={{ gap: "3" }}>
         <PrimaryButton disabled={formState.isSubmitting} type="submit">
           {intl.formatMessage({ id: "Change username" })}
         </PrimaryButton>
@@ -176,7 +176,7 @@ const ChangeUsernameForm = ({ currentUser, onClose }: { currentUser: import("../
           </Similink>
         </View>
       </View>
-    </View>
+    </FormView>
   )
 }
 
@@ -224,13 +224,13 @@ const ChangePasswordForm = ({ currentUser, onClose }: { currentUser: import("../
   )
 
   return (
-    <View
-      as="form"
+    <FormView
+
       onSubmit={handleSubmit(onSubmit)}
-      css={{ flex: "1", gap: 4 }}
+      css={{ flex: "1", gap: "4" }}
     >
-      <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
-        <View css={{ gap: 2 }}>
+      <View css={{ gap: "3", overflow: "auto", flex: "1" }}>
+        <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "Current password" })}</label>
           <Input
             type="password"
@@ -242,7 +242,7 @@ const ChangePasswordForm = ({ currentUser, onClose }: { currentUser: import("../
             <Error>{formState.errors.password.message}</Error>
           )}
         </View>
-        <View css={{ gap: 2 }}>
+        <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "New password" })}</label>
           <Input
             type="password"
@@ -256,7 +256,7 @@ const ChangePasswordForm = ({ currentUser, onClose }: { currentUser: import("../
           )}
         </View>
 
-        <View css={{ gap: 2 }}>
+        <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "Confirm new password" })}</label>
           <Input
             type="password"
@@ -273,7 +273,7 @@ const ChangePasswordForm = ({ currentUser, onClose }: { currentUser: import("../
         </View>
       </View>
 
-      <View css={{ gap: 3 }}>
+      <View css={{ gap: "3" }}>
         <PrimaryButton disabled={formState.isSubmitting} type="submit">
           {intl.formatMessage({ id: "Change password" })}
         </PrimaryButton>
@@ -287,7 +287,7 @@ const ChangePasswordForm = ({ currentUser, onClose }: { currentUser: import("../
           </Similink>
         </View>
       </View>
-    </View>
+    </FormView>
   )
 }
 export const ProfileDialog = ({ uid, deferred }: { uid: string; deferred: import("../utils/deferred").Deferred }) => {
@@ -349,9 +349,9 @@ export const ProfileDialog = ({ uid, deferred }: { uid: string; deferred: import
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
       css={{
         overflow: "auto",
-        pt: 4,
-        mt: -4,
-        gap: 3,
+        pt: "4",
+        mt: "-4",
+        gap: "3",
       }}
     >
       {changeEmailRequested ? (
@@ -370,11 +370,11 @@ export const ProfileDialog = ({ uid, deferred }: { uid: string; deferred: import
           onClose={() => setChangePasswordRequested(false)}
         />
       ) : (
-        <View css={{ gap: 4, mt: -4 }}>
-          <View css={{ gap: 3, alignItems: "center" }}>
+        <View css={{ gap: "4", mt: "-4" }}>
+          <View css={{ gap: "3", alignItems: "center" }}>
             <Badge uid={uid} size="badgeBig"></Badge>
             <Title>{username}</Title>
-            <View css={{ gap: 2, fontSize: 2, alignItems: "center" }}>
+            <View css={{ gap: "2", fontSize: "2", alignItems: "center" }}>
               {currentUser && uid === currentUser.uid && (
                 <Text>{currentUser.firebaseUser.email}</Text>
               )}
@@ -423,7 +423,7 @@ export const ProfileDialog = ({ uid, deferred }: { uid: string; deferred: import
           </View>
           {currentUser && currentUser.uid === uid && (
             <>
-              <View css={{ gap: 3, alignItems: "center" }}>
+              <View css={{ gap: "3", alignItems: "center" }}>
                 <Similink onClick={() => setChangeEmailRequested(true)}>
                   {intl.formatMessage({ id: "Change email address" })}
                 </Similink>

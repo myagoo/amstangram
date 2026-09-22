@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test"
+import { test, expect } from "vitest"
 import { createRandom } from "../src/utils/createRandom"
 import { shuffle } from "../src/utils/shuffle"
 import { getRandomEmoji } from "../src/utils/getRandomEmoji"

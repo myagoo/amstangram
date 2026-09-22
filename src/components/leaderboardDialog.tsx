@@ -6,7 +6,7 @@ import { TangramsContext } from "../contexts/tangrams"
 import { UserContext } from "../contexts/user"
 import { Badge } from "./badge"
 import { Dialog } from "./dialog"
-import { Input } from "./input"
+import { Select } from "./input"
 import { Title, InlineIcon } from "./primitives"
 import { Text } from "./text"
 import { View } from "./view"
@@ -92,12 +92,12 @@ export const LeaderboardDialog = ({ deferred }: { deferred: import("../utils/def
       title={<Title>{intl.formatMessage({ id: "Leaderboard" })}</Title>}
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
       css={{
-        gap: 3,
+        gap: "3",
       }}
     >
       {
         <>
-          <Input as="select" value={selected} onChange={handleChange}>
+          <Select  value={selected} onChange={handleChange}>
             <option value="stars">
               {intl.formatMessage({ id: "Stars earned" })}
             </option>
@@ -107,15 +107,15 @@ export const LeaderboardDialog = ({ deferred }: { deferred: import("../utils/def
             <option value="created">
               {intl.formatMessage({ id: "Created tangrams" })}
             </option>
-          </Input>
+          </Select>
 
-          <View css={{ flex: "1", overflow: "auto", gap: 2 }}>
+          <View css={{ flex: "1", overflow: "auto", gap: "2" }}>
             {sortedUsers!.map(({ uid, username, ...stats }, index) => (
               <View
                 key={uid}
                 css={{
                   flexDirection: "row",
-                  gap: 2,
+                  gap: "2",
                   alignItems: "center",
                   fontSize:
                     index === 0
@@ -126,7 +126,6 @@ export const LeaderboardDialog = ({ deferred }: { deferred: import("../utils/def
                           ? "1.2em"
                           : undefined,
                 }}
-                deps={[index]}
               >
                 <Badge
                   uid={uid}
@@ -141,7 +140,6 @@ export const LeaderboardDialog = ({ deferred }: { deferred: import("../utils/def
                         ? "bold"
                         : undefined,
                   }}
-                  deps={[currentUser, uid]}
                 >
                   {username}
                 </Text>

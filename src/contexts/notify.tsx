@@ -1,17 +1,16 @@
 import React, { createContext, useCallback, useState, useRef } from "react"
 import { createPortal } from "react-dom"
 import { View } from "../components/view"
-import { FADE_TRANSITION_DURATION } from "../constants"
-import { extendPrimitive } from "../utils/styles"
+import { styled } from "../../styled-system/jsx"
 
-const Notification = extendPrimitive(View, {
-  css: {
-    fontSize: 3,
-    p: 2,
-    borderRadius: 1,
+const Notification = styled(View, {
+  base: {
+    fontSize: "3",
+    p: "2",
+    borderRadius: "1",
     bg: "notificationBackground",
     color: "dialogText",
-    animation: `${FADE_TRANSITION_DURATION / 2}ms fadeIn both`,
+    animation: "{durations.dialog} fadeIn both",
     boxShadow: "0px 0px 10px #00000080",
   },
 })
@@ -45,10 +44,10 @@ export const NotifyProvider = ({ children }: React.PropsWithChildren) => {
           <View
             css={{
               position: "fixed",
-              top: 0,
-              left: 0,
-              bottom: 0,
-              right: 0,
+              top: "0",
+              left: "0",
+              bottom: "0",
+              right: "0",
               pointerEvents: "none",
               alignItems: "center",
               justifyContent: "center",

@@ -8,7 +8,7 @@ import { SoundContext } from "../contexts/sound"
 import { TipsContext } from "../contexts/tips"
 import { SecondaryButton } from "./button"
 import { Dialog } from "./dialog"
-import { Input } from "./input"
+import { Select } from "./input"
 import { Title } from "./primitives"
 import { Text } from "./text"
 import { Toggle } from "./toggle"
@@ -35,20 +35,20 @@ export const SettingsDialog = ({ deferred }: { deferred: import("../utils/deferr
     <Dialog
       title={<Title>{intl.formatMessage({ id: "Settings" })}</Title>}
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
-      css={{ gap: 4 }}
+      css={{ gap: "4" }}
     >
-      <View css={{ gap: 3 }}>
-        <View css={{ gap: 2 }}>
+      <View css={{ gap: "3" }}>
+        <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "Language" })}</label>
-          <Input as="select" onChange={handleLanguageChange} value={language}>
+          <Select  onChange={handleLanguageChange} value={language}>
             {supportedLanguages.map((language) => (
               <option key={language} value={language}>
                 {intl.formatMessage({ id: language })}
               </option>
             ))}
-          </Input>
+          </Select>
         </View>
-        <View css={{ gap: 2 }}>
+        <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "Difficulty" })}</label>
           <Toggle
             value={showBackgroundPattern}
@@ -59,30 +59,30 @@ export const SettingsDialog = ({ deferred }: { deferred: import("../utils/deferr
             rightValue={false}
           ></Toggle>
         </View>
-        <View css={{ gap: 2 }}>
+        <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "Theme" })}</label>
           <Toggle
             value={themeKey}
             onChange={switchTheme}
-            leftComponent={<View as={FiSun} css={{ size: "icon" }}></View>}
+            leftComponent={<View as={FiSun} css={{ boxSize: "icon" }}></View>}
             leftValue="light"
-            rightComponent={<View as={FiMoon} css={{ size: "icon" }}></View>}
+            rightComponent={<View as={FiMoon} css={{ boxSize: "icon" }}></View>}
             rightValue="dark"
           ></Toggle>
         </View>
-        <View css={{ gap: 2 }}>
+        <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "Sounds" })}</label>
           <Toggle
             invertSounds
             value={soundEnabled}
             onChange={toggleSound}
-            leftComponent={<View as={FiVolumeX} css={{ size: "icon" }}></View>}
+            leftComponent={<View as={FiVolumeX} css={{ boxSize: "icon" }}></View>}
             leftValue={false}
-            rightComponent={<View as={FiVolume2} css={{ size: "icon" }}></View>}
+            rightComponent={<View as={FiVolume2} css={{ boxSize: "icon" }}></View>}
             rightValue={true}
           ></Toggle>
         </View>
-        <View css={{ gap: 2 }}>
+        <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "Show particles" })}</label>
           <Toggle
             value={showParticles}
@@ -93,7 +93,7 @@ export const SettingsDialog = ({ deferred }: { deferred: import("../utils/deferr
             rightValue={false}
           ></Toggle>
         </View>
-        <View css={{ gap: 2 }}>
+        <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "Show tips" })}</label>
           <Toggle
             value={tipsEnabled}

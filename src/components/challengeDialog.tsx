@@ -36,7 +36,7 @@ export const ChallengeDialog = ({ uid, tangrams, deferred }: { uid: string | nul
         </Title>
       }
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
-      css={{ gap: 3, overflow: "initial", maxWidth: "568px" }}
+      css={{ gap: "3", overflow: "initial", maxWidth: "568px" }}
     >
       <View
         css={{
@@ -45,7 +45,7 @@ export const ChallengeDialog = ({ uid, tangrams, deferred }: { uid: string | nul
           flexDirection: "row",
           flexWrap: "wrap",
           justifyContent: "center",
-          m: -1,
+          m: "-1",
         }}
       >
         {tangrams.map((tangram) => (
@@ -54,7 +54,7 @@ export const ChallengeDialog = ({ uid, tangrams, deferred }: { uid: string | nul
             selected
             tangram={tangram}
             css={{
-              m: 1,
+              m: "1",
             }}
           ></Card>
         ))}

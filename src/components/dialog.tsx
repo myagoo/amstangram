@@ -1,10 +1,6 @@
 import React, { useContext } from "react"
 import { createPortal } from "react-dom"
 import { FiX } from "react-icons/fi"
-import {
-  COLOR_TRANSITION_DURATION,
-  FADE_TRANSITION_DURATION,
-} from "../constants"
 import { SoundContext } from "../contexts/sound"
 import { View } from "./view"
 
@@ -16,15 +12,15 @@ export const Dialog = ({ children, title, onClose, big, css, ...props }: React.P
       onClick={onClose}
       css={{
         position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
+        top: "0",
+        left: "0",
+        right: "0",
+        bottom: "0",
         bg: "#00000080",
         alignItems: "center",
         justifyContent: "center",
-        animation: `${FADE_TRANSITION_DURATION / 2}ms fadeIn ease both`,
-        p: 3,
+        animation: "{durations.dialog} fadeIn ease both",
+        p: "3",
       }}
     >
       <View
@@ -32,11 +28,11 @@ export const Dialog = ({ children, title, onClose, big, css, ...props }: React.P
           flex: "0 1 auto",
           bg: "dialogBackground",
           color: "dialogText",
-          borderRadius: 3,
-          transition: `background-color ${COLOR_TRANSITION_DURATION}ms, color ${COLOR_TRANSITION_DURATION}ms`,
-          fontSize: 3,
-          p: 3,
-          gap: 3,
+          borderRadius: "3",
+          transition: "background-color {durations.color}, color {durations.color}",
+          fontSize: "3",
+          p: "3",
+          gap: "3",
           maxWidth: "95vw",
           width: big ? "568px" : "400px"
         }}
@@ -45,7 +41,7 @@ export const Dialog = ({ children, title, onClose, big, css, ...props }: React.P
         <View
           css={{
             flexDirection: "row",
-            gap: 3,
+            gap: "3",
             alignItems: "center",
             justifyContent: "space-between",
             zIndex: 1,
@@ -56,7 +52,7 @@ export const Dialog = ({ children, title, onClose, big, css, ...props }: React.P
             as={FiX}
             css={{
               cursor: "pointer",
-              size: "badge",
+              boxSize: "badge",
               ml: title ? undefined : "auto",
             }}
             onClick={() => {

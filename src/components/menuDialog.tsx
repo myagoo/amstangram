@@ -1,11 +1,8 @@
-import { useKeyframes } from "../utils/styles"
 import React, { useContext } from "react"
 import { FiAward, FiGrid, FiSave, FiSettings, FiUser } from "react-icons/fi"
 import { useIntl } from "react-intl"
 import {
   DIALOG_CLOSED_REASON,
-  FADE_STAGGER_DURATION,
-  FADE_TRANSITION_DURATION,
 } from "../constants"
 import { DialogContext } from "../contexts/dialog"
 import { GalleryContext } from "../contexts/gallery"
@@ -14,7 +11,7 @@ import { UserContext } from "../contexts/user"
 import { Badge } from "./badge"
 import { Dialog } from "./dialog"
 import { Logo } from "./logo"
-import { Hint, Link, Title } from "./primitives"
+import { Link, Title } from "./primitives"
 import { Text } from "./text"
 import { View } from "./view"
 
@@ -25,17 +22,17 @@ const MenuItem = ({ action, icon, text }: { action(): void; icon: React.ElementT
       css={{
         alignItems: "center",
         flexDirection: "row",
-        gap: 3,
+        gap: "3",
         cursor: "pointer",
-        py: 3,
+        py: "3",
       }}
       onClick={() => {
         playButton()
         action()
       }}
     >
-      <View as={icon} css={{ size: "icon" }}></View>
-      <Text css={{ fontSize: 3 }}>{text}</Text>
+      <View as={icon} css={{ boxSize: "icon" }}></View>
+      <Text css={{ fontSize: "3" }}>{text}</Text>
     </View>
   )
 }
@@ -49,40 +46,34 @@ export const MenuDialog = ({ deferred }: { deferred: import("../utils/deferred")
 
   const { requestSave } = useContext(GalleryContext)
 
-  const flightAnimation = useKeyframes({
-    from: { transform: "translate(0, 0)" },
-    to: {
-      transform: "translate(30px, -30px)",
-    },
-  })
 
   return (
     <Dialog
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
       title={
-        <View css={{ flexDirection: "row", gap: 3, alignItems: "center" }}>
+        <View css={{ flexDirection: "row", gap: "3", alignItems: "center" }}>
           <Logo
             css={{
-              size: "badge",
+              boxSize: "badge",
               ml: "-2px",
               mr: "-6px",
               overflow: "visible",
               "& > g": {
-                animation: `${flightAnimation} ${FADE_TRANSITION_DURATION}ms ${FADE_STAGGER_DURATION}ms ease both`,
+                animation: "flight {durations.fade} {durations.stagger} ease both",
               },
             }}
           />
           <Title>{intl.formatMessage({ id: "Amstangram" })}</Title>
         </View>
       }
-      css={{ gap: 3, overflow: "initial" }}
+      css={{ gap: "3", overflow: "initial" }}
     >
       <View>
         {currentUser ? (
           <MenuItem
             action={() => showProfile(currentUser.uid)}
             icon={() => (
-              <Badge css={{ mx: -1 }} uid={currentUser.uid} size="badge" />
+              <Badge css={{ mx: "-1" }} uid={currentUser.uid} size="badge" />
             )}
             text={intl.formatMessage({ id: "See my profile" })}
           ></MenuItem>
@@ -129,8 +120,7 @@ export const MenuDialog = ({ deferred }: { deferred: import("../utils/deferred")
           justifyContent: "space-between",
         }}
       >
-        <Hint
-          as={Link}
+        <Link css={{ fontSize: "2", opacity: 0.75 }}
           href={`mailto:millagou.benjamin@gmail.com?subject=${intl.formatMessage(
             { id: "A word about Amstangram" }
           )}`}
@@ -138,15 +128,14 @@ export const MenuDialog = ({ deferred }: { deferred: import("../utils/deferred")
           rel="noopener, noreferrer"
         >
           {intl.formatMessage({ id: "Contact 💌" })}
-        </Hint>
-        <Hint
-          as={Link}
+        </Link>
+        <Link css={{ fontSize: "2", opacity: 0.75 }}
           href="https://github.com/myagoo/amstangram"
           target="_blank"
           rel="noopener, noreferrer"
         >
           {intl.formatMessage({ id: "Version {code}" }, { code: "✨.🥸.🚀" })}
-        </Hint>
+        </Link>
       </View>
     </Dialog>
   )

@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react"
 import { useIntl } from "react-intl"
 import { Logo } from "./logo"
 import { View } from "./view"
-import { FADE_STAGGER_DURATION, FADE_TRANSITION_DURATION } from "../constants"
+import { FADE_TRANSITION_DURATION } from "../constants"
 import { GalleryContext } from "../contexts/gallery"
 import { NotifyContext } from "../contexts/notify"
 import { TangramsContext } from "../contexts/tangrams"
@@ -71,13 +71,12 @@ export const App = () => {
         flex: "1",
         alignItems: "center",
         justifyContent: "center",
-        gap: 3,
+        gap: "3",
         animation:
           isEverythingInitialized && waited
-            ? `${FADE_TRANSITION_DURATION}ms fadeIn ease ${FADE_STAGGER_DURATION}ms forwards reverse`
+            ? "{durations.fade} fadeIn ease {durations.stagger} forwards reverse"
             : undefined,
       }}
-      deps={[isEverythingInitialized, waited]}
       onAnimationEnd={(event) => {
         if (event.currentTarget === event.target) {
           handleAnimationEnd()
@@ -86,31 +85,29 @@ export const App = () => {
     >
       <View
         css={{
-          animation: `${FADE_TRANSITION_DURATION}ms fadeIn ease ${FADE_STAGGER_DURATION}ms both`,
+          animation: "{durations.fade} fadeIn ease {durations.stagger} both",
         }}
       >
         <Logo
           css={{
-            size: "logo",
+            boxSize: "logo",
             overflow: "visible",
             "& > g": {
-              transition: `all ${FADE_TRANSITION_DURATION}ms ease`,
+              transition: "all {durations.fade} ease",
               transform:
                 isEverythingInitialized && waited
                   ? "translate(30px, -30px)"
                   : "translate(0, 0)",
             },
           }}
-          deps={[isEverythingInitialized, waited]}
         />
       </View>
 
       <Title
         css={{
-          transition: `opacity ${FADE_TRANSITION_DURATION}ms ease`,
+          transition: "opacity {durations.fade} ease",
           opacity: showLoader ? 1 : 0,
         }}
-        deps={[showLoader]}
       >
         {intl.formatMessage({ id: "Loading..." })}
       </Title>

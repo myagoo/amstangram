@@ -54,7 +54,7 @@ const TipDialog = ({
     <Dialog
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
       title={title}
-      css={{ gap: 3 }}
+      css={{ gap: "3" }}
     >
       {content}
       <PrimaryButton onClick={() => deferred.resolve(hideTips)}>
@@ -64,7 +64,7 @@ const TipDialog = ({
         <View
           as="label"
           css={{
-            gap: 1,
+            gap: "1",
             flexDirection: "row",
             cursor: "pointer",
             alignItems: "flex-end",

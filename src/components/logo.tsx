@@ -1,12 +1,12 @@
 import React, { useContext } from "react"
 import { ThemeContext } from "../utils/styles"
-import { View } from "./view"
+import { SvgView } from "./view"
 
 export const Logo = (props: import("../utils/styles").StyleProps & React.ComponentPropsWithRef<"svg">) => {
   const theme = useContext(ThemeContext)
   return (
-    <View
-      as="svg"
+    <SvgView
+
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 467.27 512"
       {...props}
@@ -29,6 +29,6 @@ export const Logo = (props: import("../utils/styles").StyleProps & React.Compone
           points="159.67 445.87 239.48 366.05 319.31 286.24 0.03 286.24 159.67 445.87"
         />
       </g>
-    </View>
+    </SvgView>
   )
 }

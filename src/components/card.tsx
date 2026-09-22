@@ -1,9 +1,8 @@
 import { ThemeContext } from "../utils/styles"
 import React, { useContext, useMemo, useCallback } from "react"
-import { COLOR_TRANSITION_DURATION } from "../constants"
 import { SoundContext } from "../contexts/sound"
 import { Badge } from "./badge"
-import { View } from "./view"
+import { View, SvgView } from "./view"
 import { useLongPress } from "../utils/useLongPress"
 import { getTangramDifficulty } from "../utils/getTangramDifficulty"
 
@@ -61,38 +60,34 @@ export const Card = <T extends Tangram>({
       <View
         css={{
           opacity: uid && approved === false ? 0.5 : 1,
-          borderRadius: 5,
-          boxShadow: selected
-            ? `0px 0px 0px 4px ${color}`
-            : "0px 0px 0px 1px rgba(0, 0, 0, 0.1)",
-          m: 1,
+          borderRadius: "5px",
+          m: "1",
           bg: "background",
-          transition: `background-color ${COLOR_TRANSITION_DURATION}ms`,
-          p: 3,
+          transition: "background-color {durations.color}",
+          p: "3",
           textAlign: "center",
           position: "relative",
           cursor: onClick || onLongPress ? "pointer" : undefined,
           width: 128,
           height: 178,
         }}
-        deps={[color, selected, uid, approved]}
+        style={{ boxShadow: selected ? `0px 0px 0px 4px ${color}` : "0px 0px 0px 1px rgba(0, 0, 0, 0.1)" }}
       >
-        <View
-          as="svg"
+        <SvgView
+
           css={{
             flex: "1",
             justifyContent: "center",
-            fill: color,
             stroke: showStroke ? "lime" : undefined,
             strokeWidth: showStroke ? 8 : undefined,
           }}
-          deps={[showStroke, color]}
+          style={{ fill: color }}
           viewBox={`0 0 ${width} ${height}`}
           dangerouslySetInnerHTML={{ __html: `<path d="${path}" />` }}
         />
         {completed && (
           <View
-            css={{ position: "absolute", top: 1, left: 1, fontSize: "30px" }}
+            css={{ position: "absolute", top: "1", left: "1", fontSize: "30px" }}
           >
             {emoji}
           </View>
@@ -102,8 +97,8 @@ export const Card = <T extends Tangram>({
             uid={uid}
             css={{
               position: "absolute",
-              bottom: 1,
-              right: 1,
+              bottom: "1",
+              right: "1",
               cursor: onBadgeClick ? "pointer" : undefined,
             }}
             onClick={

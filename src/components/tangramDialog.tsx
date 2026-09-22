@@ -12,7 +12,7 @@ import { recomputePathData } from "../utils/recomputePathData"
 import { PrimaryButton } from "./button"
 import { Card } from "./card"
 import { Dialog } from "./dialog"
-import { Input } from "./input"
+import { Input, Select } from "./input"
 import { Error, Hint, InlineIcon, Similink, Title } from "./primitives"
 import { Text } from "./text"
 import { View } from "./view"
@@ -33,11 +33,11 @@ const ReadTangramDialog = ({ tangram, deferred }: { tangram: import("../types").
   return (
     <Dialog
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
-      css={{ gap: 3 }}
+      css={{ gap: "3" }}
     >
-      <View css={{ gap: 3, overflow: "auto", flex: "1", alignItems: "center" }}>
+      <View css={{ gap: "3", overflow: "auto", flex: "1", alignItems: "center" }}>
         <Card selected tangram={tangram}></Card>
-        <Text css={{ fontSize: 2 }}>
+        <Text css={{ fontSize: "2" }}>
           <FormattedMessage
             id="Earned {stars}"
             values={{
@@ -195,9 +195,9 @@ const SaveTangramDialog = ({ tangram, deferred }: { tangram: import("../types").
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
       as="form"
       onSubmit={handleSubmit(onSubmit)}
-      css={{ gap: 3 }}
+      css={{ gap: "3" }}
     >
-      <View css={{ gap: 3, overflow: "auto", flex: "1" }}>
+      <View css={{ gap: "3", overflow: "auto", flex: "1" }}>
         <Card
           showStroke={currentUser!.isAdmin}
           selected
@@ -207,7 +207,7 @@ const SaveTangramDialog = ({ tangram, deferred }: { tangram: import("../types").
         ></Card>
 
         {tangram.approved && (
-          <Text css={{ alignSelf: "center", fontSize: 2 }}>
+          <Text css={{ alignSelf: "center", fontSize: "2" }}>
             <FormattedMessage
               id="Earned {stars}"
               values={{
@@ -234,7 +234,7 @@ const SaveTangramDialog = ({ tangram, deferred }: { tangram: import("../types").
 
         {currentUser && currentUser!.isAdmin && (
           <>
-            <View css={{ gap: 2 }}>
+            <View css={{ gap: "2" }}>
               <label>{intl.formatMessage({ id: "Path" })}</label>
               <Input as="textarea" {...register("path")}></Input>
               {formState.errors.path && (
@@ -244,41 +244,41 @@ const SaveTangramDialog = ({ tangram, deferred }: { tangram: import("../types").
           </>
         )}
 
-        <View css={{ gap: 2 }}>
+        <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "Category" })}</label>
-          <Input as="select" {...register("category")}>
+          <Select  {...register("category")}>
             {CATEGORIES.map((category) => (
               <option key={category} value={category}>
                 {intl.formatMessage({ id: category })}
               </option>
             ))}
-          </Input>
+          </Select>
         </View>
 
         {category === "digits" ? (
-          <View css={{ gap: 2 }}>
+          <View css={{ gap: "2" }}>
             <label>{intl.formatMessage({ id: "Victory emoji" })}</label>
-            <Input as="select" {...register("digitIndex")}>
+            <Select  {...register("digitIndex")}>
               {DIGITS.map((digitEmoji, index) => (
                 <option key={index} value={index}>
                   {digitEmoji}
                 </option>
               ))}
-            </Input>
+            </Select>
           </View>
         ) : category === "letters" ? (
-          <View css={{ gap: 2 }}>
+          <View css={{ gap: "2" }}>
             <label>{intl.formatMessage({ id: "Victory emoji" })}</label>
-            <Input as="select" {...register("letterIndex")}>
+            <Select  {...register("letterIndex")}>
               {LETTERS.map((letterEmoji, index) => (
                 <option key={index} value={index}>
                   {letterEmoji}
                 </option>
               ))}
-            </Input>
+            </Select>
           </View>
         ) : (
-          <View css={{ gap: 2 }}>
+          <View css={{ gap: "2" }}>
             <label>{intl.formatMessage({ id: "Victory emoji" })}</label>
             <Input {...register("emoji")} />
             <Hint>

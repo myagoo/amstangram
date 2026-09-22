@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from "react"
-import { View } from "./view"
+import { ImageView } from "./view"
 import { SoundContext } from "../contexts/sound"
 import { ThemeContext } from "../utils/styles"
 
@@ -13,15 +13,13 @@ export const Badge = ({ uid, size = "badge", css, onClick, ...props }: import(".
   }, [theme, uid])
 
   return (
-    <View
-      as="img"
+    <ImageView
       src={`https://api.dicebear.com/7.x/croodles-neutral/svg?seed=${uid}&backgroundColor=${encodeURIComponent(backgroundColor)}`}
       css={{
         m: "2px",
-        boxShadow: `0 0 0 2px ${theme.colors.dialogText}`,
+        boxShadow: "0 0 0 2px {colors.dialogText}",
         borderRadius: "50%",
-        backgroundColor,
-        size,
+        boxSize: size === "badgeBig" ? "badgeBig" : "badge",
         ...css,
       }}
       onClick={
@@ -33,6 +31,6 @@ export const Badge = ({ uid, size = "badge", css, onClick, ...props }: import(".
           : undefined
       }
       {...props}
-    ></View>
+    ></ImageView>
   )
 }

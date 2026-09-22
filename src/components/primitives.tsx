@@ -1,40 +1,40 @@
 import React from "react"
 
 import { Text } from "./text"
-import { extendPrimitive, createPrimitive, useKeyframes } from "../utils/styles"
+import { styled } from "../../styled-system/jsx"
 import { FiStar } from "react-icons/fi"
 import { View } from "./view"
 
-export const Error = extendPrimitive(Text, {
-  css: {
-    fontSize: 2,
+export const Error = styled(Text, {
+  base: {
+    fontSize: "2",
     color: "errorText",
   },
 })
 
-export const Hint = extendPrimitive(Text, {
-  css: {
-    fontSize: 2,
+export const Hint = styled(Text, {
+  base: {
+    fontSize: "2",
     opacity: 0.75,
   },
 })
 
-export const Title = extendPrimitive(Text, {
-  css: {
-    fontSize: 4,
+export const Title = styled(Text, {
+  base: {
+    fontSize: "4",
     fontWeight: "bolder",
   },
 })
 
-export const SubTitle = extendPrimitive(Text, {
-  css: {
-    fontSize: 3,
+export const SubTitle = styled(Text, {
+  base: {
+    fontSize: "3",
     fontWeight: "bold",
   },
 })
 
-export const Link = createPrimitive("a", {
-  css: {
+export const Link = styled("a", {
+  base: {
     cursor: "pointer",
     textDecoration: "underline",
     color: "inherit",
@@ -44,8 +44,8 @@ export const Link = createPrimitive("a", {
   },
 })
 
-export const Similink = extendPrimitive(Text, {
-  css: {
+export const Similink = styled(Text, {
+  base: {
     cursor: "pointer",
     textDecoration: "underline",
   },
@@ -58,7 +58,7 @@ export const InlineIcon = ({ icon, css }: import("../utils/styles").StyleProps &
       css={{
         position: "relative",
         top: "0.1em",
-        size: "0.9em",
+        boxSize: "0.9em",
         ...css,
       }}
     ></Text>
@@ -66,55 +66,34 @@ export const InlineIcon = ({ icon, css }: import("../utils/styles").StyleProps &
 }
 
 export const InlineStarIcon = ({ css }: import("../utils/styles").StyleProps) => {
-  const gradient = useKeyframes({
-    0: { color: "pieces.lt2" },
-    14: { color: "pieces.rh" },
-    28: { color: "pieces.st2" },
-    42: { color: "pieces.mt1" },
-    57: { color: "pieces.st1" },
-    71: { color: "pieces.lt1" },
-    85: { color: "pieces.sq" },
-    100: { color: "pieces.lt2" },
-  })
   return (
     <Text
       as={FiStar}
       css={{
         stroke: "currentColor",
         fill: "currentColor",
-        animation: `${gradient} 20s linear infinite both`,
+        animation: "pieceColor 20s linear infinite both",
         position: "relative",
         top: "0.1em",
-        size: "0.9em",
+        boxSize: "0.9em",
         ...css,
       }}
     ></Text>
   )
 }
 
-export const StarIcon = ({ css, deps }: import("../utils/styles").StyleProps) => {
-  const gradient = useKeyframes({
-    0: { color: "pieces.lt2" },
-    14: { color: "pieces.rh" },
-    28: { color: "pieces.st2" },
-    42: { color: "pieces.mt1" },
-    57: { color: "pieces.st1" },
-    71: { color: "pieces.lt1" },
-    85: { color: "pieces.sq" },
-    100: { color: "pieces.lt2" },
-  })
+export const StarIcon = ({ css }: import("../utils/styles").StyleProps) => {
   return (
     <View
       as={FiStar}
       css={{
-        size: "icon",
+        boxSize: "icon",
         m: "-2px",
         stroke: "currentColor",
         fill: "currentColor",
-        animation: `${gradient} 20s linear infinite both`,
+        animation: "pieceColor 20s linear infinite both",
         ...css,
       }}
-      deps={deps}
     ></View>
   )
 }
