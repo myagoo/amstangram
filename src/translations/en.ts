@@ -8,6 +8,13 @@ export default {
 
   Settings: "Settings",
   Difficulty: "Difficulty",
+  "Random tangram": "Random tangram",
+  "Difficulty {level} of {total}": "Difficulty {level} of {total}",
+  "Generating…": "Generating…",
+  "Generation failed. Please try again.":
+    "Generation failed. Please try again.",
+  Start: "Start",
+  Cancel: "Cancel",
   Easy: "Easy",
   Hard: "Hard",
 

@@ -151,10 +151,55 @@ TypeScript path workaround has been removed.
 
 ### Codebase health releases
 
-The app displays only the emoji release code (currently `🥟.🐼.🌊`), without
+The app displays only the emoji release code (currently `🥟.🎲.🧩`), without
 the numeric version. Numeric versions remain in `package.json` and release notes
 for tooling and traceability. Release 0.2.11 makes this display-only change; the
 menu browser regression checks the exact emoji label and excludes digits.
+
+**0.3.0 🥟.🎲.🧩 — generated puzzles (integration ticket 03).** Choose
+**Random tangram** in the menu, select difficulty, then Start. The native slider
+has 18 positions (17 intervals), internally matching exactly 22 down to 5 edges;
+counts are not displayed. Its green/blue/red colors use the gallery's existing
+theme and difficulty thresholds. This does not change the background-pattern setting.
+Start shows Generating and disables repeat requests while a dedicated module worker
+searches. Cancel or closing the modal terminates the worker, retaining the current
+puzzle and arrangement; failures allow retry. Cancel is immediately available,
+superseding the original ticket's delayed-cancel animation requirement.
+
+The generation-only TypeScript engine is vendored at a pinned commit under
+`vendor/tangram-generator/`; no sibling checkout, runtime server, or new dependency
+is required. Its MIT attribution is shipped in `public/TangramGenerator-LICENSE.txt`.
+The adapter rebuilds the ordered outline from the tans because upstream evaluation
+sorts the stored outer outline in place. It preserves holes and reflected tans,
+normalizes the generator's small-triangle scale (6 → 50), verifies total area,
+and computes metadata with Paper.js. The worker alone imports the engine. Existing
+Paper.js movement, snapping, rotations and completion remain unchanged.
+
+Generated puzzles have no community ID or owner: generation and completion do not
+write data, grant stars or offer moderator approval. Explicit Save tangram still
+uses the live arrangement. A seeded generation stream advances independently of
+layout/UI randomness, including across reopening the modal. Reload with the same
+`?seed=…`, settings and actions to reproduce it. Same-difficulty Next is ticket 04,
+not part of this first integration; use the menu to generate another puzzle.
+
+Regression checks cover 118 converted solutions (including every slider level,
+holes and both parallelogram orientations), real-worker seeded replay and invalid
+difficulty, mouse-only completion of a generated puzzle without community writes,
+cancellation/late-worker isolation, and failure/retry. Run:
+`PLAYWRIGHT_CHANNEL=chrome bun run test:e2e tests/generation.spec.ts`.
+The full release check passes 5 unit tests and 53 browser tests; typecheck,
+formatting, and production build pass. The existing 60 lint warnings remain.
+
+**Generation latency caveat:** exact-match rejection sampling intentionally has no
+timeout or substituted difficulty. A local Bun 1.4.2 seeded sample of 200,000 engine
+candidates took 107 seconds; counts for edges 5–22 were respectively
+8, 22, 146, 539, 1799, 4768, 9851, 18328, 29423, 38804, 39867, 31456,
+17192, 6087, 1451, 230, 25, 3. In a separate seeded scan with conversion, first
+matches for all 18 levels appeared within 34,460 candidates (22.4 seconds total);
+the 22-edge level was last. These are local engine measurements, not mobile/browser
+latency promises. Both slider extremes can take much longer than middle levels,
+especially 22 edges. Cancellation remains available; tuning the sampling strategy
+is a follow-up, not a silent relaxation of the chosen difficulty.
 
 **0.2.12 🥟.🐼.🌊 — automatic gallery scrolling.** The gallery replaces the
 manual load-more button with native intersection observation inside its scroll

@@ -607,7 +607,10 @@ export const Tangram = () => {
             currentTangramIndex < playlist!.length - 1 ? handleNext : undefined
           }
           onApprove={
-            currentUser && currentUser.isAdmin && !selectedTangram.approved
+            selectedTangram.id &&
+            currentUser &&
+            currentUser.isAdmin &&
+            !selectedTangram.approved
               ? handleApprove
               : undefined
           }

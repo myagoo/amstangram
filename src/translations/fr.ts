@@ -1,4 +1,10 @@
 export default {
+  "Random tangram": "Tangram aléatoire",
+  "Difficulty {level} of {total}": "Difficulté {level} sur {total}",
+  "Generating…": "Génération…",
+  "Generation failed. Please try again.": "La génération a échoué. Réessaie.",
+  Start: "Commencer",
+  Cancel: "Annuler",
   Amstangram: "Amstangram",
 
   Language: "Langage",

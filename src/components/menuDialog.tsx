@@ -1,5 +1,12 @@
 import React, { useContext } from "react"
-import { FiAward, FiGrid, FiSave, FiSettings, FiUser } from "react-icons/fi"
+import {
+  FiAward,
+  FiGrid,
+  FiSave,
+  FiSettings,
+  FiUser,
+  FiShuffle,
+} from "react-icons/fi"
 import { useIntl } from "react-intl"
 import { DialogContext } from "../contexts/dialog"
 import { GalleryContext } from "../contexts/gallery"
@@ -24,12 +31,19 @@ const MenuItem = ({
   const { playButton } = useContext(SoundContext)
   return (
     <View
+      as="button"
       css={{
         alignItems: "center",
         flexDirection: "row",
         gap: "3",
         cursor: "pointer",
         py: "3",
+        color: "inherit",
+        fontFamily: "inherit",
+        background: "none",
+        border: "none",
+        textAlign: "left",
+        "&:focus-visible": { outline: "2px solid {colors.dialogText}" },
       }}
       onClick={() => {
         playButton()
@@ -46,8 +60,14 @@ export const MenuDialog = ({ onClose }: { onClose(): void }) => {
   const { currentUser } = useContext(UserContext)
   const intl = useIntl()
 
-  const { showLeaderboard, showGallery, showLogin, showProfile, showSettings } =
-    useContext(DialogContext)
+  const {
+    showLeaderboard,
+    showGallery,
+    showLogin,
+    showProfile,
+    showSettings,
+    showGeneration,
+  } = useContext(DialogContext)
 
   const { requestSave } = useContext(GalleryContext)
 
@@ -97,6 +117,12 @@ export const MenuDialog = ({ onClose }: { onClose(): void }) => {
         ></MenuItem>
 
         <MenuItem
+          action={showGeneration}
+          icon={FiShuffle}
+          text={intl.formatMessage({ id: "Random tangram" })}
+        />
+
+        <MenuItem
           action={() => {
             requestSave()
             onClose()
@@ -141,7 +167,7 @@ export const MenuDialog = ({ onClose }: { onClose(): void }) => {
           target="_blank"
           rel="noopener, noreferrer"
         >
-          {intl.formatMessage({ id: "Version {code}" }, { code: "🥟.🐼.🌊" })}
+          {intl.formatMessage({ id: "Version {code}" }, { code: "🥟.🎲.🧩" })}
         </Link>
       </View>
     </Dialog>

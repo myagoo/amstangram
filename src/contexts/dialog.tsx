@@ -19,12 +19,14 @@ import { UserContext } from "./user"
 import { SettingsDialog } from "../components/settingsDialog"
 import { DIALOG_CLOSED_REASON } from "../constants"
 import { MenuDialog } from "../components/menuDialog"
+import { GenerationDialog } from "../components/generationDialog"
 
 export const DialogContext = createContext<{
   showMenu(): void
   showProfile(uid: string): void
   showLeaderboard(): void
   showGallery(): void
+  showGeneration(): void
   showLogin(): Promise<import("../types").CurrentUser | null>
   showTangram(tangram: import("../types").Tangram): void
   showSettings(): void
@@ -55,7 +57,12 @@ export const DialogProvider = ({ children }: React.PropsWithChildren) => {
   const showMenu = useCallback(() => setMenuOpen(true), [])
 
   const [galleryOpen, setGalleryOpen] = useState(false)
-  const showGallery = useCallback(() => setGalleryOpen(true), [])
+  const [generationOpen, setGenerationOpen] = useState(false)
+  const showGeneration = useCallback(() => setGenerationOpen(true), [])
+  const showGallery = useCallback(() => {
+    setGenerationOpen(false)
+    setGalleryOpen(true)
+  }, [])
 
   const [loginDeferred, setLoginDeferred] = useState<Deferred<
     import("../types").CurrentUser
@@ -157,6 +164,7 @@ export const DialogProvider = ({ children }: React.PropsWithChildren) => {
       showProfile,
       showLeaderboard,
       showGallery,
+      showGeneration,
       showLogin,
       showTangram,
       showSettings,
@@ -166,6 +174,7 @@ export const DialogProvider = ({ children }: React.PropsWithChildren) => {
     showProfile,
     showLeaderboard,
     showGallery,
+    showGeneration,
     showLogin,
     showTangram,
     showSettings,
@@ -176,6 +185,15 @@ export const DialogProvider = ({ children }: React.PropsWithChildren) => {
       {children}
       {menuOpen && <MenuDialog onClose={() => setMenuOpen(false)} />}
       {loginDeferred && <LoginDialog deferred={loginDeferred} />}
+      {generationOpen && (
+        <GenerationDialog
+          onClose={() => setGenerationOpen(false)}
+          onStart={() => {
+            setGenerationOpen(false)
+            setMenuOpen(false)
+          }}
+        />
+      )}
       {galleryOpen && (
         <GalleryDialog
           onClose={() => setGalleryOpen(false)}
