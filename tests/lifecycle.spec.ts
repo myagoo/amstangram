@@ -2,16 +2,10 @@ import { test, expect, type Page } from "@playwright/test"
 import { solveSquare } from "./solveSquare"
 
 async function expectVictoryAnimation(page: Page) {
-  await expect
-    .poll(
-      () =>
-        page.evaluate(async () => {
-          const path = "/tests/geometry.ts"
-          return (await import(path)).readProjectOpacity()
-        }),
-      { intervals: [10, 20, 50] }
-    )
-    .toBeLessThan(1)
+  await expect(page.locator("canvas")).toHaveCSS(
+    "animation-name",
+    "victoryPulse"
+  )
 }
 
 test.use({ viewport: { width: 627, height: 863 }, deviceScaleFactor: 1 })
@@ -26,6 +20,40 @@ test.beforeEach(async ({ page }) => {
     localStorage.setItem("showParticles", "true")
   })
 })
+
+for (const { particles, motion } of [
+  { particles: true, motion: "no-preference" },
+  { particles: false, motion: "no-preference" },
+  { particles: true, motion: "reduce" },
+] as const) {
+  test(`victory keeps the puzzle visible and Next immediate: particles ${particles}, motion ${motion}`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: motion })
+    await page.addInitScript(
+      (particles) => localStorage.setItem("showParticles", String(particles)),
+      particles
+    )
+    await page.goto("/?seed=42")
+    await expect(page.locator("canvas")).toBeVisible()
+    await solveSquare(page)
+    await expect(
+      page.getByRole("button", { name: "Next", exact: true })
+    ).toBeEnabled({ timeout: 300 })
+    expect(
+      await page.evaluate(async () =>
+        (await import("/tests/geometry.ts")).readProjectOpacity()
+      )
+    ).toBe(1)
+    await expect(page.locator("canvas")).toHaveCSS(
+      "animation-name",
+      motion === "reduce" ? "none" : "victoryPulse"
+    )
+    await page.getByRole("button", { name: "Next", exact: true }).click()
+    await expect(page.getByText("🟦", { exact: true })).toHaveCount(0)
+    await expect(page.locator("canvas")).toHaveCSS("animation-name", "none")
+  })
+}
 
 test("switching puzzles during victory cannot complete the replacement puzzle", async ({
   page,
@@ -45,7 +73,8 @@ test("switching puzzles during victory cannot complete the replacement puzzle", 
     .click()
   await solveSquare(page)
   await expectVictoryAnimation(page)
-  await page.locator("svg").first().click()
+  // Victory controls now mount immediately; the menu follows gameplay in the DOM.
+  await page.locator("svg").last().click()
   await page.getByText("Tangram gallery", { exact: true }).click()
   await page
     .locator('#dialogContainer svg[viewBox="0 0 200 200"]')
@@ -110,7 +139,7 @@ test("turning particles off during victory still completes safely", async ({
   await expect(page.locator("canvas")).toBeVisible({ timeout: 15000 })
   await solveSquare(page)
   await expectVictoryAnimation(page)
-  await page.locator("svg").first().click()
+  await page.locator("svg").last().click()
   await page.getByText("Settings", { exact: true }).click()
   await page
     .locator("label")

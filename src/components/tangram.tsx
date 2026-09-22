@@ -10,7 +10,6 @@ import React, {
 import { useIntl } from "react-intl"
 import {
   CLICK_TIMEOUT,
-  FADE_TRANSITION_DURATION,
   MAX_PARTICLE_OPACITY,
   MAX_PARTICLE_SIZE,
   MIN_PARTICLE_OPACITY,
@@ -69,6 +68,15 @@ export const Tangram = () => {
   const notify = useContext(NotifyContext)
   const [showBackgroundPattern] = useShowBackgroundPattern()
   const [showParticles] = useShowParticles()
+  const [reducedMotion, setReducedMotion] = useState(
+    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  )
+  useEffect(() => {
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)")
+    const update = () => setReducedMotion(preference.matches)
+    preference.addEventListener("change", update)
+    return () => preference.removeEventListener("change", update)
+  }, [])
   const {
     saveRequestId,
     playlist,
@@ -185,8 +193,6 @@ export const Tangram = () => {
   useLayoutEffect(() => {
     const start = Date.now()
     const victoryRandom = createGameRandom()
-    let victoryTimeout: ReturnType<typeof setTimeout> | undefined
-    let victoryAnimation: paper.Tween | undefined
     const attachPieceGroupEvents = (pieceGroup: TanGroup) => {
       let anchorPoint: paper.Point | null = null
       let ghostGroup: TanGroup | null = null
@@ -308,74 +314,42 @@ export const Tangram = () => {
           }
           document.body.style.cursor = "default"
 
-          if (!showParticlesRef.current) {
-            playRef.current.victory()
-            setVictoryPhase(true)
-            return
-          }
+          playRef.current.victory()
+          setVictoryPhase(true)
+          if (!showParticlesRef.current) return
 
-          victoryAnimation = project.activeLayer.tween(
-            {
-              opacity: 0,
-            },
-            {
-              duration: VICTORY_PARTICLES_DURATION,
-              easing: "easeInCubic",
-            }
-          )
-
-          for (const particle of particlesRef.current!) {
+          // Emit from the outer contour, not internal hole boundaries.
+          const outline = coumpoundPathRef.current
+          const boundary =
+            outline instanceof paper.CompoundPath
+              ? (outline.children as paper.Path[]).reduce((largest, path) =>
+                  Math.abs(path.area) > Math.abs(largest.area) ? path : largest
+                )
+              : outline
+          for (const particle of particlesRef.current ?? []) {
             particle.data.animation.stop()
-
+            const offset = victoryRandom() * boundary.length
+            const direction = boundary
+              .getNormalAt(offset)
+              .multiply(boundary.clockwise ? 1 : -1)
+            const distance = 45 + victoryRandom() * 100
+            particle.position = boundary
+              .getPointAt(offset)
+              .add(direction.multiply(3))
+            particle.scale(1.4)
+            particle.opacity = 1
             particle.data.animation = particle.tween(
               {
-                "position.x": piecesGroupRef.current!.position.x,
-                "position.y": piecesGroupRef.current!.position.y,
-                opacity: MAX_PARTICLE_OPACITY,
+                "position.x": particle.position.x + direction.x * distance,
+                "position.y": particle.position.y + direction.y * distance,
+                opacity: 0,
               },
               {
                 duration: VICTORY_PARTICLES_DURATION,
-                easing: "easeInCubic",
-              }
-            )
-          }
-          victoryTimeout = setTimeout(() => {
-            playRef.current.victory()
-            victoryAnimation = project.activeLayer.tween(
-              {
-                opacity: 1,
-              },
-              {
-                duration: FADE_TRANSITION_DURATION,
                 easing: "easeOutCubic",
               }
             )
-
-            const maxDistance =
-              Math.max(project.view.bounds.width, project.view.bounds.height) /
-              2
-
-            for (const particle of particlesRef.current ?? []) {
-              particle.data.animation.stop()
-
-              const angle = victoryRandom() * Math.PI * 2
-              const distance = victoryRandom() * maxDistance
-              particle.data.animation = particle.tween(
-                {
-                  "position.x":
-                    particle.position.x + distance * Math.cos(angle),
-                  "position.y":
-                    particle.position.y + distance * Math.sin(angle),
-                  opacity: 0,
-                },
-                {
-                  duration: VICTORY_PARTICLES_DURATION,
-                  easing: "easeOutCubic",
-                }
-              )
-            }
-            setVictoryPhase(true)
-          }, VICTORY_PARTICLES_DURATION)
+          }
         }
       }
 
@@ -478,8 +452,6 @@ export const Tangram = () => {
     const project = paper.project
     const pieces = piecesGroupRef.current!
     return () => {
-      clearTimeout(victoryTimeout)
-      victoryAnimation?.stop()
       // The project owns these resources; cleanup does not depend on effect order.
       stopParticlesRef.current?.()
       for (const piece of pieces.children) piece.data.removeListeners()
@@ -505,9 +477,9 @@ export const Tangram = () => {
   }, [selectedTangram, showBackgroundPattern, theme])
 
   useLayoutEffect(() => {
-    showParticlesRef.current = showParticles
+    showParticlesRef.current = showParticles && !reducedMotion
 
-    if (!showParticles) {
+    if (!showParticles || reducedMotion) {
       return
     }
     const particleGroup = new paper.Group()
@@ -579,7 +551,7 @@ export const Tangram = () => {
     }
     stopParticlesRef.current = stop
     return stop
-  }, [selectedTangram, showParticles])
+  }, [selectedTangram, showParticles, reducedMotion])
 
   useLayoutEffect(() => {
     for (const pieceGroup of piecesGroupRef.current!.children) {
@@ -594,7 +566,7 @@ export const Tangram = () => {
     const pieceColors = Object.values(theme.colors.pieces)
     const colorRandom = createGameRandom()
 
-    if (!showParticles) {
+    if (!showParticles || reducedMotion) {
       return
     }
 
@@ -603,7 +575,7 @@ export const Tangram = () => {
         pieceColors[Math.floor(colorRandom() * pieceColors.length)]
       )
     }
-  }, [theme.colors, selectedTangram, showParticles])
+  }, [theme.colors, selectedTangram, showParticles, reducedMotion])
 
   useEffect(() => {
     showWelcome()
@@ -637,9 +609,16 @@ export const Tangram = () => {
       )}
       <CanvasView
         ref={canvasRef}
+        style={{
+          transformOrigin: piecesGroupRef.current
+            ? `${piecesGroupRef.current.bounds.center.x}px ${piecesGroupRef.current.bounds.center.y}px`
+            : "center",
+        }}
         css={{
           minHeight: "auto",
           flex: 1,
+          animation: victoryPhase ? "500ms victoryPulse ease-out" : undefined,
+          _motionReduce: { animation: "none" },
         }}
       />
 

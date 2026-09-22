@@ -100,6 +100,17 @@ build (the existing 60 lint warnings remain).
 PLAYWRIGHT_CHANNEL=chrome bun run test:e2e tests/generatedHoles.spec.ts
 ```
 
+### Victory celebration direction
+
+The agreed direction is a crisp final snap, a brief pulse of the completed tangram,
+and a short outward burst in the tan colors. Keep the solved shape visible rather
+than fading out the board. Synchronize the existing 1.1-second victory sound with
+completion, respect mute/particle preferences and reduced motion, and keep the
+feedback satisfying without sound. Next/Retry/Quit are available immediately;
+only generation readiness can disable Next. Use the same celebration for gallery
+and generated puzzles, without a new milestone system. This reversible visual
+choice does not need an architectural decision record.
+
 ### Styling and React/Vite upgrade
 
 React/DOM 19.3.0, Vite 8.3.0, its React plugin 6.1.1, Panda 1.12.1 and Vitest
@@ -181,10 +192,26 @@ TypeScript path workaround has been removed.
 
 ### Codebase health releases
 
-The app displays only the emoji release code (currently `🥟.🎲.📐`), without
+The app displays only the emoji release code (currently `🥟.🎲.✨`), without
 the numeric version. Numeric versions remain in `package.json` and release notes
 for tooling and traceability. Release 0.2.11 makes this display-only change; the
 menu browser regression checks the exact emoji label and excludes digits.
+
+**0.3.3 🥟.🎲.✨ — a snappier victory.** Winning immediately plays the existing
+1.1-second sound and reveals a compact bottom reward panel. The solved canvas
+pulses for 500ms without changing tan geometry or fading the puzzle; the existing
+seeded particles burst outward from its outer contour for 900ms. Hole boundaries
+are excluded. Next/Retry/Quit no longer wait for an emoji animation or timeout;
+generated Next still waits only for its worker. Mute and particle preferences
+remain effective. Reduced motion skips pulse, emoji motion and ambient/burst
+particles, including when the system preference changes during play.
+
+Browser checks cover immediate continuation, reduced motion, sound-on timing and
+mute through real Web Audio, unchanged solved geometry, burst cleanup, and leaving
+or toggling particles during victory. Run
+`PLAYWRIGHT_CHANNEL=chrome bun run test:e2e tests/victory.spec.ts tests/lifecycle.spec.ts`.
+Release verification: all 89 tests pass (5 unit + 84 browser), along with
+`bun run check` and the production build. The existing 59 lint warnings remain.
 
 **0.3.2 🥟.🎲.📐 — generated-puzzle fit and slider fill.** When a generated
 puzzle opens (including Next), compare its original orientation with a 90° turn

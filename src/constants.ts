@@ -7,7 +7,7 @@ export const STRICT_ERROR_MARGIN = 2
 export const SOFT_ERROR_MARGIN = 5
 export const SNAP_DISTANCE = 10
 export const CLICK_TIMEOUT = 300
-export const VICTORY_PARTICLES_DURATION = 1500
+export const VICTORY_PARTICLES_DURATION = 900
 export const SCRAMBLE_PADDING = 100
 export {
   COLOR_TRANSITION_DURATION,
