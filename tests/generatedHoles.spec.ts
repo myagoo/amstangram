@@ -60,6 +60,20 @@ for (const fixture of holeGenerationCases) {
     await page.getByRole("slider").fill(String(22 - fixture.edges))
     await page.getByRole("button", { name: "Start", exact: true }).click()
     await expect(page.locator("#dialogContainer")).toBeEmpty({ timeout: 20000 })
+    if ([124, 141].includes(fixture.querySeed)) {
+      const fit = await page.evaluate(
+        async ({ seed, edges }) =>
+          (await import("/tests/generationGeometry.ts")).inspectGeneratedFit(
+            seed,
+            edges
+          ),
+        fixture
+      )
+      // These real-worker fixtures fit better at 45° in portrait and landscape.
+      expect(fit.candidates[1].difference).toBeLessThan(0.1)
+      expect(fit.candidates[0].difference).toBeGreaterThan(1)
+      expect(fit.candidates[2].difference).toBeGreaterThan(1)
+    }
     const { preview } = await page.evaluate(async () =>
       (await import("/tests/generationGeometry.ts")).readHoleRendering()
     )

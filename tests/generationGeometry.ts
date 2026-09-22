@@ -248,16 +248,22 @@ export function inspectGeneratedFit(seed = 1083814273, edges = 14) {
   ) as Outline
   const base = new paper.CompoundPath({ pathData: puzzle.path, insert: false })
   const scale = Math.sqrt(Math.abs(target.area / base.area))
-  const differences = [0, 90].map((angle) => {
+  const candidates = [0, 45, 90].map((angle) => {
     const expected = base.clone({ insert: false })
     expected.rotate(angle)
+    const bounds = {
+      width: expected.bounds.width,
+      height: expected.bounds.height,
+    }
     expected.scale(scale)
     expected.position = target.position
-    const difference = target.exclude(expected, { insert: false }) as Outline
+    // Equal-area outlines match when neither leaves uncovered area. XOR's signed
+    // area can cancel between disjoint regions even for different orientations.
+    const difference = target.subtract(expected, { insert: false }) as Outline
     const area = Math.abs(difference.area)
     difference.remove()
     expected.remove()
-    return area
+    return { angle, ...bounds, difference: area }
   })
   const preview = target.clone({ insert: false })
   preview.scale(1 / scale)
@@ -266,7 +272,7 @@ export function inspectGeneratedFit(seed = 1083814273, edges = 14) {
     original: { width: base.bounds.width, height: base.bounds.height },
     actual: { width: target.bounds.width, height: target.bounds.height },
     viewport: { width: paper.view.size.width, height: paper.view.size.height },
-    differences,
+    candidates,
     scale,
     preview: {
       path: preview.pathData,
@@ -293,13 +299,11 @@ export function nextMove(id: string, seed: number, edges: number) {
   const group = pieces.children.find((piece) => piece.data.id === id)!
   const path = group.children.display
   const base = new paper.CompoundPath({ pathData: puzzle.path, insert: false })
-  const rotation =
-    Math.abs(
-      target.bounds.width / target.bounds.height -
-        base.bounds.width / base.bounds.height
-    ) < 0.001
-      ? 0
-      : 90
+  // Match actual geometry, not aspect ratios (different rotations can share bounds).
+  const rotation = inspectGeneratedFit(seed, edges).candidates.reduce(
+    (best, candidate) =>
+      candidate.difference < best.difference ? candidate : best
+  ).angle
   base.rotate(rotation, new paper.Point(0, 0))
   const scale = target.bounds.width / base.bounds.width
   const origin = base.bounds.topLeft

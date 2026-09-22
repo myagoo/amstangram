@@ -192,10 +192,21 @@ TypeScript path workaround has been removed.
 
 ### Codebase health releases
 
-The app displays only the emoji release code (currently `🥟.🎲.✨`), without
+The app displays only the emoji release code (currently `🥟.🎲.🧭`), without
 the numeric version. Numeric versions remain in `package.json` and release notes
 for tooling and traceability. Release 0.2.11 makes this display-only change; the
 menu browser regression checks the exact emoji label and excludes digits.
+
+**0.3.4 🥟.🎲.🧭 — three-way generated-puzzle fit.** Before starting a generated
+puzzle (including Next), compare the original outline with two consecutive 45°
+turns: 0°, 45° and 90°. Choose the orientation allowing the largest uniform scale
+inside the existing playable margins and size caps; ties keep the earlier angle.
+Measure the rotated shape itself, not its original bounding rectangle. The
+hard-mode preview follows the chosen orientation; holes, gallery orientations and
+games already in progress are preserved. Browser regressions compare all three
+candidates and solve real-worker 45° fixtures with holes in portrait and landscape.
+Release verification: 5 unit + 84 browser tests, `bun run check`, and the production
+build pass; the existing 59 lint warnings remain.
 
 **0.3.3 🥟.🎲.✨ — a snappier victory.** Winning immediately plays the existing
 1.1-second sound and reveals a compact bottom reward panel. The solved canvas

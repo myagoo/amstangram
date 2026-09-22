@@ -411,27 +411,34 @@ export const Tangram = () => {
         availableWidth / innerBounds.width,
         availableHeight / innerBounds.height
       )
-      const rotatedScale = Math.min(
-        availableWidth / innerBounds.height,
-        availableHeight / innerBounds.width
-      )
       scaleFactorRef.current = scale
       setPreviewTangram(selectedTangram)
-      if (
-        selectedTangram &&
-        !selectedTangram.id &&
-        rotatedScale > scale + 1e-9
-      ) {
+      if (selectedTangram && !selectedTangram.id) {
         const target = coumpoundPathRef.current!
-        target.rotate(90)
-        target.translate(target.bounds.topLeft.multiply(-1))
-        scaleFactorRef.current = rotatedScale
-        setPreviewTangram({
-          ...selectedTangram,
-          path: target.pathData,
-          width: Math.round(target.bounds.width),
-          height: Math.round(target.bounds.height),
-        })
+        const candidate = target.clone({ insert: false })
+        let bestAngle = 0
+        for (const angle of [45, 90]) {
+          candidate.rotate(45)
+          const candidateScale = Math.min(
+            availableWidth / candidate.bounds.width,
+            availableHeight / candidate.bounds.height
+          )
+          if (candidateScale > scaleFactorRef.current + 1e-9) {
+            bestAngle = angle
+            scaleFactorRef.current = candidateScale
+          }
+        }
+        candidate.remove()
+        if (bestAngle) {
+          target.rotate(bestAngle)
+          target.translate(target.bounds.topLeft.multiply(-1))
+          setPreviewTangram({
+            ...selectedTangram,
+            path: target.pathData,
+            width: Math.round(target.bounds.width),
+            height: Math.round(target.bounds.height),
+          })
+        }
       }
 
       if (coumpoundPathRef.current) {
