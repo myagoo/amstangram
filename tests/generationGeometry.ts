@@ -150,6 +150,44 @@ export function readGeneratedTarget() {
   return { path: target.pathData, edges: target.curves.length }
 }
 
+export function inspectGeneratedFit(seed = 1083814273, edges = 14) {
+  const { puzzle } = candidateFor(seed, edges)
+  const target = paper.project.activeLayer.children.find(
+    (item) => item instanceof paper.Path || item instanceof paper.CompoundPath
+  ) as Outline
+  const base = new paper.CompoundPath({ pathData: puzzle.path, insert: false })
+  const scale = Math.sqrt(Math.abs(target.area / base.area))
+  const differences = [0, 90].map((angle) => {
+    const expected = base.clone({ insert: false })
+    expected.rotate(angle)
+    expected.scale(scale)
+    expected.position = target.position
+    const difference = target.exclude(expected, { insert: false }) as Outline
+    const area = Math.abs(difference.area)
+    difference.remove()
+    expected.remove()
+    return area
+  })
+  const preview = target.clone({ insert: false })
+  preview.scale(1 / scale)
+  preview.translate(preview.bounds.topLeft.multiply(-1))
+  const result = {
+    original: { width: base.bounds.width, height: base.bounds.height },
+    actual: { width: target.bounds.width, height: target.bounds.height },
+    viewport: { width: paper.view.size.width, height: paper.view.size.height },
+    differences,
+    scale,
+    preview: {
+      path: preview.pathData,
+      width: Math.round(preview.bounds.width),
+      height: Math.round(preview.bounds.height),
+    },
+  }
+  preview.remove()
+  base.remove()
+  return result
+}
+
 // UI solver: observe the actual scene; all movement/rotation is performed by mouse events.
 export function nextMove(id: string, seed: number, edges: number) {
   const { candidate, puzzle } = candidateFor(seed, edges)
@@ -164,19 +202,31 @@ export function nextMove(id: string, seed: number, edges: number) {
   const group = pieces.children.find((piece) => piece.data.id === id)!
   const path = group.children.display
   const base = new paper.CompoundPath({ pathData: puzzle.path, insert: false })
+  const rotation =
+    Math.abs(
+      target.bounds.width / target.bounds.height -
+        base.bounds.width / base.bounds.height
+    ) < 0.001
+      ? 0
+      : 90
+  base.rotate(rotation, new paper.Point(0, 0))
   const scale = target.bounds.width / base.bounds.width
+  const origin = base.bounds.topLeft
   base.remove()
   const all = candidate.tans.flatMap((tan) => tan.getPoints())
   const minX = Math.min(...all.map((point) => point.toFloatX()))
   const minY = Math.min(...all.map((point) => point.toFloatY()))
   const points = candidate.tans[ids.indexOf(id)]
     .getPoints()
-    .map(
-      (point) =>
-        new paper.Point(
-          (((point.toFloatX() - minX) * 50) / 6) * scale + target.bounds.left,
-          (((point.toFloatY() - minY) * 50) / 6) * scale + target.bounds.top
-        )
+    .map((point) =>
+      new paper.Point(
+        ((point.toFloatX() - minX) * 50) / 6,
+        ((point.toFloatY() - minY) * 50) / 6
+      )
+        .rotate(rotation, new paper.Point(0, 0))
+        .subtract(origin)
+        .multiply(scale)
+        .add(target.bounds.topLeft)
     )
   let position = path.segments
     .reduce((sum, { point }) => sum.add(point), new paper.Point(0, 0))

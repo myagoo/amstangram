@@ -151,10 +151,25 @@ TypeScript path workaround has been removed.
 
 ### Codebase health releases
 
-The app displays only the emoji release code (currently `🥟.🎲.🔁`), without
+The app displays only the emoji release code (currently `🥟.🎲.📐`), without
 the numeric version. Numeric versions remain in `package.json` and release notes
 for tooling and traceability. Release 0.2.11 makes this display-only change; the
 menu browser regression checks the exact emoji label and excludes digits.
+
+**0.3.2 🥟.🎲.📐 — generated-puzzle fit and slider fill.** When a generated
+puzzle opens (including Next), compare its original orientation with a 90° turn
+using the canvas's existing playable margins and size caps. Rotate only when it
+allows a larger puzzle; keep the original orientation on ties. The hard-mode
+preview matches the target. Gallery orientations and in-progress puzzles are
+unchanged. Generation still matches the exact selected difficulty before fitting.
+Only the slider track left of the thumb uses the current gallery difficulty color;
+the right side uses the theme's neutral toggle-track color.
+
+Browser regressions check best-fit geometry and mouse completion in portrait and
+landscape, matching hard-mode previews, and light/dark slider snapshots. Run
+`PLAYWRIGHT_CHANNEL=chrome bun run test:e2e tests/generation.spec.ts tests/generatedReplay.spec.ts`.
+Release verification: all 5 unit + 61 browser tests pass. Typecheck, formatting and
+production build pass; the 60 existing lint warnings remain unchanged.
 
 **0.3.1 🥟.🎲.🔁 — generated-puzzle replay (ticket 04).** The difficulty slider
 remembers each change in `localStorage.generationDifficulty`, even if the modal

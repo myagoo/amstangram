@@ -40,6 +40,7 @@ test("difficulty persists without starting; styled native slider remains keyboar
   await slider.focus()
   await page.keyboard.press("ArrowRight")
   await expect(slider).toHaveValue("9")
+  await expect(slider).toHaveCSS("--difficulty-progress", `${(9 / 17) * 100}%`)
   await expect(slider).toHaveCSS("outline-style", "solid")
   await expect(slider).toHaveCSS("height", "44px")
   await expect(

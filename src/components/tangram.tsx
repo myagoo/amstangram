@@ -94,6 +94,7 @@ export const Tangram = () => {
   const showParticlesRef = useRef(showParticles)
 
   const selectedTangram = playlist?.[currentTangramIndex]
+  const [previewTangram, setPreviewTangram] = useState(selectedTangram)
   const generated = !!selectedTangram && !selectedTangram.id
   const {
     next,
@@ -423,17 +424,40 @@ export const Tangram = () => {
       const innerBounds = coumpoundPathRef.current
         ? coumpoundPathRef.current.bounds
         : piecesGroupRef.current!.children[3].bounds.scale(2)
-
-      if (outerBounds.width > outerBounds.height) {
-        scaleFactorRef.current = Math.min(
-          Math.min(outerBounds.width * 0.7, 700) / innerBounds.width,
-          Math.min(outerBounds.height * 0.8, 600) / innerBounds.height
-        )
-      } else {
-        scaleFactorRef.current = Math.min(
-          Math.min(outerBounds.width * 0.8, 600) / innerBounds.width,
-          Math.min(outerBounds.height * 0.7, 700) / innerBounds.height
-        )
+      const landscape = outerBounds.width > outerBounds.height
+      const availableWidth = Math.min(
+        outerBounds.width * (landscape ? 0.7 : 0.8),
+        landscape ? 700 : 600
+      )
+      const availableHeight = Math.min(
+        outerBounds.height * (landscape ? 0.8 : 0.7),
+        landscape ? 600 : 700
+      )
+      const scale = Math.min(
+        availableWidth / innerBounds.width,
+        availableHeight / innerBounds.height
+      )
+      const rotatedScale = Math.min(
+        availableWidth / innerBounds.height,
+        availableHeight / innerBounds.width
+      )
+      scaleFactorRef.current = scale
+      setPreviewTangram(selectedTangram)
+      if (
+        selectedTangram &&
+        !selectedTangram.id &&
+        rotatedScale > scale + 1e-9
+      ) {
+        const target = coumpoundPathRef.current!
+        target.rotate(90)
+        target.translate(target.bounds.topLeft.multiply(-1))
+        scaleFactorRef.current = rotatedScale
+        setPreviewTangram({
+          ...selectedTangram,
+          path: target.pathData,
+          width: Math.round(target.bounds.width),
+          height: Math.round(target.bounds.height),
+        })
       }
 
       if (coumpoundPathRef.current) {
@@ -604,7 +628,11 @@ export const Tangram = () => {
             cursor: "pointer",
           }}
         >
-          <Card tangram={selectedTangram} selected hideBadge></Card>
+          <Card
+            tangram={previewTangram ?? selectedTangram}
+            selected
+            hideBadge
+          ></Card>
         </View>
       )}
       <CanvasView

@@ -5,7 +5,8 @@ export async function solveGenerated(
   seed = 1083814273,
   edges = 14
 ) {
-  for (const id of ["lt1", "lt2", "mt1", "st1", "st2", "sq", "rh"]) {
+  // Orient the mirrored tan before placing neighbors that could obscure it.
+  for (const id of ["rh", "lt1", "lt2", "mt1", "st1", "st2", "sq"]) {
     for (let turn = 0; turn < 17; turn++) {
       const move = await page.evaluate(
         async ({ id, seed, edges }) =>
