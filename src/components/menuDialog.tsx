@@ -149,7 +149,7 @@ export const MenuDialog = ({
         >
           {intl.formatMessage(
             { id: "Version {code}" },
-            { code: `${version} 🥟.🐼.📊` }
+            { code: `${version} 🥟.🐼.⚡` }
           )}
         </Link>
       </View>

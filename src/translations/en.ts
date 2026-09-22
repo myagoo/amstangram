@@ -20,6 +20,7 @@ export default {
 
   "Tangram gallery": "Tangram gallery",
   "All tangrams": "All tangrams",
+  "Show more tangrams": "Show more tangrams",
   "Uncompleted tangrams": "Uncompleted tangrams",
   "★ Starred tangrams": "★ Starred tangrams",
   "Pending approbation tangrams": "Pending approbation tangrams",

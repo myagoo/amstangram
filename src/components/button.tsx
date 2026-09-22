@@ -18,7 +18,10 @@ const StyledButton = styled("button", {
     cursor: "pointer",
     p: "3",
     "&:disabled": { opacity: 0.3, cursor: "not-allowed" },
-    "&:focus": { outline: "none" },
+    "&:focus-visible": {
+      outline: "2px solid {colors.dialogText}",
+      outlineOffset: "-4px",
+    },
   },
 })
 

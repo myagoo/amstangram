@@ -1,5 +1,11 @@
 import { styled } from "../../styled-system/jsx"
-import React, { useCallback, useContext, useMemo, useState } from "react"
+import React, {
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 import { FiShare2, FiStar } from "react-icons/fi"
 import { FormattedMessage, useIntl } from "react-intl"
 import { DIALOG_CLOSED_REASON } from "../constants"
@@ -32,6 +38,8 @@ const FadedView = styled(View, {
   },
 })
 
+const GALLERY_BATCH_SIZE = 48
+
 export const GalleryDialog = ({
   deferred,
 }: {
@@ -54,6 +62,12 @@ export const GalleryDialog = ({
   const [selectedTangrams, setSelectedTangrams] = useState<
     import("../types").SavedTangram[]
   >([])
+  const selectedIds = useMemo(
+    () => new Set(selectedTangrams.map(({ id }) => id)),
+    [selectedTangrams]
+  )
+  const [visibleCount, setVisibleCount] = useState(GALLERY_BATCH_SIZE)
+  const resultsRef = useRef<HTMLDivElement>(null)
 
   const [selectedGalleryFilter, setSelectedGalleryFilter] = useState(() => {
     const storedSelectedGalleryFilter = window.localStorage.getItem(
@@ -71,6 +85,8 @@ export const GalleryDialog = ({
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
     setSelectedGalleryFilter(e.target.value)
+    setVisibleCount(GALLERY_BATCH_SIZE)
+    resultsRef.current?.scrollTo(0, 0)
     window.localStorage.setItem("selectedGalleryFilter", e.target.value)
   }
 
@@ -162,6 +178,20 @@ export const GalleryDialog = ({
   ])
 
   const visibleCategories = Object.keys(tangramsByCategory)
+  const visibleGroups = useMemo(() => {
+    let remaining = visibleCount
+    return Object.entries(tangramsByCategory).flatMap(
+      ([category, tangrams]) => {
+        const visible = tangrams.slice(0, remaining)
+        remaining -= visible.length
+        return visible.length ? [[category, visible] as const] : []
+      }
+    )
+  }, [tangramsByCategory, visibleCount])
+  const totalCount = Object.values(tangramsByCategory).reduce(
+    (total, tangrams) => total + tangrams.length,
+    0
+  )
 
   return (
     <>
@@ -292,9 +322,11 @@ export const GalleryDialog = ({
               ) : (
                 <View
                   key="results"
+                  id="gallery-results"
+                  ref={resultsRef}
                   css={{ flex: "1", overflow: "auto", gap: "3" }}
                 >
-                  {visibleCategories.map((category) => (
+                  {visibleGroups.map(([category, tangrams]) => (
                     <View key={category}>
                       <FadedView>
                         <SubTitle>
@@ -312,7 +344,7 @@ export const GalleryDialog = ({
                           alignItems: "center",
                         }}
                       >
-                        {tangramsByCategory[category].map((tangram) => (
+                        {tangrams.map((tangram) => (
                           <Card
                             showStroke={
                               selectedGalleryFilter === "pending" &&
@@ -322,10 +354,7 @@ export const GalleryDialog = ({
                             key={tangram.id}
                             tangram={tangram}
                             completed={isTangramCompleted(tangram.id)}
-                            selected={selectedTangrams.some(
-                              (selectedTangram) =>
-                                selectedTangram.id === tangram.id
-                            )}
+                            selected={selectedIds.has(tangram.id)}
                             onClick={handleTangramClick}
                             onBadgeClick={showProfile}
                             onLongPress={showTangram}
@@ -334,6 +363,17 @@ export const GalleryDialog = ({
                       </View>
                     </View>
                   ))}
+                  {visibleCount < totalCount && (
+                    <PrimaryButton
+                      type="button"
+                      aria-controls="gallery-results"
+                      onClick={() =>
+                        setVisibleCount((count) => count + GALLERY_BATCH_SIZE)
+                      }
+                    >
+                      {intl.formatMessage({ id: "Show more tangrams" })}
+                    </PrimaryButton>
+                  )}
                 </View>
               )}
             </View>

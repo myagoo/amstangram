@@ -202,6 +202,34 @@ unapproved puzzles. `PLAYWRIGHT_CHANNEL=chrome bun run test:e2e tests/statistics
 checks the leaderboard and its nested profile against the same external-service
 fixture; it reproduced the incorrect completion total before the fix.
 
+**0.2.6 🥟.🐼.⚡ — incremental gallery (ticket 05).** The gallery initially
+mounts at most 48 cards. The localized, keyboard-accessible “Show more tangrams”
+button adds another 48, preserving category order. Changing a filter resets the
+display limit and scroll position, not selection. Selected-ID checks use a Set;
+the existing array still determines playlist and share-link order. Touch
+long-press details remain available for newly displayed cards. Shared buttons
+now show a theme-aware keyboard focus outline instead of suppressing it.
+
+`PLAYWRIGHT_CHANNEL=chrome bun run test:e2e tests/gallery.spec.ts` checks a
+120-puzzle fixture, keyboard expansion, cross-batch sharing and actual mouse-only
+completion in selected order, filters and touch long-press. Tests assert card
+counts and behavior, not wall-clock thresholds.
+
+Comparable local Chrome measurements used three fresh-page runs per collection,
+a 627×863 viewport, development Vite, identical square shapes with distinct IDs,
+guest mode, disabled particles and blocked remote images. Median browser task
+time from opening the gallery through two animation frames changed as follows:
+
+| Puzzles | Before (ms) | After (ms) | Dialog DOM nodes before → after |
+| --- | ---: | ---: | ---: |
+| 1 | 15.0 | 14.9 | 80 → 80 |
+| 200 | 54.0 | 26.4 | 1,075 → 316 |
+| 1,000 | 174.6 | 25.9 | 5,075 → 316 |
+
+These synthetic development measurements are not production/mobile latency or
+FPS claims. Filtering still processes the collection; repeatedly expanding can
+eventually mount every card. No virtualization dependency was added.
+
 Remaining defects found while typing/reviewing:
 
 - Secondary snapping reads an absent `shape` property from a Paper.js path.

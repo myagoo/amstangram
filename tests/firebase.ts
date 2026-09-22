@@ -64,6 +64,22 @@ if (localStorage.getItem("test-statistics")) {
   records.stats.zero = { tester: { completed: 0 } }
   records.stats.pending = { tester: { completed: 123, starred: true } }
 }
+if (localStorage.getItem("test-large-gallery")) {
+  const square = records.tangrams.square
+  records.tangrams = Object.fromEntries(
+    Array.from({ length: 120 }, (_, index) => [
+      `gallery-${String(index).padStart(3, "0")}`,
+      {
+        ...square,
+        category: index < 80 ? "geometric" : "stuff",
+        emoji: index === 55 ? "🟩" : "🟦",
+      },
+    ])
+  )
+  records.tangrams.pending = { ...square, approved: false }
+  records.stats["gallery-000"] = { tester: { completed: 0 } }
+  records.stats["gallery-055"] = { tester: { starred: true } }
+}
 export const writes: { collection: string; data: Record<string, unknown> }[] =
   []
 const snapshot = (id: string, data: Record<string, unknown>) => ({
