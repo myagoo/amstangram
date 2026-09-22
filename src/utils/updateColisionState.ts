@@ -1,7 +1,10 @@
 import { OVERLAPING_OPACITY } from "../constants"
 import { doesPathContainsPath } from "./doesPathContainsPath"
 
-export const updateColisionState = (pieceGroup: import("../types").TanGroup, piecesGroup: import("../types").PiecesGroup) => {
+export const updateColisionState = (
+  pieceGroup: import("../types").TanGroup,
+  piecesGroup: import("../types").PiecesGroup
+) => {
   for (const otherPieceGroup of piecesGroup.children) {
     if (otherPieceGroup === pieceGroup) {
       continue

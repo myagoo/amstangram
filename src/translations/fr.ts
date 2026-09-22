@@ -151,7 +151,8 @@ export default {
     "Tu peux accéder aux détails d'un tangram ou même éditer les tiens en faisant un appui long sur une carte dans la galerie {galleryIcon}",
   "tips.leaderboard":
     "Jette un oeil au classement pour savoir qui est le meilleur en appuyant sur {leaderboardIcon} dans le menu {menuIcon}",
-  "tips.particles": "Désactive les effets de particule en appuyant sur {settingsIcon} dans le menu {menuIcon}. Cela peut améliorer les performances.",
+  "tips.particles":
+    "Désactive les effets de particule en appuyant sur {settingsIcon} dans le menu {menuIcon}. Cela peut améliorer les performances.",
   "I don't want to see tips anymore": "Je ne veux plus voir les astuces",
   "Show tips": "Afficher les astuces",
   "Show particles": "Afficher les particles",
@@ -176,5 +177,5 @@ export default {
   "Forgot password?": "Mot de passe oublié ?",
   "Reset your password": "Réinitialiser le mot de passe",
   "Send the reset mail!": "Envoyer le mail de réinitialisation",
-  "Reset password email sent": "Email de réinitialisation envoyé"
+  "Reset password email sent": "Email de réinitialisation envoyé",
 }

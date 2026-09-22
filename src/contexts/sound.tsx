@@ -15,9 +15,14 @@ import victorySound from "../assets/victory.wav"
 
 type Play = ReturnType<typeof useSound>[0]
 export const SoundContext = createContext<{
-  soundEnabled: boolean; toggleSound(): void
-  playStar: Play; playButton: Play; playToggle: Play
-  playCard: Play; playTangram: Play; playVictory: Play
+  soundEnabled: boolean
+  toggleSound(): void
+  playStar: Play
+  playButton: Play
+  playToggle: Play
+  playCard: Play
+  playTangram: Play
+  playVictory: Play
 }>(null!)
 
 export const SoundProvider = ({ children }: React.PropsWithChildren) => {

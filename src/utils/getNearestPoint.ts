@@ -1,6 +1,10 @@
 import paper from "paper/dist/paper-core"
 
-export const getNearestPoint = (point: paper.Point, startPoint: paper.Point, endPoint: paper.Point) => {
+export const getNearestPoint = (
+  point: paper.Point,
+  startPoint: paper.Point,
+  endPoint: paper.Point
+) => {
   const atob = { x: endPoint.x - startPoint.x, y: endPoint.y - startPoint.y }
   const atop = { x: point.x - startPoint.x, y: point.y - startPoint.y }
   const len = atob.x * atob.x + atob.y * atob.y

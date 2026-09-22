@@ -16,7 +16,11 @@ import { View } from "./view"
 import { useShowParticles } from "../contexts/showParticles"
 import { useSwitchTheme } from "../contexts/switchTheme"
 
-export const SettingsDialog = ({ deferred }: { deferred: import("../utils/deferred").Deferred }) => {
+export const SettingsDialog = ({
+  deferred,
+}: {
+  deferred: import("../utils/deferred").Deferred
+}) => {
   const { soundEnabled, toggleSound } = useContext(SoundContext)
   const { tipsEnabled, toggleTips, resetTips } = useContext(TipsContext)
   const [showBackgroundPattern, toggleShowBackgroundPattern] =
@@ -27,7 +31,9 @@ export const SettingsDialog = ({ deferred }: { deferred: import("../utils/deferr
 
   const [themeKey, switchTheme] = useSwitchTheme()
 
-  const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleLanguageChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     setLanguage(event.target.value)
   }
 
@@ -40,7 +46,7 @@ export const SettingsDialog = ({ deferred }: { deferred: import("../utils/deferr
       <View css={{ gap: "3" }}>
         <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "Language" })}</label>
-          <Select  onChange={handleLanguageChange} value={language}>
+          <Select onChange={handleLanguageChange} value={language}>
             {supportedLanguages.map((language) => (
               <option key={language} value={language}>
                 {intl.formatMessage({ id: language })}
@@ -76,9 +82,13 @@ export const SettingsDialog = ({ deferred }: { deferred: import("../utils/deferr
             invertSounds
             value={soundEnabled}
             onChange={toggleSound}
-            leftComponent={<View as={FiVolumeX} css={{ boxSize: "icon" }}></View>}
+            leftComponent={
+              <View as={FiVolumeX} css={{ boxSize: "icon" }}></View>
+            }
             leftValue={false}
-            rightComponent={<View as={FiVolume2} css={{ boxSize: "icon" }}></View>}
+            rightComponent={
+              <View as={FiVolume2} css={{ boxSize: "icon" }}></View>
+            }
             rightValue={true}
           ></Toggle>
         </View>

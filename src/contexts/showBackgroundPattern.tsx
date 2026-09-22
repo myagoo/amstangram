@@ -7,12 +7,21 @@ import React, {
   useContext,
 } from "react"
 
-export const ShowBackgroundPatternContext = createContext<[boolean, () => void]>([true, () => { /* No-op outside the provider. */ }])
+export const ShowBackgroundPatternContext = createContext<
+  [boolean, () => void]
+>([
+  true,
+  () => {
+    /* No-op outside the provider. */
+  },
+])
 
 export const useShowBackgroundPattern = () =>
   useContext(ShowBackgroundPatternContext)
 
-export const ShowBackgroundPatternProvider = ({ children }: React.PropsWithChildren) => {
+export const ShowBackgroundPatternProvider = ({
+  children,
+}: React.PropsWithChildren) => {
   const [showBackgroundPattern, setShowBackgroundPattern] = useState(true)
 
   useEffect(() => {

@@ -1,9 +1,7 @@
 import React, { useContext } from "react"
 import { FiAward, FiGrid, FiSave, FiSettings, FiUser } from "react-icons/fi"
 import { useIntl } from "react-intl"
-import {
-  DIALOG_CLOSED_REASON,
-} from "../constants"
+import { DIALOG_CLOSED_REASON } from "../constants"
 import { DialogContext } from "../contexts/dialog"
 import { GalleryContext } from "../contexts/gallery"
 import { SoundContext } from "../contexts/sound"
@@ -15,7 +13,15 @@ import { Link, Title } from "./primitives"
 import { Text } from "./text"
 import { View } from "./view"
 
-const MenuItem = ({ action, icon, text }: { action(): void; icon: React.ElementType; text: string }) => {
+const MenuItem = ({
+  action,
+  icon,
+  text,
+}: {
+  action(): void
+  icon: React.ElementType
+  text: string
+}) => {
   const { playButton } = useContext(SoundContext)
   return (
     <View
@@ -37,7 +43,11 @@ const MenuItem = ({ action, icon, text }: { action(): void; icon: React.ElementT
   )
 }
 
-export const MenuDialog = ({ deferred }: { deferred: import("../utils/deferred").Deferred }) => {
+export const MenuDialog = ({
+  deferred,
+}: {
+  deferred: import("../utils/deferred").Deferred
+}) => {
   const { currentUser } = useContext(UserContext)
   const intl = useIntl()
 
@@ -45,7 +55,6 @@ export const MenuDialog = ({ deferred }: { deferred: import("../utils/deferred")
     useContext(DialogContext)
 
   const { requestSave } = useContext(GalleryContext)
-
 
   return (
     <Dialog
@@ -59,7 +68,8 @@ export const MenuDialog = ({ deferred }: { deferred: import("../utils/deferred")
               mr: "-6px",
               overflow: "visible",
               "& > g": {
-                animation: "flight {durations.fade} {durations.stagger} ease both",
+                animation:
+                  "flight {durations.fade} {durations.stagger} ease both",
               },
             }}
           />
@@ -120,7 +130,8 @@ export const MenuDialog = ({ deferred }: { deferred: import("../utils/deferred")
           justifyContent: "space-between",
         }}
       >
-        <Link css={{ fontSize: "2", opacity: 0.75 }}
+        <Link
+          css={{ fontSize: "2", opacity: 0.75 }}
           href={`mailto:millagou.benjamin@gmail.com?subject=${intl.formatMessage(
             { id: "A word about Amstangram" }
           )}`}
@@ -129,7 +140,8 @@ export const MenuDialog = ({ deferred }: { deferred: import("../utils/deferred")
         >
           {intl.formatMessage({ id: "Contact 💌" })}
         </Link>
-        <Link css={{ fontSize: "2", opacity: 0.75 }}
+        <Link
+          css={{ fontSize: "2", opacity: 0.75 }}
           href="https://github.com/myagoo/amstangram"
           target="_blank"
           rel="noopener, noreferrer"

@@ -1,7 +1,11 @@
 import paper from "paper/dist/paper-core"
 import { getOffsettedPathPoints } from "./getOffsettedPathPoints"
 
-export const isTangramComplete = (coumpoundPath: import("../types").Outline, piecesGroup: import("../types").PiecesGroup, errorMargin: number) => {
+export const isTangramComplete = (
+  coumpoundPath: import("../types").Outline,
+  piecesGroup: import("../types").PiecesGroup,
+  errorMargin: number
+) => {
   let newCoumpoundPath = coumpoundPath
 
   for (const pieceGroup of piecesGroup.children) {

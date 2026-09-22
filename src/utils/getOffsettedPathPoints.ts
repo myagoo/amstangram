@@ -1,6 +1,9 @@
 import paper from "paper/dist/paper-core"
 
-export const getOffsettedPathPoints = (points: paper.Point[], offset: number) => {
+export const getOffsettedPathPoints = (
+  points: paper.Point[],
+  offset: number
+) => {
   const offsetter = new window.ClipperLib.ClipperOffset()
 
   const offsettedPathPoints = new window.ClipperLib.Paths()

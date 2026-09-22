@@ -1,7 +1,10 @@
 import { useState } from "react"
 
 export const useLongPress = (callback: () => void, ms: number) => {
-  const [data, setData] = useState<{ timeoutId: number; startEvent: { clientX: number; clientY: number } } | null>(null)
+  const [data, setData] = useState<{
+    timeoutId: number
+    startEvent: { clientX: number; clientY: number }
+  } | null>(null)
 
   const handleStart = (event: React.MouseEvent | React.TouchEvent) => {
     if (data && "touches" in event && event.touches.length !== 1) {
@@ -25,7 +28,7 @@ export const useLongPress = (callback: () => void, ms: number) => {
     let moveEvent = "touches" in event ? event.touches.item(0) : event
     const distance = Math.sqrt(
       Math.pow(moveEvent.clientX - data.startEvent.clientX, 2) +
-      Math.pow(moveEvent.clientY - data.startEvent.clientY, 2)
+        Math.pow(moveEvent.clientY - data.startEvent.clientY, 2)
     )
     if (distance > 10) {
       clearTimeout(data.timeoutId)

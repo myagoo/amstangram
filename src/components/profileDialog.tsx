@@ -18,13 +18,22 @@ import { ErrorText, InlineIcon, Similink, Title } from "./primitives"
 import { Text } from "./text"
 import { View, FormView } from "./view"
 
-const ChangeEmailForm = ({ currentUser, onClose }: { currentUser: import("../types").CurrentUser; onClose(): void }) => {
+const ChangeEmailForm = ({
+  currentUser,
+  onClose,
+}: {
+  currentUser: import("../types").CurrentUser
+  onClose(): void
+}) => {
   const intl = useIntl()
 
   const { updateEmail } = useContext(UserContext)
 
   const notify = useContext(NotifyContext)
-  const { handleSubmit, register, setError, formState } = useForm<{ password: string; newEmail: string }>()
+  const { handleSubmit, register, setError, formState } = useForm<{
+    password: string
+    newEmail: string
+  }>()
 
   const onSubmit = useCallback(
     async ({ password, newEmail }: { password: string; newEmail: string }) => {
@@ -66,11 +75,7 @@ const ChangeEmailForm = ({ currentUser, onClose }: { currentUser: import("../typ
   )
 
   return (
-    <FormView
-
-      onSubmit={handleSubmit(onSubmit)}
-      css={{ flex: "1", gap: "4" }}
-    >
+    <FormView onSubmit={handleSubmit(onSubmit)} css={{ flex: "1", gap: "4" }}>
       <View css={{ gap: "3", overflow: "auto", flex: "1" }}>
         <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "Password" })}</label>
@@ -117,13 +122,21 @@ const ChangeEmailForm = ({ currentUser, onClose }: { currentUser: import("../typ
   )
 }
 
-const ChangeUsernameForm = ({ currentUser, onClose }: { currentUser: import("../types").CurrentUser; onClose(): void }) => {
+const ChangeUsernameForm = ({
+  currentUser,
+  onClose,
+}: {
+  currentUser: import("../types").CurrentUser
+  onClose(): void
+}) => {
   const intl = useIntl()
 
   const { updateUsername } = useContext(UserContext)
 
   const notify = useContext(NotifyContext)
-  const { handleSubmit, register, formState } = useForm<{ newUsername: string }>()
+  const { handleSubmit, register, formState } = useForm<{
+    newUsername: string
+  }>()
 
   const onSubmit = useCallback(
     async ({ newUsername }: { newUsername: string }) => {
@@ -142,11 +155,7 @@ const ChangeUsernameForm = ({ currentUser, onClose }: { currentUser: import("../
   )
 
   return (
-    <FormView
-
-      onSubmit={handleSubmit(onSubmit)}
-      css={{ flex: "1", gap: "4" }}
-    >
+    <FormView onSubmit={handleSubmit(onSubmit)} css={{ flex: "1", gap: "4" }}>
       <View css={{ gap: "3", overflow: "auto", flex: "1" }}>
         <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "New username" })}</label>
@@ -180,14 +189,24 @@ const ChangeUsernameForm = ({ currentUser, onClose }: { currentUser: import("../
   )
 }
 
-const ChangePasswordForm = ({ currentUser, onClose }: { currentUser: import("../types").CurrentUser; onClose(): void }) => {
+const ChangePasswordForm = ({
+  currentUser,
+  onClose,
+}: {
+  currentUser: import("../types").CurrentUser
+  onClose(): void
+}) => {
   const intl = useIntl()
 
   const { updateUsername } = useContext(UserContext)
 
   const notify = useContext(NotifyContext)
 
-  const { handleSubmit, register, watch, setError, formState } = useForm<{ password: string; newPassword: string; newPasswordConfirm: string }>()
+  const { handleSubmit, register, watch, setError, formState } = useForm<{
+    password: string
+    newPassword: string
+    newPasswordConfirm: string
+  }>()
 
   const newPassword = watch("newPassword")
 
@@ -224,11 +243,7 @@ const ChangePasswordForm = ({ currentUser, onClose }: { currentUser: import("../
   )
 
   return (
-    <FormView
-
-      onSubmit={handleSubmit(onSubmit)}
-      css={{ flex: "1", gap: "4" }}
-    >
+    <FormView onSubmit={handleSubmit(onSubmit)} css={{ flex: "1", gap: "4" }}>
       <View css={{ gap: "3", overflow: "auto", flex: "1" }}>
         <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "Current password" })}</label>
@@ -290,7 +305,13 @@ const ChangePasswordForm = ({ currentUser, onClose }: { currentUser: import("../
     </FormView>
   )
 }
-export const ProfileDialog = ({ uid, deferred }: { uid: string; deferred: import("../utils/deferred").Deferred }) => {
+export const ProfileDialog = ({
+  uid,
+  deferred,
+}: {
+  uid: string
+  deferred: import("../utils/deferred").Deferred
+}) => {
   const intl = useIntl()
   const notify = useContext(NotifyContext)
 

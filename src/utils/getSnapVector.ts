@@ -1,9 +1,20 @@
 import paper from "paper/dist/paper-core"
 import { getNearestPoint } from "./getNearestPoint"
 
-interface Snap { maxDistance: number; distance: number; shape?: paper.Path; vector?: paper.Point; segment?: [paper.Point, paper.Point]; point?: paper.Point }
+interface Snap {
+  maxDistance: number
+  distance: number
+  shape?: paper.Path
+  vector?: paper.Point
+  segment?: [paper.Point, paper.Point]
+  point?: paper.Point
+}
 
-const getPrimarySnap = (shape: paper.Path, otherShapes: paper.Path[], snap: Snap) => {
+const getPrimarySnap = (
+  shape: paper.Path,
+  otherShapes: paper.Path[],
+  snap: Snap
+) => {
   for (const otherShape of otherShapes) {
     for (const { point: otherPoint } of otherShape.segments) {
       for (const { point: ghostPoint } of shape.segments) {
@@ -57,7 +68,11 @@ const getPrimarySnap = (shape: paper.Path, otherShapes: paper.Path[], snap: Snap
   return snap
 }
 
-const getSecondarySnap = (shape: paper.Path, otherShapes: paper.Path[], snap: Snap) => {
+const getSecondarySnap = (
+  shape: paper.Path,
+  otherShapes: paper.Path[],
+  snap: Snap
+) => {
   if (snap.segment && snap.vector) {
     let bestNewVectorLenth = snap.maxDistance
     let bestNewVector
@@ -137,7 +152,10 @@ export const getSnapVector = (
 
   getSecondarySnap(
     shape,
-    otherPrimaryShapes.filter((otherShape) => (otherShape as paper.Path & { shape?: paper.Path }).shape !== snap.shape),
+    otherPrimaryShapes.filter(
+      (otherShape) =>
+        (otherShape as paper.Path & { shape?: paper.Path }).shape !== snap.shape
+    ),
     snap
   )
 

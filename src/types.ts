@@ -38,7 +38,8 @@ export interface CurrentUser extends UserMetadata {
 export type TanId = "st1" | "st2" | "mt1" | "lt1" | "lt2" | "sq" | "rh"
 
 export interface TanGroup extends paper.Group {
-  children: paper.Path[] & Record<"display" | "collision" | "insetBorder" | "display 1", paper.Path>
+  children: paper.Path[] &
+    Record<"display" | "collision" | "insetBorder" | "display 1", paper.Path>
   data: {
     id: TanId
     collisions: Set<TanId>
@@ -52,6 +53,9 @@ export interface PiecesGroup extends paper.Group {
 }
 
 export type Outline = paper.Path | paper.CompoundPath
-export type TangramStats = Record<string, { completed?: number; starred?: boolean }>
+export type TangramStats = Record<
+  string,
+  { completed?: number; starred?: boolean }
+>
 export type CompletionMap = Record<string, Record<string, number | undefined>>
 export type StarMap = Record<string, Record<string, boolean | undefined>>

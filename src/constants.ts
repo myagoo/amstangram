@@ -9,7 +9,11 @@ export const SNAP_DISTANCE = 10
 export const CLICK_TIMEOUT = 300
 export const VICTORY_PARTICLES_DURATION = 1500
 export const SCRAMBLE_PADDING = 100
-export { COLOR_TRANSITION_DURATION, FADE_TRANSITION_DURATION, FADE_STAGGER_DURATION } from "./theme"
+export {
+  COLOR_TRANSITION_DURATION,
+  FADE_TRANSITION_DURATION,
+  FADE_STAGGER_DURATION,
+} from "./theme"
 export const DIALOG_CLOSED_REASON = "DIALOG_CLOSED_REASON"
 
 export const PARTICLES_COUNT = 60
@@ -27,18 +31,7 @@ export const CATEGORIES = [
   "stuff",
 ]
 
-export const DIGITS = [
-  "0️⃣",
-  "1️⃣",
-  "2️⃣",
-  "3️⃣",
-  "4️⃣",
-  "5️⃣",
-  "6️⃣",
-  "7️⃣",
-  "8️⃣",
-  "9️⃣",
-]
+export const DIGITS = ["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"]
 export const LETTERS = [
   "🄰",
   "🄱",

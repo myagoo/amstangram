@@ -11,6 +11,9 @@ export const createRandom = (seed: string | null) => {
 }
 
 // Separate streams keep unrelated UI activity from consuming gameplay randomness.
-export const createGameRandom = () => createRandom(
-  typeof window === "undefined" ? null : new URLSearchParams(window.location.search).get("seed")
-)
+export const createGameRandom = () =>
+  createRandom(
+    typeof window === "undefined"
+      ? null
+      : new URLSearchParams(window.location.search).get("seed")
+  )

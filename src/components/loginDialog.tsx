@@ -15,7 +15,9 @@ const ResetPasswordTab = ({ setTab }: { setTab(tab: string): void }) => {
   const intl = useIntl()
   const notify = useContext(NotifyContext)
 
-  const { handleSubmit, register, setError, formState } = useForm<{ email: string }>()
+  const { handleSubmit, register, setError, formState } = useForm<{
+    email: string
+  }>()
 
   const onSubmit = useCallback(
     async ({ email }: { email: string }) => {
@@ -47,12 +49,7 @@ const ResetPasswordTab = ({ setTab }: { setTab(tab: string): void }) => {
   )
 
   return (
-    <FormView
-
-      name="reset"
-      onSubmit={handleSubmit(onSubmit)}
-      css={{ gap: "4" }}
-    >
+    <FormView name="reset" onSubmit={handleSubmit(onSubmit)} css={{ gap: "4" }}>
       <View css={{ gap: "2" }}>
         <label>{intl.formatMessage({ id: "Email address" })}</label>
         <Input
@@ -85,15 +82,34 @@ const ResetPasswordTab = ({ setTab }: { setTab(tab: string): void }) => {
   )
 }
 
-const SignUpTab = ({ onSignUp, setTab }: { onSignUp(user: import("../types").CurrentUser): void; setTab(tab: string): void }) => {
+const SignUpTab = ({
+  onSignUp,
+  setTab,
+}: {
+  onSignUp(user: import("../types").CurrentUser): void
+  setTab(tab: string): void
+}) => {
   const intl = useIntl()
 
-  const { handleSubmit, register, watch, setError, formState } = useForm<{ email: string; password: string; passwordConfirm: string; username: string }>()
+  const { handleSubmit, register, watch, setError, formState } = useForm<{
+    email: string
+    password: string
+    passwordConfirm: string
+    username: string
+  }>()
 
   const password = watch("password")
 
   const onSubmit = useCallback(
-    async ({ email, username, password }: { email: string; username: string; password: string }) => {
+    async ({
+      email,
+      username,
+      password,
+    }: {
+      email: string
+      username: string
+      password: string
+    }) => {
       try {
         const { user } = await firebase
           .auth()
@@ -144,7 +160,6 @@ const SignUpTab = ({ onSignUp, setTab }: { onSignUp(user: import("../types").Cur
 
   return (
     <FormView
-
       name="signup"
       autoComplete="off"
       onSubmit={handleSubmit(onSubmit)}
@@ -227,10 +242,19 @@ const SignUpTab = ({ onSignUp, setTab }: { onSignUp(user: import("../types").Cur
   )
 }
 
-const SignInTab = ({ onSignIn, setTab }: { onSignIn(user: import("../types").CurrentUser): void; setTab(tab: string): void }) => {
+const SignInTab = ({
+  onSignIn,
+  setTab,
+}: {
+  onSignIn(user: import("../types").CurrentUser): void
+  setTab(tab: string): void
+}) => {
   const intl = useIntl()
 
-  const { handleSubmit, register, setError, formState } = useForm<{ email: string; password: string }>()
+  const { handleSubmit, register, setError, formState } = useForm<{
+    email: string
+    password: string
+  }>()
 
   const onSubmit = useCallback(
     async ({ email, password }: { email: string; password: string }) => {
@@ -279,7 +303,6 @@ const SignInTab = ({ onSignIn, setTab }: { onSignIn(user: import("../types").Cur
 
   return (
     <FormView
-
       name="signin"
       onSubmit={handleSubmit(onSubmit)}
       css={{ gap: "4" }}
@@ -337,7 +360,11 @@ const SignInTab = ({ onSignIn, setTab }: { onSignIn(user: import("../types").Cur
   )
 }
 
-export const LoginDialog = ({ deferred }: { deferred: import("../utils/deferred").Deferred<import("../types").CurrentUser> }) => {
+export const LoginDialog = ({
+  deferred,
+}: {
+  deferred: import("../utils/deferred").Deferred<import("../types").CurrentUser>
+}) => {
   const intl = useIntl()
 
   const notify = useContext(NotifyContext)

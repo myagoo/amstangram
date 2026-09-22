@@ -14,14 +14,25 @@ interface UserContextValue {
   currentUser: CurrentUser | null | undefined
   usersMetadata: Record<string, UserMetadata> | null
   updateUsername(user: CurrentUser, username: string): Promise<void>
-  updatePassword(user: CurrentUser, password: string, newPassword: string): Promise<void>
-  updateEmail(user: CurrentUser, newEmail: string, password: string): Promise<void>
+  updatePassword(
+    user: CurrentUser,
+    password: string,
+    newPassword: string
+  ): Promise<void>
+  updateEmail(
+    user: CurrentUser,
+    newEmail: string,
+    password: string
+  ): Promise<void>
 }
 export const UserContext = createContext<UserContextValue>(null!)
 
 export const UserProvider = ({ children }: React.PropsWithChildren) => {
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>()
-  const [usersMetadata, setUsersMetadata] = useState<Record<string, UserMetadata> | null>(null)
+  const [usersMetadata, setUsersMetadata] = useState<Record<
+    string,
+    UserMetadata
+  > | null>(null)
 
   const [initialized, setInitialized] = useState(false)
 
@@ -71,19 +82,22 @@ export const UserProvider = ({ children }: React.PropsWithChildren) => {
     return unsubscribe
   }, [])
 
-  const updateUsername = useCallback(async (currentUser: CurrentUser, username: string) => {
-    await currentUser.firebaseUser.updateProfile({
-      displayName: username,
-    })
+  const updateUsername = useCallback(
+    async (currentUser: CurrentUser, username: string) => {
+      await currentUser.firebaseUser.updateProfile({
+        displayName: username,
+      })
 
-    await firebase
-      .firestore()
-      .collection("users")
-      .doc(currentUser.uid)
-      .update({ username })
+      await firebase
+        .firestore()
+        .collection("users")
+        .doc(currentUser.uid)
+        .update({ username })
 
-    setCurrentUser({ ...currentUser, username })
-  }, [])
+      setCurrentUser({ ...currentUser, username })
+    },
+    []
+  )
 
   const updatePassword = useCallback(
     async (currentUser: CurrentUser, password: string, newPassword: string) => {
@@ -99,16 +113,19 @@ export const UserProvider = ({ children }: React.PropsWithChildren) => {
     []
   )
 
-  const updateEmail = useCallback(async (currentUser: CurrentUser, newEmail: string, password: string) => {
-    const credential = firebase.auth.EmailAuthProvider.credential(
-      currentUser.firebaseUser.email!,
-      password
-    )
+  const updateEmail = useCallback(
+    async (currentUser: CurrentUser, newEmail: string, password: string) => {
+      const credential = firebase.auth.EmailAuthProvider.credential(
+        currentUser.firebaseUser.email!,
+        password
+      )
 
-    await currentUser.firebaseUser.reauthenticateWithCredential(credential)
+      await currentUser.firebaseUser.reauthenticateWithCredential(credential)
 
-    await currentUser.firebaseUser.updateEmail(newEmail)
-  }, [])
+      await currentUser.firebaseUser.updateEmail(newEmail)
+    },
+    []
+  )
 
   const contextValue = useMemo(
     () => ({

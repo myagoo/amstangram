@@ -1,7 +1,9 @@
 import paper from "paper/dist/paper-core"
 import firebase from "./firebase"
 
-export const recomputeEverything = async (tangrams: import("../types").Tangram[]) => {
+export const recomputeEverything = async (
+  tangrams: import("../types").Tangram[]
+) => {
   if (
     !window.confirm(
       "Vous êtes sur le point de recalculer la length et le percent de tous les tangrams. Êtes vous sûr ?"

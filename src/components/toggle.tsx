@@ -12,9 +12,16 @@ export const Toggle = <T extends string | boolean>({
   value,
   onChange,
   invertSounds,
-}: { leftComponent: React.ReactNode; rightComponent: React.ReactNode; leftValue: T; rightValue: T; value: T; onChange(value: T): void; invertSounds?: boolean }) => {
+}: {
+  leftComponent: React.ReactNode
+  rightComponent: React.ReactNode
+  leftValue: T
+  rightValue: T
+  value: T
+  onChange(value: T): void
+  invertSounds?: boolean
+}) => {
   const { playToggle, soundEnabled } = useContext(SoundContext)
-
 
   const selectedSide = useMemo(
     () => (value === rightValue ? "right" : "left"),

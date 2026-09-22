@@ -49,9 +49,9 @@ export const Card = <T extends Tangram>({
       onClick={
         onClick
           ? () => {
-            playCard()
-            onClick(tangram)
-          }
+              playCard()
+              onClick(tangram)
+            }
           : undefined
       }
       {...longPressHandlers}
@@ -71,10 +71,13 @@ export const Card = <T extends Tangram>({
           width: 128,
           height: 178,
         }}
-        style={{ boxShadow: selected ? `0px 0px 0px 4px ${color}` : "0px 0px 0px 1px rgba(0, 0, 0, 0.1)" }}
+        style={{
+          boxShadow: selected
+            ? `0px 0px 0px 4px ${color}`
+            : "0px 0px 0px 1px rgba(0, 0, 0, 0.1)",
+        }}
       >
         <SvgView
-
           css={{
             flex: "1",
             justifyContent: "center",
@@ -87,7 +90,12 @@ export const Card = <T extends Tangram>({
         />
         {completed && (
           <View
-            css={{ position: "absolute", top: "1", left: "1", fontSize: "30px" }}
+            css={{
+              position: "absolute",
+              top: "1",
+              left: "1",
+              fontSize: "30px",
+            }}
           >
             {emoji}
           </View>
@@ -104,9 +112,9 @@ export const Card = <T extends Tangram>({
             onClick={
               onBadgeClick
                 ? (e) => {
-                  e.stopPropagation()
-                  onBadgeClick(uid)
-                }
+                    e.stopPropagation()
+                    onBadgeClick(uid)
+                  }
                 : undefined
             }
           ></Badge>

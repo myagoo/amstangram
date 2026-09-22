@@ -14,7 +14,6 @@ export const Menu = () => {
     showMenu()
   }
 
-
   return (
     <>
       <View

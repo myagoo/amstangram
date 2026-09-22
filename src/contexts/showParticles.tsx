@@ -7,12 +7,18 @@ import React, {
   useContext,
 } from "react"
 
-export const ShowParticlesContext = createContext<[boolean, () => void]>([true, () => { /* No-op outside the provider. */ }])
+export const ShowParticlesContext = createContext<[boolean, () => void]>([
+  true,
+  () => {
+    /* No-op outside the provider. */
+  },
+])
 
-export const useShowParticles = () =>
-  useContext(ShowParticlesContext)
+export const useShowParticles = () => useContext(ShowParticlesContext)
 
-export const ShowParticlesProvider = ({ children }: React.PropsWithChildren) => {
+export const ShowParticlesProvider = ({
+  children,
+}: React.PropsWithChildren) => {
   const [showParticles, setShowParticles] = useState(true)
 
   useEffect(() => {

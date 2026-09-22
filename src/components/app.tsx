@@ -19,9 +19,8 @@ export const App = () => {
   const [showLoaderTimeout, setShowLoaderTimeout] = useState<number>()
   const [initialized, setInitialized] = useState(false)
   const { initialized: tangramsInitialized } = useContext(TangramsContext)
-  const { playlist, initialized: galleryInitialized } = useContext(
-    GalleryContext
-  )
+  const { playlist, initialized: galleryInitialized } =
+    useContext(GalleryContext)
   const { currentUser, initialized: usersInitialized } = useContext(UserContext)
 
   const isEverythingInitialized =

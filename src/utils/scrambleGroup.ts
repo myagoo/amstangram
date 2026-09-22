@@ -4,7 +4,10 @@ import { createGameRandom } from "./createRandom"
 
 const scrambleRandom = createGameRandom()
 
-export const scrambleGroup = (group: import("../types").TanGroup, random = scrambleRandom) => {
+export const scrambleGroup = (
+  group: import("../types").TanGroup,
+  random = scrambleRandom
+) => {
   const maxPoint = new paper.Point(
     paper.project.view.bounds.width,
     paper.project.view.bounds.height

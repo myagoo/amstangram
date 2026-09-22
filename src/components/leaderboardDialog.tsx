@@ -14,7 +14,11 @@ import { useIntl } from "react-intl"
 import { FiStar } from "react-icons/fi"
 import { GalleryContext } from "../contexts/gallery"
 
-export const LeaderboardDialog = ({ deferred }: { deferred: import("../utils/deferred").Deferred }) => {
+export const LeaderboardDialog = ({
+  deferred,
+}: {
+  deferred: import("../utils/deferred").Deferred
+}) => {
   const intl = useIntl()
 
   const { showProfile } = useContext(DialogContext)
@@ -27,7 +31,9 @@ export const LeaderboardDialog = ({ deferred }: { deferred: import("../utils/def
       "selectedLeaderboard"
     )
 
-    return ["stars", "completed", "created"].includes(storedSelectedLeaderBoard!)
+    return ["stars", "completed", "created"].includes(
+      storedSelectedLeaderBoard!
+    )
       ? storedSelectedLeaderBoard!
       : "stars"
   })
@@ -84,7 +90,11 @@ export const LeaderboardDialog = ({ deferred }: { deferred: import("../utils/def
     if (!users) {
       return
     }
-    return users.sort((userA, userB) => userB[selected as "stars" | "completed" | "created"] - userA[selected as "stars" | "completed" | "created"])
+    return users.sort(
+      (userA, userB) =>
+        userB[selected as "stars" | "completed" | "created"] -
+        userA[selected as "stars" | "completed" | "created"]
+    )
   }, [users, selected])
 
   return (
@@ -97,7 +107,7 @@ export const LeaderboardDialog = ({ deferred }: { deferred: import("../utils/def
     >
       {
         <>
-          <Select  value={selected} onChange={handleChange}>
+          <Select value={selected} onChange={handleChange}>
             <option value="stars">
               {intl.formatMessage({ id: "Stars earned" })}
             </option>

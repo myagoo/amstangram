@@ -4,7 +4,22 @@ import { FiX } from "react-icons/fi"
 import { SoundContext } from "../contexts/sound"
 import { View } from "./view"
 
-export const Dialog = ({ children, title, onClose, big, css, ...props }: React.PropsWithChildren<import("../utils/styles").StyleProps & { title?: React.ReactNode; onClose(): void; big?: boolean; as?: "form"; onSubmit?: React.FormEventHandler }>) => {
+export const Dialog = ({
+  children,
+  title,
+  onClose,
+  big,
+  css,
+  ...props
+}: React.PropsWithChildren<
+  import("../utils/styles").StyleProps & {
+    title?: React.ReactNode
+    onClose(): void
+    big?: boolean
+    as?: "form"
+    onSubmit?: React.FormEventHandler
+  }
+>) => {
   const { playButton } = useContext(SoundContext)
 
   return createPortal(
@@ -29,12 +44,13 @@ export const Dialog = ({ children, title, onClose, big, css, ...props }: React.P
           bg: "dialogBackground",
           color: "dialogText",
           borderRadius: "3",
-          transition: "background-color {durations.color}, color {durations.color}",
+          transition:
+            "background-color {durations.color}, color {durations.color}",
           fontSize: "3",
           p: "3",
           gap: "3",
           maxWidth: "95vw",
-          width: big ? "568px" : "400px"
+          width: big ? "568px" : "400px",
         }}
         onClick={(e) => e.stopPropagation()}
       >

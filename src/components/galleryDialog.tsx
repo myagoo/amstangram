@@ -21,17 +21,22 @@ import { Text } from "./text"
 import { View } from "./view"
 
 const FadedView = styled(View, {
-    base: {
-      p: "3",
-      alignItems: "center",
-      position: "sticky",
-      top: "0",
-      zIndex: 1,
-      background: "linear-gradient(0deg, rgba(0,0,0,0) 0%, {colors.dialogBackground} 50%)",
-    },
+  base: {
+    p: "3",
+    alignItems: "center",
+    position: "sticky",
+    top: "0",
+    zIndex: 1,
+    background:
+      "linear-gradient(0deg, rgba(0,0,0,0) 0%, {colors.dialogBackground} 50%)",
+  },
 })
 
-export const GalleryDialog = ({ deferred }: { deferred: import("../utils/deferred").Deferred }) => {
+export const GalleryDialog = ({
+  deferred,
+}: {
+  deferred: import("../utils/deferred").Deferred
+}) => {
   const intl = useIntl()
 
   const { currentUser } = useContext(UserContext)
@@ -46,7 +51,9 @@ export const GalleryDialog = ({ deferred }: { deferred: import("../utils/deferre
     isTangramStarred,
   } = useContext(GalleryContext)
 
-  const [selectedTangrams, setSelectedTangrams] = useState<import("../types").SavedTangram[]>([])
+  const [selectedTangrams, setSelectedTangrams] = useState<
+    import("../types").SavedTangram[]
+  >([])
 
   const [selectedGalleryFilter, setSelectedGalleryFilter] = useState(() => {
     const storedSelectedGalleryFilter = window.localStorage.getItem(
@@ -60,26 +67,31 @@ export const GalleryDialog = ({ deferred }: { deferred: import("../utils/deferre
       : "all"
   })
 
-  const handleGalleryFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleGalleryFilterChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     setSelectedGalleryFilter(e.target.value)
     window.localStorage.setItem("selectedGalleryFilter", e.target.value)
   }
 
-  const handleTangramClick = useCallback((clickedTangram: import("../types").SavedTangram) => {
-    setSelectedTangrams((prevPendingSelectedTangrams) => {
-      if (
-        prevPendingSelectedTangrams.some(
-          (pendingSelectedTangram) =>
-            pendingSelectedTangram.id === clickedTangram.id
-        )
-      ) {
-        return prevPendingSelectedTangrams.filter(
-          (tangram) => tangram.id !== clickedTangram.id
-        )
-      }
-      return [...prevPendingSelectedTangrams, clickedTangram]
-    })
-  }, [])
+  const handleTangramClick = useCallback(
+    (clickedTangram: import("../types").SavedTangram) => {
+      setSelectedTangrams((prevPendingSelectedTangrams) => {
+        if (
+          prevPendingSelectedTangrams.some(
+            (pendingSelectedTangram) =>
+              pendingSelectedTangram.id === clickedTangram.id
+          )
+        ) {
+          return prevPendingSelectedTangrams.filter(
+            (tangram) => tangram.id !== clickedTangram.id
+          )
+        }
+        return [...prevPendingSelectedTangrams, clickedTangram]
+      })
+    },
+    []
+  )
 
   const handleStartClick = () => {
     if (selectedTangrams.length) {
@@ -97,7 +109,10 @@ export const GalleryDialog = ({ deferred }: { deferred: import("../utils/deferre
     const tangrams =
       selectedGalleryFilter === "pending" ? pendingTangrams : approvedTangrams
 
-    const newTangramsByCategory: Record<string, import("../types").SavedTangram[]> = {}
+    const newTangramsByCategory: Record<
+      string,
+      import("../types").SavedTangram[]
+    > = {}
 
     for (const tangram of tangrams!) {
       if (
@@ -120,7 +135,10 @@ export const GalleryDialog = ({ deferred }: { deferred: import("../utils/deferre
       newTangramsByCategory[tangram.category].push(tangram)
     }
 
-    const newSortedTangramsByCategory: Record<string, import("../types").SavedTangram[]> = {}
+    const newSortedTangramsByCategory: Record<
+      string,
+      import("../types").SavedTangram[]
+    > = {}
 
     for (const sortedCategory of Object.keys(newTangramsByCategory).sort()) {
       newSortedTangramsByCategory[sortedCategory] = newTangramsByCategory[
@@ -159,7 +177,6 @@ export const GalleryDialog = ({ deferred }: { deferred: import("../utils/deferre
         {
           <>
             <Select
-
               value={selectedGalleryFilter}
               onChange={handleGalleryFilterChange}
             >
@@ -328,9 +345,9 @@ export const GalleryDialog = ({ deferred }: { deferred: import("../utils/deferre
                   : selectedTangrams.length === 1
                     ? intl.formatMessage({ id: "Start 1 tangram!" })
                     : intl.formatMessage(
-                      { id: "Start {count} tangrams!" },
-                      { count: selectedTangrams.length }
-                    )}
+                        { id: "Start {count} tangrams!" },
+                        { count: selectedTangrams.length }
+                      )}
               </PrimaryButton>
               <PrimaryButton
                 disabled={selectedTangrams.length === 0}

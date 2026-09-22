@@ -2,11 +2,13 @@ import React, { useContext } from "react"
 import { ThemeContext } from "../utils/styles"
 import { SvgView } from "./view"
 
-export const Logo = (props: import("../utils/styles").StyleProps & React.ComponentPropsWithRef<"svg">) => {
+export const Logo = (
+  props: import("../utils/styles").StyleProps &
+    React.ComponentPropsWithRef<"svg">
+) => {
   const theme = useContext(ThemeContext)
   return (
     <SvgView
-
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 467.27 512"
       {...props}

@@ -32,9 +32,28 @@ import { UserContext } from "./user"
 import { GalleryContext } from "./gallery"
 import { useSwitchTheme } from "./switchTheme"
 
-interface TipState { particles?: boolean; showBackgroundPattern: boolean; themeKey: string; soundEnabled: boolean; currentUser: import("../types").CurrentUser | null | undefined; approvedTangrams: import("../types").SavedTangram[] | null; isTangramCompleted(id: string): boolean }
-interface Tip { id: string; title?: React.ReactNode; content: React.ReactNode; predicate?: (state: TipState) => unknown }
-export const TipsContext = createContext<{ showRandomTip(): void; showWelcome(): void; tipsEnabled: boolean; toggleTips(): void; resetTips(): void }>(null!)
+interface TipState {
+  particles?: boolean
+  showBackgroundPattern: boolean
+  themeKey: string
+  soundEnabled: boolean
+  currentUser: import("../types").CurrentUser | null | undefined
+  approvedTangrams: import("../types").SavedTangram[] | null
+  isTangramCompleted(id: string): boolean
+}
+interface Tip {
+  id: string
+  title?: React.ReactNode
+  content: React.ReactNode
+  predicate?: (state: TipState) => unknown
+}
+export const TipsContext = createContext<{
+  showRandomTip(): void
+  showWelcome(): void
+  tipsEnabled: boolean
+  toggleTips(): void
+  resetTips(): void
+}>(null!)
 
 const TipDialog = ({
   deferred,
@@ -47,7 +66,10 @@ const TipDialog = ({
     ),
     content,
   },
-}: { deferred: Deferred<boolean>; tip: Tip }) => {
+}: {
+  deferred: Deferred<boolean>
+  tip: Tip
+}) => {
   const intl = useIntl()
   const [hideTips, setHideTips] = useState(false)
   return (
@@ -242,7 +264,10 @@ const tips: Tip[] = [
 export const TipsProvider = ({ children }: React.PropsWithChildren) => {
   const intl = useIntl()
   const notify = useContext(NotifyContext)
-  const [tipDialogData, setTipDialogData] = useState<{ deferred: Deferred<boolean>; tip: Tip } | null>(null)
+  const [tipDialogData, setTipDialogData] = useState<{
+    deferred: Deferred<boolean>
+    tip: Tip
+  } | null>(null)
   const [tipsEnabled, setTipsEnabled] = useState(true)
 
   const { soundEnabled } = useContext(SoundContext)

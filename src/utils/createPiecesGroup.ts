@@ -90,7 +90,11 @@ const createRhombus = (size: number, id: import("../types").TanId) => {
   return group as import("../types").TanGroup
 }
 
-const createSquare = (size: number, id: import("../types").TanId, random: () => number) => {
+const createSquare = (
+  size: number,
+  id: import("../types").TanId,
+  random: () => number
+) => {
   const displayShape = new paper.Path.Rectangle({
     name: "display",
     point: [0, 0],

@@ -17,7 +17,7 @@ import { UserProvider } from "./contexts/user"
 
 // Try to remove service workers... Not sure this is useful
 if (window.isSecureContext) {
-  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+  navigator.serviceWorker.getRegistrations().then(function (registrations) {
     for (let registration of registrations) {
       registration.unregister()
     }
@@ -27,12 +27,11 @@ if (window.isSecureContext) {
 const Main = () => {
   useEffect(() => {
     if (matchMedia("hover: none").matches) {
-      window.oncontextmenu = function() {
+      window.oncontextmenu = function () {
         return false
       }
     }
   }, [])
-
 
   return (
     <SoundProvider>

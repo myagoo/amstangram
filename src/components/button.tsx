@@ -26,21 +26,38 @@ type ButtonProps = ComponentProps<typeof StyledButton> & { mute?: boolean }
 
 const BaseButton = ({ onClick, mute, ...props }: ButtonProps) => {
   const { playButton } = useContext(SoundContext)
-  return <StyledButton {...props} onClick={event => {
-    if (!mute) playButton()
-    onClick?.(event)
-  }} />
+  return (
+    <StyledButton
+      {...props}
+      onClick={(event) => {
+        if (!mute) playButton()
+        onClick?.(event)
+      }}
+    />
+  )
 }
 
-export const SecondaryButton = ({ css, ...props }: ButtonProps) =>
-  <BaseButton {...props} css={{ border: "2px solid", borderRadius: "2", ...css }} />
+export const SecondaryButton = ({ css, ...props }: ButtonProps) => (
+  <BaseButton
+    {...props}
+    css={{ border: "2px solid", borderRadius: "2", ...css }}
+  />
+)
 
-export const DangerButton = ({ css, ...props }: ButtonProps) =>
-  <BaseButton {...props} css={{ border: "2px solid", color: "errorText", ...css }} />
+export const DangerButton = ({ css, ...props }: ButtonProps) => (
+  <BaseButton
+    {...props}
+    css={{ border: "2px solid", color: "errorText", ...css }}
+  />
+)
 
-export const PrimaryButton = ({ css, ...props }: ButtonProps) =>
-  <BaseButton {...props} css={{
-    animation: "pieceBackground 20s linear infinite both",
-    color: "#FFFFFFDD",
-    ...css,
-  }} />
+export const PrimaryButton = ({ css, ...props }: ButtonProps) => (
+  <BaseButton
+    {...props}
+    css={{
+      animation: "pieceBackground 20s linear infinite both",
+      color: "#FFFFFFDD",
+      ...css,
+    }}
+  />
+)

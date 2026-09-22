@@ -146,7 +146,8 @@ export default {
     "You can acces tangram details or edit your own tangrams by long pressing a card in the gallery {galleryIcon}",
   "tips.leaderboard":
     "Check the leaderboard to see who's the best by pressing {leaderboardIcon} in the menu {menuIcon}",
-  "tips.particles": "Disable particle effects by pressing {settingsIcon} in the menu {menuIcon}. It can improve performances.",
+  "tips.particles":
+    "Disable particle effects by pressing {settingsIcon} in the menu {menuIcon}. It can improve performances.",
 
   "I don't want to see tips anymore": "I don't want to see tips anymore",
   "Show tips": "Show tips",
@@ -172,5 +173,5 @@ export default {
   "Forgot password?": "Forgot password?",
   "Reset your password": "Reset your password",
   "Send the reset mail!": "Send the reset mail!",
-  "Reset password email sent": "Reset password email sent"
+  "Reset password email sent": "Reset password email sent",
 }

@@ -13,9 +13,23 @@ test("seeded streams preserve the recorded sequence and validate URL seeds", () 
   ])
   expect(createRandom("0")()).toBe(0.23606797284446657)
   for (const seed of ["0", "4294967295"]) {
-    expect(Array.from({ length: 1000 }, createRandom(seed)).every(value => value >= 0 && value < 1)).toBe(true)
+    expect(
+      Array.from({ length: 1000 }, createRandom(seed)).every(
+        (value) => value >= 0 && value < 1
+      )
+    ).toBe(true)
   }
-  for (const seed of [null, "", "-1", "1.5", "Infinity", "NaN", "4294967296", "42oops", " 42"]) {
+  for (const seed of [
+    null,
+    "",
+    "-1",
+    "1.5",
+    "Infinity",
+    "NaN",
+    "4294967296",
+    "42oops",
+    " 42",
+  ]) {
     expect(createRandom(seed)).toBe(Math.random)
   }
 })
@@ -23,7 +37,10 @@ test("seeded streams preserve the recorded sequence and validate URL seeds", () 
 test("unit callers can replay shuffles and emojis using isolated streams", () => {
   const sample = () => {
     const random = createRandom("42")
-    return { playlist: shuffle([1, 2, 3, 4, 5, 6, 7], random), emoji: getRandomEmoji(random) }
+    return {
+      playlist: shuffle([1, 2, 3, 4, 5, 6, 7], random),
+      emoji: getRandomEmoji(random),
+    }
   }
   const first = sample()
   shuffle([1, 2, 3], createRandom("99"))

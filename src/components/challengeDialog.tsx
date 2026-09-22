@@ -9,7 +9,15 @@ import { Dialog } from "./dialog"
 import { Title } from "./primitives"
 import { View } from "./view"
 
-export const ChallengeDialog = ({ uid, tangrams, deferred }: { uid: string | null; tangrams: import("../types").SavedTangram[]; deferred: import("../utils/deferred").Deferred }) => {
+export const ChallengeDialog = ({
+  uid,
+  tangrams,
+  deferred,
+}: {
+  uid: string | null
+  tangrams: import("../types").SavedTangram[]
+  deferred: import("../utils/deferred").Deferred
+}) => {
   const intl = useIntl()
   const { usersMetadata } = useContext(UserContext)
   const { setPlaylist } = useContext(GalleryContext)
@@ -22,17 +30,17 @@ export const ChallengeDialog = ({ uid, tangrams, deferred }: { uid: string | nul
         <Title>
           {username
             ? intl.formatMessage(
-              { id: "{username} challenged you" },
-              {
-                username,
-              }
-            )
+                { id: "{username} challenged you" },
+                {
+                  username,
+                }
+              )
             : intl.formatMessage(
-              { id: "Rise to the challenge" },
-              {
-                username,
-              }
-            )}
+                { id: "Rise to the challenge" },
+                {
+                  username,
+                }
+              )}
         </Title>
       }
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}

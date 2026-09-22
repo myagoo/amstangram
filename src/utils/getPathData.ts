@@ -1,6 +1,9 @@
 import paper from "paper/dist/paper-core"
 
-export const getPathData = (piecesGroup: import("../types").PiecesGroup, scaleFactor: number) => {
+export const getPathData = (
+  piecesGroup: import("../types").PiecesGroup,
+  scaleFactor: number
+) => {
   let compoundPath: import("../types").Outline | undefined
 
   for (const pieceGroup of piecesGroup.children) {

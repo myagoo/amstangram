@@ -13,7 +13,13 @@ export const Victory = ({
   onNext,
   onApprove,
   onStarToggle,
-}: { tangram: import("../types").SavedTangram; onStop(): void; onNext?: () => void; onApprove?: () => void; onStarToggle?: () => void }) => {
+}: {
+  tangram: import("../types").SavedTangram
+  onStop(): void
+  onNext?: () => void
+  onApprove?: () => void
+  onStarToggle?: () => void
+}) => {
   const intl = useIntl()
   const [emojiSpinEnded, setEmojiSpinEnded] = useState(false)
   const { playStar } = useContext(SoundContext)
@@ -30,7 +36,6 @@ export const Victory = ({
   }, [tangram, tangramsStarredBy])
 
   const starred = isTangramStarred(tangram.id)
-
 
   const handleEmojiSpinAnimationEnd = () => {
     setTimeout(() => setEmojiSpinEnded(true), 1000)
@@ -80,7 +85,6 @@ export const Victory = ({
           >
             {onApprove && (
               <PrimaryButton
-
                 onClick={onApprove}
                 css={{
                   display: "flex",
@@ -96,7 +100,6 @@ export const Victory = ({
             )}
             {onStarToggle && (
               <PrimaryButton
-
                 mute
                 onClick={() => {
                   playStar()
@@ -122,7 +125,6 @@ export const Victory = ({
             )}
             {onNext ? (
               <PrimaryButton
-
                 onClick={onNext}
                 css={{
                   display: "flex",
@@ -137,7 +139,6 @@ export const Victory = ({
               </PrimaryButton>
             ) : (
               <PrimaryButton
-
                 onClick={onStop}
                 css={{
                   display: "flex",

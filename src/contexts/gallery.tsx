@@ -15,7 +15,12 @@ import { NotifyContext } from "./notify"
 import { TangramsContext } from "./tangrams"
 import { UserContext } from "./user"
 
-import type { SavedTangram, CompletionMap, StarMap, TangramStats } from "../types"
+import type {
+  SavedTangram,
+  CompletionMap,
+  StarMap,
+  TangramStats,
+} from "../types"
 interface GalleryContextValue {
   initialized: boolean
   requestSave(): void
@@ -27,7 +32,10 @@ interface GalleryContextValue {
   tangramsCompletedBy: CompletionMap | null
   tangramsStarredBy: StarMap | null
   toggleTangramStar(tangram: SavedTangram): Promise<void>
-  markTangramAsComplete(tangram: SavedTangram, completionTime: number): Promise<void>
+  markTangramAsComplete(
+    tangram: SavedTangram,
+    completionTime: number
+  ): Promise<void>
   isTangramCompleted(tangramId: string): boolean
   isTangramStarred(tangramId: string): boolean
 }
@@ -40,7 +48,8 @@ export const GalleryProvider = ({ children }: React.PropsWithChildren) => {
   const { currentUser } = useContext(UserContext)
   const { approvedTangrams } = useContext(TangramsContext)
 
-  const [tangramsCompletedBy, setTangramsCompletedBy] = useState<CompletionMap | null>(null)
+  const [tangramsCompletedBy, setTangramsCompletedBy] =
+    useState<CompletionMap | null>(null)
   const [tangramsStarredBy, setTangramsLikedBy] = useState<StarMap | null>(null)
 
   const [playlist, setPlaylist] = useState<SavedTangram[] | null>(null)
@@ -123,19 +132,20 @@ export const GalleryProvider = ({ children }: React.PropsWithChildren) => {
 
   const startRandomPlaylist = useCallback(
     (sortDifficulty?: boolean) => {
-      const sortFn: (a: SavedTangram, b: SavedTangram) => number = sortDifficulty
-        ? ({ id: idA, edges: edgesA }, { id: idB, edges: edgesB }) => {
-          const isTangramACompleted = isTangramCompleted(idA)
-          const isTangramBCompleted = isTangramCompleted(idB)
-          return !isTangramACompleted && !isTangramBCompleted
-            ? edgesB - edgesA
-            : Number(isTangramACompleted) - Number(isTangramBCompleted)
-        }
-        : ({ id: idA }, { id: idB }) => {
-          const isTangramACompleted = isTangramCompleted(idA)
-          const isTangramBCompleted = isTangramCompleted(idB)
-          return Number(isTangramACompleted) - Number(isTangramBCompleted)
-        }
+      const sortFn: (a: SavedTangram, b: SavedTangram) => number =
+        sortDifficulty
+          ? ({ id: idA, edges: edgesA }, { id: idB, edges: edgesB }) => {
+              const isTangramACompleted = isTangramCompleted(idA)
+              const isTangramBCompleted = isTangramCompleted(idB)
+              return !isTangramACompleted && !isTangramBCompleted
+                ? edgesB - edgesA
+                : Number(isTangramACompleted) - Number(isTangramBCompleted)
+            }
+          : ({ id: idA }, { id: idB }) => {
+              const isTangramACompleted = isTangramCompleted(idA)
+              const isTangramBCompleted = isTangramCompleted(idB)
+              return Number(isTangramACompleted) - Number(isTangramBCompleted)
+            }
 
       const randomPlaylist = shuffle([...approvedTangrams!]).sort(sortFn)
       setPlaylist(randomPlaylist)

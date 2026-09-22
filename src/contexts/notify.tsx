@@ -15,11 +15,16 @@ const Notification = styled(View, {
   },
 })
 
-export const NotifyContext = createContext<(content: React.ReactNode) => void>(null!)
+export const NotifyContext = createContext<(content: React.ReactNode) => void>(
+  null!
+)
 
 export const NotifyProvider = ({ children }: React.PropsWithChildren) => {
   const notificationRef = useRef<HTMLDivElement>(null)
-  const [notificationData, setNotificationData] = useState<{ content: React.ReactNode; timeoutId: number } | null>(null)
+  const [notificationData, setNotificationData] = useState<{
+    content: React.ReactNode
+    timeoutId: number
+  } | null>(null)
 
   const notify = useCallback((content: React.ReactNode) => {
     setNotificationData((prevNotificationData) => {

@@ -10,16 +10,24 @@ export const useSound = (
     interrupt = false,
     onload,
     ...delegated
-  }: Omit<import("howler").HowlOptions, "src" | "onload"> & { id?: string; playbackRate?: number; soundEnabled?: boolean; interrupt?: boolean; onload?: (this: import("howler").Howl) => void }
+  }: Omit<import("howler").HowlOptions, "src" | "onload"> & {
+    id?: string
+    playbackRate?: number
+    soundEnabled?: boolean
+    interrupt?: boolean
+    onload?: (this: import("howler").Howl) => void
+  }
 ) => {
-  const HowlConstructor = React.useRef<typeof import("howler").Howl | null>(null)
+  const HowlConstructor = React.useRef<typeof import("howler").Howl | null>(
+    null
+  )
   const isMounted = React.useRef(false)
 
   const [duration, setDuration] = React.useState<number | null>(null)
 
   const [sound, setSound] = React.useState<import("howler").Howl | null>(null)
 
-  const handleLoad = function(this: import("howler").Howl) {
+  const handleLoad = function (this: import("howler").Howl) {
     if (typeof onload === "function") {
       onload.call(this)
     }
@@ -96,7 +104,11 @@ export const useSound = (
   }, [volume, playbackRate])
 
   const play = React.useCallback(
-    (options?: { forceSoundEnabled?: boolean; playbackRate?: number; id?: string | number }) => {
+    (options?: {
+      forceSoundEnabled?: boolean
+      playbackRate?: number
+      id?: string | number
+    }) => {
       if (typeof options === "undefined") {
         options = {}
       }

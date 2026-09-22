@@ -3,7 +3,10 @@ declare module "paper/dist/paper-core" {
   export = paper
 }
 
-interface ClipperPoint { X: number; Y: number }
+interface ClipperPoint {
+  X: number
+  Y: number
+}
 interface Window {
   ClipperLib: {
     Paths: new () => ClipperPoint[][]

@@ -3,7 +3,17 @@ import { ImageView } from "./view"
 import { SoundContext } from "../contexts/sound"
 import { ThemeContext } from "../utils/styles"
 
-export const Badge = ({ uid, size = "badge", css, onClick, ...props }: import("../utils/styles").StyleProps & { uid: string; size?: string; onClick?: React.MouseEventHandler<HTMLImageElement> }) => {
+export const Badge = ({
+  uid,
+  size = "badge",
+  css,
+  onClick,
+  ...props
+}: import("../utils/styles").StyleProps & {
+  uid: string
+  size?: string
+  onClick?: React.MouseEventHandler<HTMLImageElement>
+}) => {
   const { playButton } = useContext(SoundContext)
   const theme = useContext(ThemeContext)
 
@@ -25,9 +35,9 @@ export const Badge = ({ uid, size = "badge", css, onClick, ...props }: import(".
       onClick={
         onClick
           ? (e) => {
-            playButton()
-            onClick(e)
-          }
+              playButton()
+              onClick(e)
+            }
           : undefined
       }
       {...props}

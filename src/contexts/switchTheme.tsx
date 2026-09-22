@@ -11,7 +11,14 @@ export type { AppTheme } from "../theme"
 
 export const ThemeContext = createContext(THEMES.light)
 
-export const SwitchThemeContext = createContext<[string, (key: string) => void]>(["", () => { /* No-op outside the provider. */ }])
+export const SwitchThemeContext = createContext<
+  [string, (key: string) => void]
+>([
+  "",
+  () => {
+    /* No-op outside the provider. */
+  },
+])
 
 export const useSwitchTheme = () => useContext(SwitchThemeContext)
 
@@ -33,15 +40,12 @@ export const SwitchThemeProvider = ({ children }: React.PropsWithChildren) => {
     document.documentElement.dataset.theme = themeKey
   }, [themeKey])
 
-  const switchTheme = useCallback(
-    (newThemeKey: string) => {
-      if (newThemeKey === "light" || newThemeKey === "dark") {
-        setThemeKey(newThemeKey)
-        window.localStorage.setItem(STORAGE_KEY, newThemeKey)
-      }
-    },
-    []
-  )
+  const switchTheme = useCallback((newThemeKey: string) => {
+    if (newThemeKey === "light" || newThemeKey === "dark") {
+      setThemeKey(newThemeKey)
+      window.localStorage.setItem(STORAGE_KEY, newThemeKey)
+    }
+  }, [])
 
   const contextValue = useMemo<[string, (key: string) => void]>(
     () => [themeKey, switchTheme],

@@ -46,7 +46,9 @@ import { View, CanvasView } from "./view"
 
 import type { TanGroup, PiecesGroup, Outline } from "../types"
 
-interface Particle extends paper.Path { data: { index: number; animation: paper.Tween } }
+interface Particle extends paper.Path {
+  data: { index: number; animation: paper.Tween }
+}
 
 export const Tangram = () => {
   const intl = useIntl()
@@ -211,14 +213,14 @@ export const Tangram = () => {
 
         const ghostShape = ghostGroup!.children["display 1"]
 
-        const otherShapes = piecesGroupRef.current!.children
-          .filter((otherGroup) => otherGroup !== pieceGroup)
+        const otherShapes = piecesGroupRef
+          .current!.children.filter((otherGroup) => otherGroup !== pieceGroup)
           .map(({ children }) => children["display"])
 
         const coumpoundShapes =
           showBackgroundPatternRef.current && coumpoundPathRef.current
             ? coumpoundPathRef.current instanceof paper.CompoundPath
-              ? coumpoundPathRef.current.children as paper.Path[]
+              ? (coumpoundPathRef.current.children as paper.Path[])
               : [coumpoundPathRef.current]
             : null
 
@@ -478,9 +480,14 @@ export const Tangram = () => {
 
     for (let i = 0; i < PARTICLES_COUNT; i++) {
       // Each particle owns its stream: tween completion order cannot change other particles.
-      const random = createRandom(String(Math.floor(particleSeeds() * 4294967296)))
-      const getRandomRadius = () => random() * (MAX_PARTICLE_SIZE - MIN_PARTICLE_SIZE) + MIN_PARTICLE_SIZE
-      const getRandomOpacity = () => random() * (MAX_PARTICLE_OPACITY - MIN_PARTICLE_OPACITY) + MIN_PARTICLE_OPACITY
+      const random = createRandom(
+        String(Math.floor(particleSeeds() * 4294967296))
+      )
+      const getRandomRadius = () =>
+        random() * (MAX_PARTICLE_SIZE - MIN_PARTICLE_SIZE) + MIN_PARTICLE_SIZE
+      const getRandomOpacity = () =>
+        random() * (MAX_PARTICLE_OPACITY - MIN_PARTICLE_OPACITY) +
+        MIN_PARTICLE_OPACITY
       const particle = new paper.Path.Circle({
         center: new paper.Point(random(), random()).multiply(maxPoint),
         radius: getRandomRadius(),
@@ -518,7 +525,8 @@ export const Tangram = () => {
     }
     return () => {
       active = false
-      for (const particle of particleGroup.children) particle.data.animation.stop()
+      for (const particle of particleGroup.children)
+        particle.data.animation.stop()
       particleGroup.remove()
       particlesRef.current = null
     }
@@ -526,10 +534,12 @@ export const Tangram = () => {
 
   useLayoutEffect(() => {
     for (const pieceGroup of piecesGroupRef.current!.children) {
-      pieceGroup.children["display"].fillColor =
-        new paper.Color(theme.colors.pieces[pieceGroup.data.id])
-      pieceGroup.children["insetBorder"].strokeColor =
-        new paper.Color(theme.colors.pieces[pieceGroup.data.id])
+      pieceGroup.children["display"].fillColor = new paper.Color(
+        theme.colors.pieces[pieceGroup.data.id]
+      )
+      pieceGroup.children["insetBorder"].strokeColor = new paper.Color(
+        theme.colors.pieces[pieceGroup.data.id]
+      )
     }
 
     const pieceColors = Object.values(theme.colors.pieces)
@@ -540,8 +550,9 @@ export const Tangram = () => {
     }
 
     for (const particle of particlesRef.current!) {
-      particle.fillColor =
-        new paper.Color(pieceColors[Math.floor(colorRandom() * pieceColors.length)])
+      particle.fillColor = new paper.Color(
+        pieceColors[Math.floor(colorRandom() * pieceColors.length)]
+      )
     }
   }, [theme.colors, selectedTangram, showParticles])
 
@@ -572,7 +583,6 @@ export const Tangram = () => {
         </View>
       )}
       <CanvasView
-
         ref={canvasRef}
         css={{
           minHeight: "auto",

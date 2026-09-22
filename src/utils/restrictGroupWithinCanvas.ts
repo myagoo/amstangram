@@ -1,6 +1,9 @@
 import paper from "paper/dist/paper-core"
 
-export const restrictGroupWithinCanvas = (group: paper.Group, canvas: HTMLCanvasElement) => {
+export const restrictGroupWithinCanvas = (
+  group: paper.Group,
+  canvas: HTMLCanvasElement
+) => {
   const correctionVector = group.pivot
     ? group.pivot.subtract(group.bounds.center)
     : new paper.Point(0, 0)

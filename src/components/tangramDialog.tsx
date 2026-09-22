@@ -17,7 +17,13 @@ import { ErrorText, Hint, InlineIcon, Similink, Title } from "./primitives"
 import { Text } from "./text"
 import { View } from "./view"
 
-const ReadTangramDialog = ({ tangram, deferred }: { tangram: import("../types").Tangram; deferred: import("../utils/deferred").Deferred }) => {
+const ReadTangramDialog = ({
+  tangram,
+  deferred,
+}: {
+  tangram: import("../types").Tangram
+  deferred: import("../utils/deferred").Deferred
+}) => {
   const { tangramsStarredBy } = useContext(GalleryContext)
 
   const stars = useMemo(() => {
@@ -35,7 +41,9 @@ const ReadTangramDialog = ({ tangram, deferred }: { tangram: import("../types").
       onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
       css={{ gap: "3" }}
     >
-      <View css={{ gap: "3", overflow: "auto", flex: "1", alignItems: "center" }}>
+      <View
+        css={{ gap: "3", overflow: "auto", flex: "1", alignItems: "center" }}
+      >
         <Card selected tangram={tangram}></Card>
         <Text css={{ fontSize: "2" }}>
           <FormattedMessage
@@ -56,7 +64,13 @@ const ReadTangramDialog = ({ tangram, deferred }: { tangram: import("../types").
   )
 }
 
-const SaveTangramDialog = ({ tangram, deferred }: { tangram: import("../types").Tangram; deferred: import("../utils/deferred").Deferred }) => {
+const SaveTangramDialog = ({
+  tangram,
+  deferred,
+}: {
+  tangram: import("../types").Tangram
+  deferred: import("../utils/deferred").Deferred
+}) => {
   const intl = useIntl()
   const notify = useContext(NotifyContext)
   const { currentUser } = useContext(UserContext)
@@ -246,7 +260,7 @@ const SaveTangramDialog = ({ tangram, deferred }: { tangram: import("../types").
 
         <View css={{ gap: "2" }}>
           <label>{intl.formatMessage({ id: "Category" })}</label>
-          <Select  {...register("category")}>
+          <Select {...register("category")}>
             {CATEGORIES.map((category) => (
               <option key={category} value={category}>
                 {intl.formatMessage({ id: category })}
@@ -258,7 +272,7 @@ const SaveTangramDialog = ({ tangram, deferred }: { tangram: import("../types").
         {category === "digits" ? (
           <View css={{ gap: "2" }}>
             <label>{intl.formatMessage({ id: "Victory emoji" })}</label>
-            <Select  {...register("digitIndex")}>
+            <Select {...register("digitIndex")}>
               {DIGITS.map((digitEmoji, index) => (
                 <option key={index} value={index}>
                   {digitEmoji}
@@ -269,7 +283,7 @@ const SaveTangramDialog = ({ tangram, deferred }: { tangram: import("../types").
         ) : category === "letters" ? (
           <View css={{ gap: "2" }}>
             <label>{intl.formatMessage({ id: "Victory emoji" })}</label>
-            <Select  {...register("letterIndex")}>
+            <Select {...register("letterIndex")}>
               {LETTERS.map((letterEmoji, index) => (
                 <option key={index} value={index}>
                   {letterEmoji}
@@ -307,7 +321,13 @@ const SaveTangramDialog = ({ tangram, deferred }: { tangram: import("../types").
   )
 }
 
-export const TangramDialog = ({ tangram, deferred }: { tangram: import("../types").Tangram; deferred: import("../utils/deferred").Deferred }) => {
+export const TangramDialog = ({
+  tangram,
+  deferred,
+}: {
+  tangram: import("../types").Tangram
+  deferred: import("../utils/deferred").Deferred
+}) => {
   const { currentUser } = useContext(UserContext)
   const isEdit =
     currentUser &&

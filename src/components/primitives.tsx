@@ -51,7 +51,12 @@ export const Similink = styled(Text, {
   },
 })
 
-export const InlineIcon = ({ icon, css }: import("../utils/styles").StyleProps & { icon: import("react-icons").IconType }) => {
+export const InlineIcon = ({
+  icon,
+  css,
+}: import("../utils/styles").StyleProps & {
+  icon: import("react-icons").IconType
+}) => {
   return (
     <Text
       as={icon}
@@ -65,7 +70,9 @@ export const InlineIcon = ({ icon, css }: import("../utils/styles").StyleProps &
   )
 }
 
-export const InlineStarIcon = ({ css }: import("../utils/styles").StyleProps) => {
+export const InlineStarIcon = ({
+  css,
+}: import("../utils/styles").StyleProps) => {
   return (
     <Text
       as={FiStar}

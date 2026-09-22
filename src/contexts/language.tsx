@@ -8,7 +8,9 @@ export const supportedLanguages = ["en", "fr"]
 
 export const LanguageContext = createContext({
   language: fallBackLanguage,
-  setLanguage: (_language: string) => { /* No-op outside the provider. */ },
+  setLanguage: (_language: string) => {
+    /* No-op outside the provider. */
+  },
 })
 
 export const getDefaultLanguage = () => {
