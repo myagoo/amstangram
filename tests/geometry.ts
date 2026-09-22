@@ -7,6 +7,17 @@ import { getSnapVector } from "../src/utils/getSnapVector"
 import { getTangramDifficulty } from "../src/utils/getTangramDifficulty"
 import { SMALL_TRIANGLE_BASE } from "../src/constants"
 
+export const projectSetups = { count: 0 }
+export const countProjects = () => paper.projects.length
+export const readProjectOpacity = () => paper.project.activeLayer.opacity
+export function trackProjectSetups() {
+  const setup = paper.setup.bind(paper)
+  paper.setup = (...args: Parameters<typeof setup>) => {
+    projectSetups.count++
+    return setup(...args)
+  }
+}
+
 export function readTan(id: string) {
   const pieces = paper.project.activeLayer.children.find(
     (item) =>

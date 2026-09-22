@@ -26,6 +26,8 @@ interface GalleryContextValue {
   requestSave(): void
   saveRequestId: number
   playlist: SavedTangram[] | null
+  currentTangramIndex: number
+  advancePlaylist(): void
   setPlaylist: React.Dispatch<React.SetStateAction<SavedTangram[] | null>>
   shareTangrams(tangrams: SavedTangram[]): void
   startRandomPlaylist(sortDifficulty?: boolean): void
@@ -52,7 +54,27 @@ export const GalleryProvider = ({ children }: React.PropsWithChildren) => {
     useState<CompletionMap | null>(null)
   const [tangramsStarredBy, setTangramsLikedBy] = useState<StarMap | null>(null)
 
-  const [playlist, setPlaylist] = useState<SavedTangram[] | null>(null)
+  const [{ playlist, currentTangramIndex }, setSession] = useState<{
+    playlist: SavedTangram[] | null
+    currentTangramIndex: number
+  }>({ playlist: null, currentTangramIndex: 0 })
+  const setPlaylist = useCallback<GalleryContextValue["setPlaylist"]>(
+    (next) => {
+      setSession((session) => ({
+        playlist: typeof next === "function" ? next(session.playlist) : next,
+        currentTangramIndex: 0,
+      }))
+    },
+    []
+  )
+  const advancePlaylist = useCallback(() => {
+    setSession((session) =>
+      session.playlist &&
+      session.currentTangramIndex < session.playlist.length - 1
+        ? { ...session, currentTangramIndex: session.currentTangramIndex + 1 }
+        : session
+    )
+  }, [])
   const [saveRequestId, setSaveRequestId] = useState(0)
   const [initialized, setInitialized] = useState(false)
 
@@ -150,7 +172,7 @@ export const GalleryProvider = ({ children }: React.PropsWithChildren) => {
       const randomPlaylist = shuffle([...approvedTangrams!]).sort(sortFn)
       setPlaylist(randomPlaylist)
     },
-    [approvedTangrams, isTangramCompleted]
+    [approvedTangrams, isTangramCompleted, setPlaylist]
   )
 
   const markTangramAsComplete = useCallback(
@@ -212,6 +234,8 @@ export const GalleryProvider = ({ children }: React.PropsWithChildren) => {
       requestSave,
       saveRequestId,
       playlist,
+      currentTangramIndex,
+      advancePlaylist,
       setPlaylist,
       shareTangrams,
       startRandomPlaylist,
@@ -227,6 +251,9 @@ export const GalleryProvider = ({ children }: React.PropsWithChildren) => {
       requestSave,
       saveRequestId,
       playlist,
+      currentTangramIndex,
+      advancePlaylist,
+      setPlaylist,
       shareTangrams,
       startRandomPlaylist,
       tangramsCompletedBy,

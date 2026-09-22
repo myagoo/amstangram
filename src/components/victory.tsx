@@ -1,4 +1,4 @@
-import React, { useContext, useState, useMemo } from "react"
+import React, { useContext, useState, useMemo, useEffect, useRef } from "react"
 import { FiCheck, FiPlay, FiX, FiStar } from "react-icons/fi"
 import { useIntl } from "react-intl"
 import { PrimaryButton } from "./button"
@@ -22,6 +22,10 @@ export const Victory = ({
 }) => {
   const intl = useIntl()
   const [emojiSpinEnded, setEmojiSpinEnded] = useState(false)
+  const spinTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  )
+  useEffect(() => () => clearTimeout(spinTimeout.current), [])
   const { playStar } = useContext(SoundContext)
   const { tangramsStarredBy, isTangramStarred } = useContext(GalleryContext)
 
@@ -38,7 +42,8 @@ export const Victory = ({
   const starred = isTangramStarred(tangram.id)
 
   const handleEmojiSpinAnimationEnd = () => {
-    setTimeout(() => setEmojiSpinEnded(true), 1000)
+    clearTimeout(spinTimeout.current)
+    spinTimeout.current = setTimeout(() => setEmojiSpinEnded(true), 1000)
   }
 
   return (

@@ -4,7 +4,6 @@ import React, {
   useContext,
   useEffect,
   useLayoutEffect,
-  useMemo,
   useRef,
   useState,
 } from "react"
@@ -72,6 +71,8 @@ export const Tangram = () => {
   const {
     saveRequestId,
     playlist,
+    currentTangramIndex,
+    advancePlaylist,
     setPlaylist,
     markTangramAsComplete,
     toggleTangramStar,
@@ -80,20 +81,18 @@ export const Tangram = () => {
   const markTangramAsCompleteRef = useRef(markTangramAsComplete)
   markTangramAsCompleteRef.current = markTangramAsComplete
 
-  const [currentTangramIndex, setCurrentTangramIndex] = useState(0)
   const [victoryPhase, setVictoryPhase] = useState(false)
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const scaleFactorRef = useRef(1)
   const piecesGroupRef = useRef<PiecesGroup | null>(null)
   const particlesRef = useRef<Particle[] | null>(null)
+  const stopParticlesRef = useRef<(() => void) | null>(null)
   const coumpoundPathRef = useRef<Outline | null>(null)
   const showBackgroundPatternRef = useRef(showBackgroundPattern)
   const showParticlesRef = useRef(showParticles)
 
-  const selectedTangram = useMemo(() => {
-    return playlist && playlist[currentTangramIndex]
-  }, [playlist, currentTangramIndex])
+  const selectedTangram = playlist?.[currentTangramIndex]
 
   useEffect(() => {
     setVictoryPhase(false)
@@ -101,7 +100,7 @@ export const Tangram = () => {
 
   const handleNext = () => {
     setVictoryPhase(false)
-    setCurrentTangramIndex(currentTangramIndex + 1)
+    advancePlaylist()
     showRandomTip()
   }
 
@@ -120,10 +119,6 @@ export const Tangram = () => {
 
     notify(intl.formatMessage({ id: "Tangram approved" }))
   }
-
-  useEffect(() => {
-    setCurrentTangramIndex(0)
-  }, [playlist])
 
   // Handle save tangram request
   useEffect(() => {
@@ -175,6 +170,8 @@ export const Tangram = () => {
   useLayoutEffect(() => {
     const start = Date.now()
     const victoryRandom = createGameRandom()
+    let victoryTimeout: ReturnType<typeof setTimeout> | undefined
+    let victoryAnimation: paper.Tween | undefined
     const attachPieceGroupEvents = (pieceGroup: TanGroup) => {
       let anchorPoint: paper.Point | null = null
       let ghostGroup: TanGroup | null = null
@@ -302,7 +299,7 @@ export const Tangram = () => {
             return
           }
 
-          paper.project.activeLayer.tween(
+          victoryAnimation = project.activeLayer.tween(
             {
               opacity: 0,
             },
@@ -315,7 +312,7 @@ export const Tangram = () => {
           for (const particle of particlesRef.current!) {
             particle.data.animation.stop()
 
-            particle.tween(
+            particle.data.animation = particle.tween(
               {
                 "position.x": piecesGroupRef.current!.position.x,
                 "position.y": piecesGroupRef.current!.position.y,
@@ -327,9 +324,9 @@ export const Tangram = () => {
               }
             )
           }
-          setTimeout(() => {
+          victoryTimeout = setTimeout(() => {
             playRef.current.victory()
-            paper.project.activeLayer.tween(
+            victoryAnimation = project.activeLayer.tween(
               {
                 opacity: 1,
               },
@@ -340,14 +337,15 @@ export const Tangram = () => {
             )
 
             const maxDistance =
-              Math.max(paper.view.bounds.width, paper.view.bounds.height) / 2
+              Math.max(project.view.bounds.width, project.view.bounds.height) /
+              2
 
-            for (const particle of particlesRef.current!) {
+            for (const particle of particlesRef.current ?? []) {
               particle.data.animation.stop()
 
               const angle = victoryRandom() * Math.PI * 2
               const distance = victoryRandom() * maxDistance
-              particle.tween(
+              particle.data.animation = particle.tween(
                 {
                   "position.x":
                     particle.position.x + distance * Math.cos(angle),
@@ -374,7 +372,9 @@ export const Tangram = () => {
         mouseup: handleMouseUp,
       })
 
-      pieceGroup.data.removeListeners = () =>
+      pieceGroup.data.removeListeners = () => {
+        ghostGroup?.remove()
+        ghostGroup = null
         pieceGroup.off({
           mouseenter: handleMouseEnter,
           mouseleave: handleMouseLeave,
@@ -382,6 +382,7 @@ export const Tangram = () => {
           mousedrag: handleMouseDrag,
           mouseup: handleMouseUp,
         })
+      }
     }
 
     const init = () => {
@@ -436,6 +437,19 @@ export const Tangram = () => {
     }
 
     init()
+    const project = paper.project
+    const pieces = piecesGroupRef.current!
+    return () => {
+      clearTimeout(victoryTimeout)
+      victoryAnimation?.stop()
+      // The project owns these resources; cleanup does not depend on effect order.
+      stopParticlesRef.current?.()
+      for (const piece of pieces.children) piece.data.removeListeners()
+      project.remove()
+      piecesGroupRef.current = null
+      coumpoundPathRef.current = null
+      document.body.style.cursor = "default"
+    }
   }, [selectedTangram])
 
   useLayoutEffect(() => {
@@ -516,27 +530,18 @@ export const Tangram = () => {
 
       particlesRef.current[i] = particle
     }
-    return () => {
+    const stop = () => {
+      if (!active) return
       active = false
       for (const particle of particleGroup.children)
         particle.data.animation.stop()
       particleGroup.remove()
       particlesRef.current = null
+      stopParticlesRef.current = null
     }
+    stopParticlesRef.current = stop
+    return stop
   }, [selectedTangram, showParticles])
-
-  // Layout cleanups run in declaration order: detach animated items before
-  // destroying their project's view, including on puzzle changes and unmount.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: The project above is recreated whenever selectedTangram changes.
-  useLayoutEffect(() => {
-    const project = paper.project
-    return () => {
-      project.remove()
-      particlesRef.current = null
-      piecesGroupRef.current = null
-      coumpoundPathRef.current = null
-    }
-  }, [selectedTangram])
 
   useLayoutEffect(() => {
     for (const pieceGroup of piecesGroupRef.current!.children) {

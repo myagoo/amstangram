@@ -39,6 +39,8 @@ and does not verify real authentication or Firestore permissions.
 The gallery-switch regression opts into two distinct puzzle records and leaves
 particles enabled. A one-puzzle fixture can reselect the same object without
 recreating the game, hiding cleanup-order crashes when switching real puzzles.
+The lifecycle suite also uses an explicitly ordered playlist when checking Next
+and replacement, so it cannot accidentally reselect the already active puzzle.
 
 ### Reproducible randomness
 
@@ -169,6 +171,24 @@ Five browser checks cover these paths using the existing external-service fixtur
 the failure cases verify that email, credentials and profile remain unchanged.
 Run the same account test command above. Firebase remains unchanged; these tests
 do not verify real account configuration or send verification emails.
+
+**0.2.4 🥟.🐼.🧩 — active-puzzle lifetime (ticket 03).** Playlist and cursor are
+updated atomically in the gallery state. Replacing an advanced playlist no longer
+initializes an intermediate blank puzzle. The game's setup effect now owns its
+disposal: cancel victory timers/tweens, stop particles, detach tan handlers and
+remove the captured Paper project. Particle cleanup is idempotent, so disposal
+does not depend on effect declaration order. Victory's delayed controls also
+cancel their timer on unmount. Disabling particles mid-victory still completes
+the solved puzzle safely.
+
+Run `PLAYWRIGHT_CHANNEL=chrome bun run test:e2e tests/lifecycle.spec.ts` for
+gallery replacement during victory, Next then playlist replacement, disabling
+particles during victory, and actual React unmount/remount. The latter uses a
+test-only page with real providers and gameplay; Firebase alone is substituted.
+Tests replay the recorded mouse-only square solution and observe the Paper
+boundary, without mocking completion. The stale-victory and double-initialization
+regressions both failed before their fixes. Geometry, seeded random sequences,
+Firebase contracts and generator integration are unchanged.
 
 Remaining defects found while typing/reviewing:
 
