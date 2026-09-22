@@ -90,6 +90,24 @@ harmless misplaced PURE annotation warning from Panda's generated code remain.
 
 ## Migration baseline and known issues
 
+Non-Firebase dependency maintenance updates Paper.js to 0.12.18, gh-pages to
+6.3.0 and Howler types to 2.2.13. Unused npm Sentry and offset-polygon dependencies
+were removed after searching application code, tests and maintenance tools;
+the separate Sentry CDN integration in `index.html` is unchanged.
+Firebase stays at 10.7.0 by explicit scope choice; no Firebase migration or
+real-SDK emulator verification is included in this modernization.
+
+The dependency audit is **not clean**. Firebase 10.7.0 is covered by
+[CVE-2024-11023](https://github.com/advisories/GHSA-3wf4-68gx-mph8), concerning
+attacker-controlled session-sync configuration (patched in 10.9.0). Its existing
+dependency tree also includes flagged gRPC, protobufjs, Undici and websocket-driver
+versions. An advisory is not proof that this browser app exposes every affected
+code path; assess those separately before choosing a Firebase security update.
+Do not run the legacy maintenance scripts against production as an audit test.
+Tooling advisories will be reassessed after the ESLint-to-Biome replacement;
+run `bun audit` to see the current complete list. No forced dependency overrides
+have been introduced merely to suppress the report.
+
 The TypeScript migration starts from `7003b42762d7c48eaec354720c641e8ce4fb4915`.
 Puzzle metadata/storage shapes and Paper.js algorithms are unchanged. Panda now
 supplies styling types; use-sound 5 exports its own declarations, so the old
