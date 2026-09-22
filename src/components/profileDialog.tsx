@@ -198,7 +198,7 @@ const ChangePasswordForm = ({
 }) => {
   const intl = useIntl()
 
-  const { updateUsername } = useContext(UserContext)
+  const { updatePassword } = useContext(UserContext)
 
   const notify = useContext(NotifyContext)
 
@@ -211,10 +211,15 @@ const ChangePasswordForm = ({
   const newPassword = watch("newPassword")
 
   const onSubmit = useCallback(
-    async ({ password }: { password: string; newPassword: string }) => {
+    async ({
+      password,
+      newPassword,
+    }: {
+      password: string
+      newPassword: string
+    }) => {
       try {
-        // Preserve the legacy username update; correcting the password workflow is separate.
-        await updateUsername(currentUser, password)
+        await updatePassword(currentUser, password, newPassword)
         notify(intl.formatMessage({ id: "Password changed successfuly" }))
         onClose()
       } catch (error) {
@@ -239,7 +244,7 @@ const ChangePasswordForm = ({
         }
       }
     },
-    [currentUser, updateUsername, onClose, setError, notify, intl]
+    [currentUser, updatePassword, onClose, setError, notify, intl]
   )
 
   return (

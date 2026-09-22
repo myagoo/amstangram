@@ -16,7 +16,35 @@ const records: Record<string, Record<string, Record<string, unknown>>> = {
   },
   stats: {},
 }
-const user = { uid: "tester", email: "tester@example.test" }
+export const account = {
+  password: "fixture-current-password",
+  profileUpdates: [] as Record<string, unknown>[],
+}
+const user = {
+  uid: "tester",
+  email: "tester@example.test",
+  async reauthenticateWithCredential(credential: {
+    email: string
+    password: string
+  }) {
+    if (
+      credential.email !== this.email ||
+      credential.password !== account.password
+    )
+      throw Object.assign(new Error("Fixture authentication rejection"), {
+        code: "auth/wrong-password",
+      })
+  },
+  async updatePassword(password: string) {
+    const code = localStorage.getItem("test-password-error")
+    if (code)
+      throw Object.assign(new Error("Fixture password rejection"), { code })
+    account.password = password
+  },
+  async updateProfile(data: Record<string, unknown>) {
+    account.profileUpdates.push(data)
+  },
+}
 // Opt in so existing single-puzzle geometry and visual baselines stay unchanged.
 if (localStorage.getItem("test-two-puzzles")) {
   records.tangrams["square-copy"] = { ...records.tangrams.square }
@@ -28,19 +56,26 @@ const snapshot = (id: string, data: Record<string, unknown>) => ({
   data: () => data,
 })
 const firebase = {
-  auth: () => ({
-    onAuthStateChanged(callback: (value: typeof user | null) => void) {
-      queueMicrotask(() =>
-        callback(localStorage.getItem("test-guest") ? null : user)
-      )
-      return () => {}
-    },
-    signInWithEmailAndPassword: async () => {
-      throw Object.assign(new Error("Fixture authentication rejection"), {
-        code: "auth/wrong-password",
-      })
-    },
-  }),
+  auth: Object.assign(
+    () => ({
+      onAuthStateChanged(callback: (value: typeof user | null) => void) {
+        queueMicrotask(() =>
+          callback(localStorage.getItem("test-guest") ? null : user)
+        )
+        return () => {}
+      },
+      signInWithEmailAndPassword: async () => {
+        throw Object.assign(new Error("Fixture authentication rejection"), {
+          code: "auth/wrong-password",
+        })
+      },
+    }),
+    {
+      EmailAuthProvider: {
+        credential: (email: string, password: string) => ({ email, password }),
+      },
+    }
+  ),
   firestore: () => ({
     collection(name: string) {
       return {
@@ -62,7 +97,12 @@ const firebase = {
             set: async () => {
               throw new Error("Unexpected persistence in migration smoke test")
             },
-            update: async () => {
+            update: async (data: Record<string, unknown>) => {
+              if (name === "users") {
+                writes.push({ collection: name, data })
+                Object.assign(records[name][id], data)
+                return
+              }
               throw new Error("Unexpected persistence in migration smoke test")
             },
           }

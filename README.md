@@ -148,12 +148,23 @@ Puzzle metadata/storage shapes and Paper.js algorithms are unchanged. Panda now
 supplies styling types; use-sound 5 exports its own declarations, so the old
 TypeScript path workaround has been removed.
 
-Existing defects found while typing, **not fixed by this migration**:
+### Codebase health releases
 
-- **Security-sensitive:** the change-password form calls `updateUsername` with
-  the entered current password. This can expose that password as the username;
-  do not use this form until it is fixed. The change-email form also reverses
-  the email/password arguments. No real accounts were used during verification.
+**0.2.2 🥟.🐼.🔐 — safe password changes (ticket 01).** The profile form now
+reauthenticates with the current password and sends the new password to Firebase
+Auth, never to the username updater. Success preserves the public username;
+wrong passwords, weak passwords, service failures and confirmation mismatches
+keep the form open with feedback. Browser regression coverage uses only the
+Firebase fixture and checks that neither Auth profile nor Firestore metadata is
+written. Run `PLAYWRIGHT_CHANNEL=chrome bun run test:e2e tests/account.spec.ts`.
+The old implementation reproduced a false success and changed the fixture's
+username before the fix. This does not establish whether real accounts were
+affected; no historical account investigation or production data changes were made.
+
+Remaining defects found while typing/reviewing:
+
+- The change-email form reverses email/password arguments (ticket 02).
+  No real accounts were used during verification.
 - Secondary snapping reads an absent `shape` property from a Paper.js path.
 - The unused local sound helper's invalid effect-dependency object was replaced
   with an empty dependency array; the game uses the external `use-sound` package.
