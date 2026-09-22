@@ -151,10 +151,24 @@ TypeScript path workaround has been removed.
 
 ### Codebase health releases
 
-The app displays only the emoji release code (currently `🥟.🐼.🙈`), without
+The app displays only the emoji release code (currently `🥟.🐼.🌊`), without
 the numeric version. Numeric versions remain in `package.json` and release notes
 for tooling and traceability. Release 0.2.11 makes this display-only change; the
 menu browser regression checks the exact emoji label and excludes digits.
+
+**0.2.12 🥟.🐼.🌊 — automatic gallery scrolling.** The gallery replaces the
+manual load-more button with native intersection observation inside its scroll
+area. It reveals another 48 cards when the end is within 200px, and stops once
+all matches are displayed. The scroll region is keyboard-focusable with a visible
+focus outline; keyboard, wheel and touch scrolling use the same loading trigger.
+Filters reset the display limit and scroll position without clearing selection.
+Observers are disconnected on filter changes, batch updates and dialog close.
+
+Run `PLAYWRIGHT_CHANNEL=chrome bun run test:e2e tests/gallery.spec.ts` for
+keyboard/wheel loading, final-batch bounds, sharing and play order, filter resets,
+empty-result recovery, reopening and touch long-press details. This still only
+bounds initial rendering: scrolling through everything eventually mounts all
+cards, and no server pagination or virtualization is introduced.
 
 **0.2.2 🥟.🐼.🔐 — safe password changes (ticket 01).** The profile form now
 reauthenticates with the current password and sends the new password to Firebase
@@ -207,8 +221,9 @@ checks the leaderboard and its nested profile against the same external-service
 fixture; it reproduced the incorrect completion total before the fix.
 
 **0.2.6 🥟.🐼.⚡ — incremental gallery (ticket 05).** The gallery initially
-mounts at most 48 cards. The localized, keyboard-accessible “Show more tangrams”
-button adds another 48, preserving category order. Changing a filter resets the
+mounted at most 48 cards. Its localized, keyboard-accessible “Show more tangrams”
+button added another 48 (replaced by automatic scrolling in 0.2.12), preserving
+category order. Changing a filter resets the
 display limit and scroll position, not selection. Selected-ID checks use a Set;
 the existing array still determines playlist and share-link order. Touch
 long-press details remain available for newly displayed cards. Shared buttons

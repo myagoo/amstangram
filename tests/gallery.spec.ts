@@ -1,5 +1,12 @@
-import { test, expect } from "@playwright/test"
+import { test, expect, type Page } from "@playwright/test"
 import { solveSquare } from "./solveSquare"
+
+async function scrollToNextBatch(page: Page) {
+  await page
+    .getByRole("region", { name: "Tangram gallery", exact: true })
+    .hover()
+  await page.mouse.wheel(0, 10000)
+}
 
 test.use({ viewport: { width: 627, height: 863 }, deviceScaleFactor: 1 })
 test.beforeEach(async ({ page }) => {
@@ -32,25 +39,20 @@ test("gallery mounts batches and preserves share and play order across them", as
   await page.getByText("Tangram gallery", { exact: true }).click()
   const cards = page.locator('#dialogContainer svg[viewBox="0 0 200 200"]')
   await expect(cards).toHaveCount(48)
-  await page
-    .getByRole("button", { name: "Show more tangrams", exact: true })
-    .focus()
-  await expect(
-    page.getByRole("button", { name: "Show more tangrams", exact: true })
-  ).toHaveCSS("outline-style", "solid")
-  await expect(
-    page.getByRole("button", { name: "Show more tangrams", exact: true })
-  ).toHaveCSS("outline-width", "2px")
-  await expect(
-    page.getByRole("button", { name: "Show more tangrams", exact: true })
-  ).not.toHaveCSS("outline-color", "rgba(0, 0, 0, 0)")
-  await page.keyboard.press("Enter")
+  const results = page.getByRole("region", {
+    name: "Tangram gallery",
+    exact: true,
+  })
+  await results.focus()
+  await expect(results).toHaveCSS("outline-style", "solid")
+  await expect(results).not.toHaveCSS("outline-color", "rgba(0, 0, 0, 0)")
+  await page.keyboard.press("End")
   await expect(cards).toHaveCount(96)
   await cards.nth(55).click()
   await cards.nth(0).click()
-  await page
-    .getByRole("button", { name: "Show more tangrams", exact: true })
-    .click()
+  await scrollToNextBatch(page)
+  await expect(cards).toHaveCount(120)
+  await scrollToNextBatch(page)
   await expect(cards).toHaveCount(120)
   await expect(
     page.getByRole("button", { name: "Show more tangrams", exact: true })
@@ -82,9 +84,7 @@ test("gallery filters reset batches without losing selected puzzles", async ({
   await page.getByText("Tangram gallery", { exact: true }).click()
   const cards = page.locator('#dialogContainer svg[viewBox="0 0 200 200"]')
   await cards.first().click()
-  await page
-    .getByRole("button", { name: "Show more tangrams", exact: true })
-    .click()
+  await scrollToNextBatch(page)
   await expect(cards).toHaveCount(96)
   await expect(page.getByText("Stuff", { exact: true })).toBeVisible()
   await page.getByRole("combobox").selectOption("starred")
@@ -113,9 +113,7 @@ test("a touch long-press still opens details for an incrementally loaded card", 
   await expect(page.locator("canvas")).toBeVisible({ timeout: 15000 })
   await page.locator("svg").first().click()
   await page.getByText("Tangram gallery", { exact: true }).click()
-  await page
-    .getByRole("button", { name: "Show more tangrams", exact: true })
-    .click()
+  await scrollToNextBatch(page)
   const card = page
     .locator('#dialogContainer svg[viewBox="0 0 200 200"]')
     .nth(55)
@@ -140,9 +138,31 @@ test("a touch long-press still opens details for an incrementally loaded card", 
   await expect(page.getByText("Earned 1", { exact: true })).toBeVisible()
   await page.mouse.click(1, 1)
   await expect(
-    page.getByRole("button", { name: "Show more tangrams", exact: true })
+    page.getByRole("region", { name: "Tangram gallery", exact: true })
   ).toBeVisible()
   await expect(
     page.locator('#dialogContainer svg[viewBox="0 0 200 200"]')
   ).toHaveCount(96)
+})
+
+test("automatic scrolling resumes after an empty filter and resets on reopen", async ({
+  page,
+}) => {
+  await page.addInitScript(() => localStorage.setItem("test-guest", "true"))
+  await page.goto("/?seed=42")
+  await expect(page.locator("canvas")).toBeVisible({ timeout: 15000 })
+  await page.locator("svg").first().click()
+  await page.getByText("Tangram gallery", { exact: true }).click()
+  const cards = page.locator('#dialogContainer svg[viewBox="0 0 200 200"]')
+  await page.getByRole("combobox").selectOption("starred")
+  await expect(cards).toHaveCount(0)
+  await page.getByRole("combobox").selectOption("all")
+  await expect(cards).toHaveCount(48)
+  await scrollToNextBatch(page)
+  await expect(cards).toHaveCount(96)
+  await page.mouse.click(1, 1)
+  await page.getByText("Tangram gallery", { exact: true }).click()
+  await expect(cards).toHaveCount(48)
+  await scrollToNextBatch(page)
+  await expect(cards).toHaveCount(96)
 })

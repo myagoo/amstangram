@@ -21,7 +21,6 @@ export default {
   "Tangram gallery": "Galerie des tangrams",
 
   "All tangrams": "Tous les tangrams",
-  "Show more tangrams": "Afficher plus de tangrams",
   "Uncompleted tangrams": "Tangrams non complétés",
   "★ Starred tangrams": "Tangrams étoilés ★",
   "Pending approbation tangrams": "Tangrams en attente d'approbation",

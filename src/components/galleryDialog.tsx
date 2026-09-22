@@ -2,6 +2,7 @@ import { styled } from "../../styled-system/jsx"
 import React, {
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -69,6 +70,7 @@ export const GalleryDialog = ({
   )
   const [visibleCount, setVisibleCount] = useState(GALLERY_BATCH_SIZE)
   const resultsRef = useRef<HTMLDivElement>(null)
+  const loadMoreRef = useRef<HTMLDivElement>(null)
 
   const [selectedGalleryFilter, setSelectedGalleryFilter] = useState(() => {
     const storedSelectedGalleryFilter = window.localStorage.getItem(
@@ -191,6 +193,32 @@ export const GalleryDialog = ({
     (total, tangrams) => total + tangrams.length,
     0
   )
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Changing filters must cancel queued intersections even when the result count stays the same.
+  useEffect(() => {
+    if (
+      !resultsRef.current ||
+      !loadMoreRef.current ||
+      visibleCount >= totalCount
+    )
+      return
+    let active = true
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (active && entry.isIntersecting) {
+          setVisibleCount(
+            Math.min(visibleCount + GALLERY_BATCH_SIZE, totalCount)
+          )
+        }
+      },
+      { root: resultsRef.current, rootMargin: "200px 0px" }
+    )
+    observer.observe(loadMoreRef.current)
+    return () => {
+      active = false
+      observer.disconnect()
+    }
+  }, [visibleCount, totalCount, selectedGalleryFilter])
 
   return (
     <>
@@ -323,7 +351,18 @@ export const GalleryDialog = ({
                   key="results"
                   id="gallery-results"
                   ref={resultsRef}
-                  css={{ flex: "1", overflow: "auto", gap: "3" }}
+                  role="region"
+                  aria-label={intl.formatMessage({ id: "Tangram gallery" })}
+                  tabIndex={0}
+                  css={{
+                    flex: "1",
+                    overflow: "auto",
+                    gap: "3",
+                    "&:focus-visible": {
+                      outline: "2px solid {colors.dialogText}",
+                      outlineOffset: "-2px",
+                    },
+                  }}
                 >
                   {visibleGroups.map(([category, tangrams]) => (
                     <View key={category}>
@@ -363,15 +402,11 @@ export const GalleryDialog = ({
                     </View>
                   ))}
                   {visibleCount < totalCount && (
-                    <PrimaryButton
-                      type="button"
-                      aria-controls="gallery-results"
-                      onClick={() =>
-                        setVisibleCount((count) => count + GALLERY_BATCH_SIZE)
-                      }
-                    >
-                      {intl.formatMessage({ id: "Show more tangrams" })}
-                    </PrimaryButton>
+                    <div
+                      ref={loadMoreRef}
+                      aria-hidden="true"
+                      style={{ height: 1, flexShrink: 0 }}
+                    />
                   )}
                 </View>
               )}
