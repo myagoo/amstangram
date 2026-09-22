@@ -1,7 +1,6 @@
 import React, { useContext } from "react"
 import { FiAward, FiGrid, FiSave, FiSettings, FiUser } from "react-icons/fi"
 import { useIntl } from "react-intl"
-import { version } from "../../package.json"
 import { DialogContext } from "../contexts/dialog"
 import { GalleryContext } from "../contexts/gallery"
 import { SoundContext } from "../contexts/sound"
@@ -142,10 +141,7 @@ export const MenuDialog = ({ onClose }: { onClose(): void }) => {
           target="_blank"
           rel="noopener, noreferrer"
         >
-          {intl.formatMessage(
-            { id: "Version {code}" },
-            { code: `${version} 🥟.🐼.🧹` }
-          )}
+          {intl.formatMessage({ id: "Version {code}" }, { code: "🥟.🐼.🙈" })}
         </Link>
       </View>
     </Dialog>

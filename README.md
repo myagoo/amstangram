@@ -151,6 +151,11 @@ TypeScript path workaround has been removed.
 
 ### Codebase health releases
 
+The app displays only the emoji release code (currently `🥟.🐼.🙈`), without
+the numeric version. Numeric versions remain in `package.json` and release notes
+for tooling and traceability. Release 0.2.11 makes this display-only change; the
+menu browser regression checks the exact emoji label and excludes digits.
+
 **0.2.2 🥟.🐼.🔐 — safe password changes (ticket 01).** The profile form now
 reauthenticates with the current password and sends the new password to Firebase
 Auth, never to the username updater. Success preserves the public username;
