@@ -36,6 +36,10 @@ The browser test replaces Firebase only in its own Vite config and blocks remote
 requests. It checks submitted metadata in memory, never writes community data,
 and does not verify real authentication or Firestore permissions.
 
+The gallery-switch regression opts into two distinct puzzle records and leaves
+particles enabled. A one-puzzle fixture can reselect the same object without
+recreating the game, hiding cleanup-order crashes when switching real puzzles.
+
 ### Reproducible randomness
 
 Open `/?seed=42` to reproduce all game-owned randomness: tan positions and

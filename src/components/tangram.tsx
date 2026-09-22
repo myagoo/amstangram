@@ -436,13 +436,6 @@ export const Tangram = () => {
     }
 
     init()
-
-    return () => {
-      paper.project.remove()
-      particlesRef.current = null
-      piecesGroupRef.current = null
-      coumpoundPathRef.current = null
-    }
   }, [selectedTangram])
 
   useLayoutEffect(() => {
@@ -531,6 +524,19 @@ export const Tangram = () => {
       particlesRef.current = null
     }
   }, [selectedTangram, showParticles])
+
+  // Layout cleanups run in declaration order: detach animated items before
+  // destroying their project's view, including on puzzle changes and unmount.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: The project above is recreated whenever selectedTangram changes.
+  useLayoutEffect(() => {
+    const project = paper.project
+    return () => {
+      project.remove()
+      particlesRef.current = null
+      piecesGroupRef.current = null
+      coumpoundPathRef.current = null
+    }
+  }, [selectedTangram])
 
   useLayoutEffect(() => {
     for (const pieceGroup of piecesGroupRef.current!.children) {

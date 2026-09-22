@@ -17,6 +17,10 @@ const records: Record<string, Record<string, Record<string, unknown>>> = {
   stats: {},
 }
 const user = { uid: "tester", email: "tester@example.test" }
+// Opt in so existing single-puzzle geometry and visual baselines stay unchanged.
+if (localStorage.getItem("test-two-puzzles")) {
+  records.tangrams["square-copy"] = { ...records.tangrams.square }
+}
 export const writes: { collection: string; data: Record<string, unknown> }[] =
   []
 const snapshot = (id: string, data: Record<string, unknown>) => ({

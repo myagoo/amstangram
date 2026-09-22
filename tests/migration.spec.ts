@@ -201,6 +201,35 @@ test("mouse clicks rotate and flip the parallelogram; dragging moves it", async 
   expect(errors).toEqual([])
 })
 
+test("gallery switches puzzles with particles enabled without losing the game", async ({
+  page,
+}) => {
+  const errors: string[] = []
+  page.on("pageerror", (error) => errors.push(error.message))
+  await page.addInitScript(() => {
+    localStorage.setItem("test-guest", "true")
+    localStorage.setItem("test-two-puzzles", "true")
+    localStorage.setItem("showParticles", "true")
+  })
+  await page.goto("/?seed=42")
+  await expect(page.locator("canvas")).toBeVisible({ timeout: 15000 })
+
+  // Distinct records force a real puzzle change even though their outlines match.
+  for (const index of [0, 1, 0]) {
+    await page.locator("svg").first().click()
+    await page.getByText("Tangram gallery", { exact: true }).click()
+    const cards = page.locator('#dialogContainer svg[viewBox="0 0 200 200"]')
+    await expect(cards).toHaveCount(2)
+    await cards.nth(index).click()
+    await page
+      .getByRole("button", { name: "Start 1 tangram !", exact: true })
+      .click()
+    await expect(page.locator("#dialogContainer")).toBeEmpty()
+    await expect(page.locator("canvas")).toBeVisible()
+    expect(errors).toEqual([])
+  }
+})
+
 test("gallery play, tan transforms, and saving the current arrangement", async ({
   page,
 }) => {
