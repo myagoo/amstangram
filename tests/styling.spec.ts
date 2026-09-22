@@ -20,7 +20,7 @@ test("settings preserve layout, theme switching and the saved theme", async ({
   await expect(page.locator("canvas")).toBeVisible({ timeout: 15000 })
   await page.locator("svg").first().click()
   await expect(
-    page.getByRole("link", { name: "Version 🥟.🎲.🧩", exact: true })
+    page.getByRole("link", { name: "Version 🥟.🎲.🔁", exact: true })
   ).toBeVisible()
   await expect(page.getByRole("link", { name: /^Version / })).not.toContainText(
     /\d/

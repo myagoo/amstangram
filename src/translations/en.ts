@@ -14,7 +14,8 @@ export default {
   "Generation failed. Please try again.":
     "Generation failed. Please try again.",
   Start: "Start",
-  Cancel: "Cancel",
+  Close: "Close",
+  Retry: "Retry",
   Easy: "Easy",
   Hard: "Hard",
 

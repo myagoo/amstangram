@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test"
 import { generationSeeds } from "./generationSeeds"
+import { solveGenerated } from "./solveGenerated"
 
 test.use({ viewport: { width: 627, height: 863 }, deviceScaleFactor: 1 })
 test.beforeEach(async ({ page }) => {
@@ -81,11 +82,11 @@ test("real worker generates a reproducible puzzle, playable to victory without c
   await expect(slider).toHaveAttribute("min", "0")
   await expect(slider).toHaveAttribute("max", "17")
   await slider.fill("0")
-  await expect(slider).toHaveCSS("accent-color", "rgb(16, 172, 132)")
+  await expect(slider).toHaveCSS("color", "rgb(16, 172, 132)")
   await slider.fill("17")
-  await expect(slider).toHaveCSS("accent-color", "rgb(238, 82, 83)")
+  await expect(slider).toHaveCSS("color", "rgb(238, 82, 83)")
   await slider.fill("8")
-  await expect(slider).toHaveCSS("accent-color", "rgb(46, 134, 222)")
+  await expect(slider).toHaveCSS("color", "rgb(46, 134, 222)")
   await page.getByRole("button", { name: "Start", exact: true }).click()
   await expect(page.locator("#dialogContainer")).toBeEmpty({ timeout: 20000 })
   expect(
@@ -96,33 +97,7 @@ test("real worker generates a reproducible puzzle, playable to victory without c
     )
   ).toBe(14)
 
-  for (const id of ["lt1", "lt2", "mt1", "st1", "st2", "sq", "rh"]) {
-    for (let turn = 0; turn < 17; turn++) {
-      const move = await page.evaluate(
-        async (id) =>
-          (await import("/tests/generationGeometry.ts")).nextMove(
-            id,
-            1083814273,
-            14
-          ),
-        id
-      )
-      if (!move.aligned) {
-        if (turn === 16)
-          throw new Error(`Unable to orient ${id}: ${JSON.stringify(move)}`)
-        await page.mouse.click(move.x, move.y, { delay: 20 })
-        continue
-      }
-      await page.mouse.move(move.x, move.y)
-      await page.mouse.down()
-      await page.mouse.move(move.toX, move.toY, { steps: 12 })
-      await page.mouse.up()
-      break
-    }
-  }
-  await expect(page.getByText("🎲", { exact: true })).toBeVisible({
-    timeout: 10000,
-  })
+  await solveGenerated(page)
   const writes = await page.evaluate(
     async () => (await import("/tests/firebase.ts")).writes
   )
@@ -154,7 +129,13 @@ test("cancel preserves the live arrangement and prevents a late worker from repl
       page.getByRole("button", { name: "Generating…", exact: true })
     ).toBeDisabled()
     await expect(page.getByRole("slider")).toBeDisabled()
-    await page.getByRole("button", { name: "Cancel", exact: true }).click()
+    await expect(
+      page.getByRole("button", { name: "Cancel", exact: true })
+    ).toHaveCount(0)
+    await page
+      .getByRole("button", { name: "Close", exact: true })
+      .last()
+      .click()
     expect(
       await page.evaluate(
         async () => (await import("/tests/geometry.ts")).readScene().tans

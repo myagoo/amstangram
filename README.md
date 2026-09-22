@@ -151,10 +151,39 @@ TypeScript path workaround has been removed.
 
 ### Codebase health releases
 
-The app displays only the emoji release code (currently `🥟.🎲.🧩`), without
+The app displays only the emoji release code (currently `🥟.🎲.🔁`), without
 the numeric version. Numeric versions remain in `package.json` and release notes
 for tooling and traceability. Release 0.2.11 makes this display-only change; the
 menu browser regression checks the exact emoji label and excludes digits.
+
+**0.3.1 🥟.🎲.🔁 — generated-puzzle replay (ticket 04).** The difficulty slider
+remembers each change in `localStorage.generationDifficulty`, even if the modal
+is closed without starting. Invalid stored values fall back to the middle setting;
+unavailable storage does not prevent generation. Its native keyboard/touch controls
+now use a toggle-sized 20px track and 20px circular thumb with a 2px theme-colored
+border, within a 44px interaction area. The track keeps the gallery difficulty colors.
+There is no separate Cancel button: the localized, keyboard-accessible close button
+terminates the modal's request without disturbing the current puzzle.
+
+While playing a generated puzzle, a worker prepares exactly one next puzzle at the
+**current puzzle's** difficulty. Changing the saved slider preference does not change
+that active game's difficulty. Victory uses the existing Next button: it is disabled
+and says Generating while pending, becomes Next when ready, or offers Retry if the
+worker fails. Next consumes the ready puzzle and starts a new one-puzzle prefetch.
+No growing playlist, disk cache, automatic advance, or community writes are added.
+Switching puzzles or unmounting gameplay terminates pending work; late responses
+cannot replace gallery play. The shared worker request helper keeps seeded generation
+reproducible for the same seed, preferences and actions, independent of worker timing.
+Prefetch can hide generation latency, but extreme levels can still take a long time.
+
+Tests cover two successive mouse-solved generated puzzles, delayed prefetch, retry,
+termination on gallery navigation, saved/invalid/unavailable difficulty preferences,
+light and dark/mobile slider snapshots, and explicit saving of the live arrangement
+rather than the target. Run `PLAYWRIGHT_CHANNEL=chrome bun run test:e2e tests/generatedReplay.spec.ts`.
+Release verification: 5 unit + 59 browser tests pass, including unchanged gallery
+and settings snapshots. Typecheck, formatting and production build pass; the
+existing 60 lint warnings remain. A production-build mobile smoke check verifies
+saved difficulty, the styled slider, and foreground plus background worker loading.
 
 **0.3.0 🥟.🎲.🧩 — generated puzzles (integration ticket 03).** Choose
 **Random tangram** in the menu, select difficulty, then Start. The native slider
@@ -163,8 +192,8 @@ counts are not displayed. Its green/blue/red colors use the gallery's existing
 theme and difficulty thresholds. This does not change the background-pattern setting.
 Start shows Generating and disables repeat requests while a dedicated module worker
 searches. Cancel or closing the modal terminates the worker, retaining the current
-puzzle and arrangement; failures allow retry. Cancel is immediately available,
-superseding the original ticket's delayed-cancel animation requirement.
+puzzle and arrangement; failures allow retry. This release made Cancel immediately
+available; 0.3.1 replaces it with close-button-only cancellation.
 
 The generation-only TypeScript engine is vendored at a pinned commit under
 `vendor/tangram-generator/`; no sibling checkout, runtime server, or new dependency
@@ -179,8 +208,8 @@ Generated puzzles have no community ID or owner: generation and completion do no
 write data, grant stars or offer moderator approval. Explicit Save tangram still
 uses the live arrangement. A seeded generation stream advances independently of
 layout/UI randomness, including across reopening the modal. Reload with the same
-`?seed=…`, settings and actions to reproduce it. Same-difficulty Next is ticket 04,
-not part of this first integration; use the menu to generate another puzzle.
+`?seed=…`, settings and actions to reproduce it. Same-difficulty Next followed in
+ticket 04 / release 0.3.1.
 
 Regression checks cover 118 converted solutions (including every slider level,
 holes and both parallelogram orientations), real-worker seeded replay and invalid

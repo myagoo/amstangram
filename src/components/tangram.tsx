@@ -44,6 +44,7 @@ import { Victory } from "./victory"
 import { View, CanvasView } from "./view"
 
 import type { TanGroup, PiecesGroup, Outline } from "../types"
+import { useNextGeneratedTangram } from "../generation/useNextGeneratedTangram"
 
 interface Particle extends paper.Path {
   data: { index: number; animation: paper.Tween }
@@ -93,14 +94,29 @@ export const Tangram = () => {
   const showParticlesRef = useRef(showParticles)
 
   const selectedTangram = playlist?.[currentTangramIndex]
+  const generated = !!selectedTangram && !selectedTangram.id
+  const {
+    next,
+    failed: nextFailed,
+    retry: retryNext,
+  } = useNextGeneratedTangram(selectedTangram)
 
   useEffect(() => {
     setVictoryPhase(false)
   }, [selectedTangram])
 
   const handleNext = () => {
+    if (generated) {
+      if (nextFailed) {
+        retryNext()
+        return
+      }
+      if (!next) return
+      setPlaylist([next])
+    } else {
+      advancePlaylist()
+    }
     setVictoryPhase(false)
-    advancePlaylist()
     showRandomTip()
   }
 
@@ -604,8 +620,12 @@ export const Tangram = () => {
           tangram={selectedTangram}
           onStop={handleStop}
           onNext={
-            currentTangramIndex < playlist!.length - 1 ? handleNext : undefined
+            generated || currentTangramIndex < playlist!.length - 1
+              ? handleNext
+              : undefined
           }
+          nextLoading={generated && !next && !nextFailed}
+          nextFailed={generated && nextFailed}
           onApprove={
             selectedTangram.id &&
             currentUser &&

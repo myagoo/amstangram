@@ -1,7 +1,8 @@
-import React, { useContext } from "react"
+import React from "react"
 import { createPortal } from "react-dom"
 import { FiX } from "react-icons/fi"
-import { SoundContext } from "../contexts/sound"
+import { useIntl } from "react-intl"
+import { SecondaryButton } from "./button"
 import { View } from "./view"
 
 export const Dialog = ({
@@ -20,7 +21,7 @@ export const Dialog = ({
     onSubmit?: React.FormEventHandler
   }
 >) => {
-  const { playButton } = useContext(SoundContext)
+  const intl = useIntl()
 
   return createPortal(
     <View
@@ -64,18 +65,19 @@ export const Dialog = ({
           }}
         >
           {title}
-          <View
-            as={FiX}
+          <SecondaryButton
+            aria-label={intl.formatMessage({ id: "Close" })}
             css={{
               cursor: "pointer",
               boxSize: "badge",
               ml: title ? undefined : "auto",
+              p: 0,
+              border: "none",
             }}
-            onClick={() => {
-              playButton()
-              onClose()
-            }}
-          ></View>
+            onClick={onClose}
+          >
+            <View as={FiX} css={{ boxSize: "badge" }} />
+          </SecondaryButton>
         </View>
         <View
           css={{

@@ -5,16 +5,49 @@ import {
   MIN_GENERATED_EDGES,
   MAX_GENERATED_EDGES,
 } from "../generation/settings"
-import type { Tangram } from "../types"
-import { createGameRandom } from "../utils/createRandom"
+import { requestPuzzle } from "../generation/requestPuzzle"
 import { getTangramDifficulty } from "../utils/getTangramDifficulty"
 import { ThemeContext } from "../utils/styles"
-import { PrimaryButton, SecondaryButton } from "./button"
+import { PrimaryButton } from "./button"
+import { styled } from "../../styled-system/jsx"
 import { Dialog } from "./dialog"
 import { Title } from "./primitives"
 import { View } from "./view"
 
-const random = createGameRandom()
+const thumb = {
+  width: "20px",
+  height: "20px",
+  borderRadius: "99999px",
+  bg: "dialogText",
+  border: "none",
+  boxShadow: "0 0 0 2px {colors.inputBackground}",
+} as const
+const track = {
+  height: "20px",
+  borderRadius: "99999px",
+  bg: "currentColor",
+} as const
+const DifficultySlider = styled("input", {
+  base: {
+    appearance: "none",
+    width: "100%",
+    height: "44px",
+    flexShrink: 0,
+    background: "transparent",
+    cursor: "pointer",
+    margin: 0,
+    "&::-webkit-slider-runnable-track": track,
+    "&::-moz-range-track": track,
+    "&::-webkit-slider-thumb": { ...thumb, appearance: "none" },
+    "&::-moz-range-thumb": thumb,
+    "&:disabled": { opacity: 0.5, cursor: "not-allowed" },
+    "&:focus-visible": {
+      outline: "2px solid {colors.dialogText}",
+      outlineOffset: "2px",
+      borderRadius: "2",
+    },
+  },
+})
 
 export const GenerationDialog = ({
   onClose,
@@ -26,65 +59,68 @@ export const GenerationDialog = ({
   const intl = useIntl()
   const theme = useContext(ThemeContext)
   const { setPlaylist } = useContext(GalleryContext)
-  const [difficulty, setDifficulty] = useState(8)
+  const [difficulty, setDifficulty] = useState(() => {
+    try {
+      const saved: unknown = JSON.parse(
+        localStorage.getItem("generationDifficulty") ?? "null"
+      )
+      if (
+        typeof saved === "number" &&
+        Number.isInteger(saved) &&
+        saved >= 0 &&
+        saved <= MAX_GENERATED_EDGES - MIN_GENERATED_EDGES
+      )
+        return saved
+    } catch {
+      // Storage is optional; keep the default if unavailable or malformed.
+    }
+    return 8
+  })
   const [loading, setLoading] = useState(false)
   const [failed, setFailed] = useState(false)
-  const workerRef = useRef<Worker | null>(null)
+  const cancelRef = useRef<(() => void) | null>(null)
   const edges = MAX_GENERATED_EDGES - difficulty
 
   const cancel = () => {
-    workerRef.current?.terminate()
-    workerRef.current = null
+    cancelRef.current?.()
+    cancelRef.current = null
     onClose()
   }
 
   useEffect(
     () => () => {
-      workerRef.current?.terminate()
-      workerRef.current = null
+      cancelRef.current?.()
+      cancelRef.current = null
     },
     []
   )
 
+  useEffect(() => {
+    try {
+      localStorage.setItem("generationDifficulty", JSON.stringify(difficulty))
+    } catch {
+      // An unavailable store must not prevent generation.
+    }
+  }, [difficulty])
+
   const start = () => {
-    if (workerRef.current) return
+    if (cancelRef.current) return
     setLoading(true)
     setFailed(false)
     const fail = () => {
-      workerRef.current?.terminate()
-      workerRef.current = null
+      cancelRef.current = null
       setLoading(false)
       setFailed(true)
     }
     try {
-      const worker = new Worker(
-        new URL("../generation/generate.worker.ts", import.meta.url),
-        { type: "module" }
-      )
-      workerRef.current = worker
-      worker.onmessage = (
-        event: MessageEvent<{ puzzle?: Tangram; error?: boolean }>
-      ) => {
-        if (workerRef.current !== worker) return
-        if (!event.data.puzzle || event.data.puzzle.edges !== edges) {
+      cancelRef.current = requestPuzzle(edges, (puzzle) => {
+        cancelRef.current = null
+        if (!puzzle) {
           fail()
           return
         }
-        worker.terminate()
-        workerRef.current = null
-        setPlaylist([event.data.puzzle])
+        setPlaylist([puzzle])
         onStart()
-      }
-      worker.onerror = (event) => {
-        event.preventDefault()
-        if (workerRef.current === worker) fail()
-      }
-      worker.onmessageerror = () => {
-        if (workerRef.current === worker) fail()
-      }
-      worker.postMessage({
-        edges,
-        seed: String(Math.floor(random() * 4294967296)),
       })
     } catch {
       fail()
@@ -100,7 +136,7 @@ export const GenerationDialog = ({
       <label htmlFor="generation-difficulty">
         {intl.formatMessage({ id: "Difficulty" })}
       </label>
-      <input
+      <DifficultySlider
         id="generation-difficulty"
         type="range"
         min={0}
@@ -117,9 +153,7 @@ export const GenerationDialog = ({
         )}
         onChange={(event) => setDifficulty(Number(event.target.value))}
         style={{
-          accentColor:
-            theme.colors.difficulties[getTangramDifficulty({ edges })],
-          width: "100%",
+          color: theme.colors.difficulties[getTangramDifficulty({ edges })],
         }}
       />
       <View css={{ flexDirection: "row", justifyContent: "space-between" }}>
@@ -139,9 +173,6 @@ export const GenerationDialog = ({
       >
         {intl.formatMessage({ id: loading ? "Generating…" : "Start" })}
       </PrimaryButton>
-      <SecondaryButton onClick={cancel}>
-        {intl.formatMessage({ id: "Cancel" })}
-      </SecondaryButton>
     </Dialog>
   )
 }

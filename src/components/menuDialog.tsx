@@ -167,7 +167,7 @@ export const MenuDialog = ({ onClose }: { onClose(): void }) => {
           target="_blank"
           rel="noopener, noreferrer"
         >
-          {intl.formatMessage({ id: "Version {code}" }, { code: "🥟.🎲.🧩" })}
+          {intl.formatMessage({ id: "Version {code}" }, { code: "🥟.🎲.🔁" })}
         </Link>
       </View>
     </Dialog>
