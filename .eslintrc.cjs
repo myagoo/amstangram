@@ -9,9 +9,15 @@ module.exports = {
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs'],
   parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
+  parser: '@typescript-eslint/parser',
   settings: { react: { version: '18.2' } },
-  plugins: ['react-refresh'],
+  plugins: ['react-refresh', '@typescript-eslint'],
   rules: {
+    'react/prop-types': 'off', // TypeScript checks component props.
+    'no-undef': 'off', // TypeScript resolves values and type names.
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^React$|^_' }],
+    '@typescript-eslint/no-explicit-any': 'error',
     'react-refresh/only-export-components': [
       'warn',
       { allowConstantExport: true },
