@@ -19,6 +19,9 @@ test("settings preserve layout, theme switching and the saved theme", async ({
   await page.goto("/?seed=42")
   await expect(page.locator("canvas")).toBeVisible({ timeout: 15000 })
   await page.locator("svg").first().click()
+  await expect(
+    page.getByRole("link", { name: "Version 0.2.0 🥟.🐼.⚡", exact: true })
+  ).toBeVisible()
   await page.getByText("Settings", { exact: true }).click()
   const select = page.getByRole("combobox")
   await expect(select).toHaveCSS("padding", "8px")
