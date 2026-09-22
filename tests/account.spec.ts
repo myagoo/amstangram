@@ -1,5 +1,29 @@
 import { test, expect } from "@playwright/test"
 
+test("username change follows the metadata snapshot and preserves account operations", async ({
+  page,
+}) => {
+  await page.getByText("Change username", { exact: true }).click()
+  await page.locator('input[name="newUsername"]').fill("Renamed")
+  await page
+    .getByRole("button", { name: "Change username", exact: true })
+    .click()
+  await expect(
+    page.getByText("Username updated successfuly", { exact: true })
+  ).toBeVisible()
+  await expect(page.getByText("Renamed", { exact: true })).toBeVisible()
+  expect(
+    await page.evaluate(async () => {
+      const path = "/tests/firebase.ts"
+      const { account, writes } = await import(path)
+      return { profileUpdates: account.profileUpdates, writes }
+    })
+  ).toEqual({
+    profileUpdates: [{ displayName: "Renamed" }],
+    writes: [{ collection: "users", data: { username: "Renamed" } }],
+  })
+})
+
 test("email change reauthenticates with the current account and preserves its profile", async ({
   page,
 }) => {

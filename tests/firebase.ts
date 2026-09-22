@@ -86,14 +86,34 @@ const snapshot = (id: string, data: Record<string, unknown>) => ({
   id,
   data: () => data,
 })
+type SnapshotListener = (value: { docs: ReturnType<typeof snapshot>[] }) => void
+const authListeners = new Set<(value: typeof user | null) => void>()
+const userListeners = new Set<SnapshotListener>()
+const userSnapshot = () => ({
+  docs: Object.entries(records.users).map(([id, data]) => snapshot(id, data)),
+})
+export const userService = {
+  reads: [] as string[],
+  auth(signedIn: boolean) {
+    for (const callback of authListeners) callback(signedIn ? user : null)
+  },
+  metadata(users: typeof records.users) {
+    records.users = users
+    for (const callback of userListeners) callback(userSnapshot())
+  },
+}
 const firebase = {
   auth: Object.assign(
     () => ({
       onAuthStateChanged(callback: (value: typeof user | null) => void) {
-        queueMicrotask(() =>
-          callback(localStorage.getItem("test-guest") ? null : user)
-        )
-        return () => {}
+        authListeners.add(callback)
+        if (!localStorage.getItem("test-manual-user"))
+          queueMicrotask(() =>
+            callback(localStorage.getItem("test-guest") ? null : user)
+          )
+        return () => {
+          authListeners.delete(callback)
+        }
       },
       signInWithEmailAndPassword: async () => {
         throw Object.assign(new Error("Fixture authentication rejection"), {
@@ -113,6 +133,14 @@ const firebase = {
         onSnapshot(
           callback: (value: { docs: ReturnType<typeof snapshot>[] }) => void
         ) {
+          if (name === "users") {
+            userListeners.add(callback)
+            if (!localStorage.getItem("test-manual-user"))
+              queueMicrotask(() => callback(userSnapshot()))
+            return () => {
+              userListeners.delete(callback)
+            }
+          }
           queueMicrotask(() =>
             callback({
               docs: Object.entries(records[name]).map(([id, data]) =>
@@ -124,7 +152,10 @@ const firebase = {
         },
         doc(id: string) {
           return {
-            get: async () => snapshot(id, records[name][id]),
+            get: async () => {
+              userService.reads.push(`${name}/${id}`)
+              return snapshot(id, records[name][id])
+            },
             set: async () => {
               throw new Error("Unexpected persistence in migration smoke test")
             },
@@ -132,6 +163,7 @@ const firebase = {
               if (name === "users") {
                 writes.push({ collection: name, data })
                 Object.assign(records[name][id], data)
+                for (const callback of userListeners) callback(userSnapshot())
                 return
               }
               throw new Error("Unexpected persistence in migration smoke test")

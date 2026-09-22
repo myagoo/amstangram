@@ -12,5 +12,10 @@
     "resolveJsonModule": true,
     "types": ["vite/client"]
   },
-  "include": ["src", "tests/geometry.ts", "tests/lifecycle.tsx"]
+  "include": [
+    "src",
+    "tests/geometry.ts",
+    "tests/lifecycle.tsx",
+    "tests/user.tsx"
+  ]
 }

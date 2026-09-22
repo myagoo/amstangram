@@ -28,40 +28,24 @@ interface UserContextValue {
 export const UserContext = createContext<UserContextValue>(null!)
 
 export const UserProvider = ({ children }: React.PropsWithChildren) => {
-  const [currentUser, setCurrentUser] = useState<CurrentUser | null>()
+  const [authUser, setAuthUser] = useState<CurrentUser["firebaseUser"] | null>()
   const [usersMetadata, setUsersMetadata] = useState<Record<
     string,
     UserMetadata
   > | null>(null)
 
-  const [initialized, setInitialized] = useState(false)
+  const initialized = authUser !== undefined && usersMetadata !== null
+  const currentUser = useMemo(() => {
+    if (!authUser) return authUser
+    const metadata = usersMetadata?.[authUser.uid]
+    // Signup can notify Auth before its metadata document exists.
+    return metadata
+      ? { ...metadata, uid: authUser.uid, firebaseUser: authUser }
+      : undefined
+  }, [authUser, usersMetadata])
 
   useEffect(() => {
-    if (currentUser !== undefined && usersMetadata !== null) {
-      setInitialized(true)
-    }
-  }, [currentUser, usersMetadata])
-
-  useEffect(() => {
-    const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
-      if (!user) {
-        setCurrentUser(null)
-      } else {
-        // This read is redundant
-        const snapshot = await firebase
-          .firestore()
-          .collection("users")
-          .doc(user.uid)
-          .get()
-
-        const userMetadata = snapshot.data() as UserMetadata
-        setCurrentUser({
-          uid: user.uid,
-          ...userMetadata,
-          firebaseUser: user,
-        })
-      }
-    })
+    const unsubscribe = firebase.auth().onAuthStateChanged(setAuthUser)
     return unsubscribe
   }, [])
 
@@ -93,8 +77,6 @@ export const UserProvider = ({ children }: React.PropsWithChildren) => {
         .collection("users")
         .doc(currentUser.uid)
         .update({ username })
-
-      setCurrentUser({ ...currentUser, username })
     },
     []
   )

@@ -230,6 +230,26 @@ These synthetic development measurements are not production/mobile latency or
 FPS claims. Filtering still processes the collection; repeatedly expanding can
 eventually mount every card. No virtualization dependency was added.
 
+**0.2.7 🥟.🐼.👤 — snapshot-derived user details (ticket 06).** The user
+provider stores Auth identity and the existing users snapshot, deriving current
+user details from those sources. It no longer fetches a duplicate document on
+each Auth event or manually copies username updates into a second state object.
+Logout cannot be undone by the old outstanding metadata read.
+
+Startup waits for Auth and the initial users snapshot in either order. Missing
+metadata does not block gameplay or invent a profile: account-dependent UI stays
+unavailable until the snapshot contains that user's document, including the
+interval between signup authentication and metadata creation. Snapshot changes
+then update current-user details automatically. This does not repair missing
+documents or change the Firebase version, account operations or subscriptions.
+
+Run `PLAYWRIGHT_CHANNEL=chrome bun run test:e2e tests/user.spec.ts tests/account.spec.ts`.
+The test-only provider page controls the external Firebase fixture, not React
+state: it covers arrival order, zero duplicate reads, logout races, missing
+metadata and later username updates. The normal profile UI also verifies username
+writes and all existing password/email regressions. Real Firebase rules and
+network failures remain outside these fixtures.
+
 Remaining defects found while typing/reviewing:
 
 - Secondary snapping reads an absent `shape` property from a Paper.js path.
