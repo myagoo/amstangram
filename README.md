@@ -16,7 +16,7 @@ scripts outside `src` remain JavaScript.
 - `bun run format`: format owned source, tests and root JS/TS/JSON configuration.
 - `bun run format:check`: check formatting without changing files.
 - `bun run check`: lint, formatting check and explicit TypeScript checking.
-- `bun run test:unit`: Vitest tests for seeded random streams.
+- `bun run test:unit`: Vitest tests for seeded random streams and player statistics.
 - `bun run test:e2e`: Playwright browser tests, including square completion,
   theme/layout snapshots and real Web Audio playback. `bun run test` runs both suites.
 - `bun run --bun playwright install chromium`, then `bun run test`: gallery → play → tan
@@ -107,12 +107,11 @@ and props; linting is not a replacement for `bun run typecheck`.
 The mapping is not identical: Biome checks more hook dependencies and mixed
 exports, unused parameters before used ones, and unused React imports without
 the old name exemption. Underscore-prefixed variables/parameters remain exempt.
-The baseline is 68 warnings, not a warning-free lint pass. Some legacy React
+The initial migration baseline was 68 warnings; the codebase-health cleanup
+reduces it to 60, not a warning-free lint pass. Some legacy React
 class/display-name/deprecation and dynamic-RegExp checks have no migrated
 equivalent. Biome also rejects more global-name shadows and empty function bodies;
 the error-text component was renamed and intentional context no-ops documented.
-The two existing effect suppressions in the unused sound helper were translated
-with reasons; no hook behavior or blanket suppression was introduced.
 
 Formatting retains two spaces, LF, double quotes, optional semicolons and ES5
 trailing commas. Its mechanical changes are committed separately. Import
@@ -282,13 +281,25 @@ The old double parse incorrectly treated JSON `null` as disabled; that regressio
 failed before the fix. Sound/theme storage is unchanged. There is no preference
 registry or cross-tab synchronization layer.
 
-Remaining defects found while typing/reviewing:
+**0.2.10 🥟.🐼.🧹 — unused-code cleanup (ticket 09).** Import/caller searches
+confirmed that the custom `src/utils/useSound.ts` hook and the provider's
+`approvedTangramsByCategory: null` placeholder had no consumers. Removing them
+deletes 165 source lines (164 + 1). Gameplay still uses the installed `use-sound`
+package; no dependency was removed and no bundle-size savings are claimed.
+The deleted code remains recoverable from Git history.
+
+The existing `tests/styling.spec.ts` real Web Audio check verifies playback and
+muting; the full unit/browser suite remains the cleanup regression gate. Run
+`PLAYWRIGHT_CHANNEL=chrome bun run test`.
+
+The maintainer requested retaining `recomputeEverything` in
+`src/utils/recomputeEvertything.ts` for manual maintenance. Its historical filename
+and implementation are unchanged. It can rewrite stored tangrams, so it is not
+part of application startup, tests or deployment, and was not run against data.
+
+Remaining defect found while typing/reviewing:
 
 - Secondary snapping reads an absent `shape` property from a Paper.js path.
-- The unused local sound helper's invalid effect-dependency object was replaced
-  with an empty dependency array; the game uses the external `use-sound` package.
-- The unused recomputation helper now supplies the canvas size required by
-  Paper.js's typed project constructor. It was not run against stored data.
 
 Generator integration and the random-puzzle menu are separate follow-up work.
 

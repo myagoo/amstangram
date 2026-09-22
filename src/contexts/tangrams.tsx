@@ -47,7 +47,6 @@ export const TangramsProvider = ({ children }: React.PropsWithChildren) => {
         initialized: false,
         approvedTangrams: null,
         pendingTangrams: null,
-        approvedTangramsByCategory: null,
       }
     }
 
