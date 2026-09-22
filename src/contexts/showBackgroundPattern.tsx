@@ -1,11 +1,5 @@
-import React, {
-  useState,
-  useCallback,
-  useEffect,
-  useMemo,
-  createContext,
-  useContext,
-} from "react"
+import React, { createContext, useContext } from "react"
+import { useStoredBoolean } from "../utils/useStoredBoolean"
 
 export const ShowBackgroundPatternContext = createContext<
   [boolean, () => void]
@@ -22,40 +16,9 @@ export const useShowBackgroundPattern = () =>
 export const ShowBackgroundPatternProvider = ({
   children,
 }: React.PropsWithChildren) => {
-  const [showBackgroundPattern, setShowBackgroundPattern] = useState(true)
-
-  useEffect(() => {
-    const storedData = window.localStorage.getItem("showBackgroundPattern")
-
-    if (storedData === null) {
-      setShowBackgroundPattern(true)
-      return
-    }
-
-    try {
-      const storedShowBackgroundPattern = JSON.parse(storedData)
-      setShowBackgroundPattern(!!JSON.parse(storedShowBackgroundPattern))
-    } catch (error) {
-      window.localStorage.removeItem("showBackgroundPattern")
-    }
-  }, [])
-
-  const toggleShowBackgroundPattern = useCallback(() => {
-    const newShowBackgroundPattern = !showBackgroundPattern
-    setShowBackgroundPattern(newShowBackgroundPattern)
-    window.localStorage.setItem(
-      "showBackgroundPattern",
-      JSON.stringify(newShowBackgroundPattern)
-    )
-  }, [showBackgroundPattern])
-
-  const contextValue = useMemo<[boolean, () => void]>(
-    () => [showBackgroundPattern, toggleShowBackgroundPattern],
-    [showBackgroundPattern, toggleShowBackgroundPattern]
-  )
-
+  const value = useStoredBoolean("showBackgroundPattern")
   return (
-    <ShowBackgroundPatternContext.Provider value={contextValue}>
+    <ShowBackgroundPatternContext.Provider value={value}>
       {children}
     </ShowBackgroundPatternContext.Provider>
   )

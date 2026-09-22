@@ -144,7 +144,7 @@ export const MenuDialog = ({ onClose }: { onClose(): void }) => {
         >
           {intl.formatMessage(
             { id: "Version {code}" },
-            { code: `${version} 🥟.🐼.💬` }
+            { code: `${version} 🥟.🐼.⚙️` }
           )}
         </Link>
       </View>

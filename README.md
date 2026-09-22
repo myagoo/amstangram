@@ -267,6 +267,21 @@ only external Firebase is substituted. Both cancellation and the old null-parent
 promise error reproduced before the fix. No modal framework or exclusive-dialog
 policy was introduced; existing challenge selection rules are unchanged.
 
+**0.2.9 🥟.🐼.⚙️ — shared boolean preferences (ticket 08).** Particle and
+background-pattern providers now use `useStoredBoolean`, retaining their named
+contexts, hooks and `showParticles` / `showBackgroundPattern` keys. Both default
+to enabled. Stored JSON booleans are read once during initialization; missing,
+malformed or non-boolean values use the default. The current value is persisted
+as a normalized JSON boolean, including startup defaults. If preference storage
+is unavailable, toggles still work in memory but cannot survive a reload.
+
+`PLAYWRIGHT_CHANNEL=chrome bun run test:e2e tests/preferences.spec.ts` checks
+both settings through the normal UI with missing, true, false, malformed and
+non-boolean storage, toggling/reloading each case, plus blocked preference storage.
+The old double parse incorrectly treated JSON `null` as disabled; that regression
+failed before the fix. Sound/theme storage is unchanged. There is no preference
+registry or cross-tab synchronization layer.
+
 Remaining defects found while typing/reviewing:
 
 - Secondary snapping reads an absent `shape` property from a Paper.js path.
