@@ -6,6 +6,7 @@ import {
 } from "../constants"
 import { getOffsettedPathPoints } from "./getOffsettedPathPoints"
 import { getTriangleCenter } from "./getTriangleCenter"
+import { createGameRandom } from "./createRandom"
 
 const createTriangle = (size: number, id: import("../types").TanId) => {
   const points = [
@@ -89,7 +90,7 @@ const createRhombus = (size: number, id: import("../types").TanId) => {
   return group as import("../types").TanGroup
 }
 
-const createSquare = (size: number, id: import("../types").TanId) => {
+const createSquare = (size: number, id: import("../types").TanId, random: () => number) => {
   const displayShape = new paper.Path.Rectangle({
     name: "display",
     point: [0, 0],
@@ -114,13 +115,13 @@ const createSquare = (size: number, id: import("../types").TanId) => {
     position: paper.view.center,
     data: { id, collisions: new Set() },
     applyMatrix: true,
-    rotation: Math.round(Math.random() * 7) * 45,
+    rotation: Math.round(random() * 7) * 45,
   })
 
   return group as import("../types").TanGroup
 }
 
-export const createPiecesGroup = () => {
+export const createPiecesGroup = (random = createGameRandom()) => {
   const smallBase = SMALL_TRIANGLE_BASE
   const mediumBase = Math.sqrt(Math.pow(smallBase, 2) * 2)
   const largeBase = Math.sqrt(Math.pow(mediumBase, 2) * 2)
@@ -131,7 +132,7 @@ export const createPiecesGroup = () => {
     createTriangle(mediumBase, "mt1"),
     createTriangle(largeBase, "lt1"),
     createTriangle(largeBase, "lt2"),
-    createSquare(mediumBase, "sq"),
+    createSquare(mediumBase, "sq", random),
     createRhombus(smallBase, "rh"),
   ]) as import("../types").PiecesGroup
 }

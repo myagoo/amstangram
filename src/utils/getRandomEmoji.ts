@@ -1,5 +1,8 @@
+import { createGameRandom } from "./createRandom"
+
+const emojiRandom = createGameRandom()
 const EMOJIS = ["💪", "🔥", "😱", "😎", "🎉", "🥇", "🚀", "👌", "👍", "😵"]
 
-export const getRandomEmoji = () => {
-  return EMOJIS[Math.floor(Math.random() * EMOJIS.length)]
+export const getRandomEmoji = (random = emojiRandom) => {
+  return EMOJIS[Math.floor(random() * EMOJIS.length)]
 }

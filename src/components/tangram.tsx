@@ -31,6 +31,7 @@ import { SoundContext } from "../contexts/sound"
 import { TipsContext } from "../contexts/tips"
 import { UserContext } from "../contexts/user"
 import { createPiecesGroup } from "../utils/createPiecesGroup"
+import { createGameRandom, createRandom } from "../utils/createRandom"
 import firebase from "../utils/firebase"
 import { getPathData } from "../utils/getPathData"
 import { getSnapVector } from "../utils/getSnapVector"
@@ -83,7 +84,6 @@ export const Tangram = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const scaleFactorRef = useRef(1)
   const piecesGroupRef = useRef<PiecesGroup | null>(null)
-  const particlesGroupRef = useRef<paper.Group | null>(null)
   const particlesRef = useRef<Particle[] | null>(null)
   const coumpoundPathRef = useRef<Outline | null>(null)
   const showBackgroundPatternRef = useRef(showBackgroundPattern)
@@ -172,6 +172,7 @@ export const Tangram = () => {
   // Init a game
   useLayoutEffect(() => {
     const start = Date.now()
+    const victoryRandom = createGameRandom()
     const attachPieceGroupEvents = (pieceGroup: TanGroup) => {
       let anchorPoint: paper.Point | null = null
       let ghostGroup: TanGroup | null = null
@@ -342,8 +343,8 @@ export const Tangram = () => {
             for (const particle of particlesRef.current!) {
               particle.data.animation.stop()
 
-              const angle = Math.random() * Math.PI * 2
-              const distance = Math.random() * maxDistance
+              const angle = victoryRandom() * Math.PI * 2
+              const distance = victoryRandom() * maxDistance
               particle.tween(
                 {
                   "position.x":
@@ -384,7 +385,8 @@ export const Tangram = () => {
     const init = () => {
       paper.setup(canvasRef.current!)
 
-      piecesGroupRef.current = createPiecesGroup()
+      const random = createGameRandom()
+      piecesGroupRef.current = createPiecesGroup(random)
 
       if (selectedTangram) {
         coumpoundPathRef.current = paper.project.importSVG(
@@ -424,7 +426,7 @@ export const Tangram = () => {
 
       for (const pieceGroup of piecesGroupRef.current!.children) {
         pieceGroup.scale(scaleFactorRef.current)
-        scrambleGroup(pieceGroup, canvasRef.current!)
+        scrambleGroup(pieceGroup, random)
         attachPieceGroupEvents(pieceGroup)
         restrictGroupWithinCanvas(pieceGroup, canvasRef.current!)
         updateColisionState(pieceGroup, piecesGroupRef.current!)
@@ -462,6 +464,8 @@ export const Tangram = () => {
       return
     }
     const particleGroup = new paper.Group()
+    const particleSeeds = createGameRandom()
+    let active = true
 
     particleGroup.sendToBack()
 
@@ -470,19 +474,15 @@ export const Tangram = () => {
       canvasRef.current!.height
     ).divide(window.devicePixelRatio)
 
-    const getRandomRadius = () =>
-      Math.random() * (MAX_PARTICLE_SIZE - MIN_PARTICLE_SIZE) +
-      MIN_PARTICLE_SIZE
-
-    const getRandomOpacity = () =>
-      Math.random() * (MAX_PARTICLE_OPACITY - MIN_PARTICLE_OPACITY) +
-      MIN_PARTICLE_OPACITY
-
     particlesRef.current = new Array(PARTICLES_COUNT)
 
     for (let i = 0; i < PARTICLES_COUNT; i++) {
+      // Each particle owns its stream: tween completion order cannot change other particles.
+      const random = createRandom(String(Math.floor(particleSeeds() * 4294967296)))
+      const getRandomRadius = () => random() * (MAX_PARTICLE_SIZE - MIN_PARTICLE_SIZE) + MIN_PARTICLE_SIZE
+      const getRandomOpacity = () => random() * (MAX_PARTICLE_OPACITY - MIN_PARTICLE_OPACITY) + MIN_PARTICLE_OPACITY
       const particle = new paper.Path.Circle({
-        center: paper.Point.random().multiply(maxPoint),
+        center: new paper.Point(random(), random()).multiply(maxPoint),
         radius: getRandomRadius(),
         opacity: getRandomOpacity(),
         parent: particleGroup,
@@ -490,22 +490,23 @@ export const Tangram = () => {
       }) as Particle
 
       const randomize = () => {
+        if (!active) return
         const values = {
           radius: getRandomRadius(),
           opacity: getRandomOpacity(),
           "position.x": Math.min(
             canvasRef.current!.width / window.devicePixelRatio,
-            Math.max(0, particle.position.x + Math.random() * 200 - 100)
+            Math.max(0, particle.position.x + random() * 200 - 100)
           ),
           "position.y": Math.min(
             canvasRef.current!.height / window.devicePixelRatio,
-            Math.max(0, particle.position.y + Math.random() * 200 - 100)
+            Math.max(0, particle.position.y + random() * 200 - 100)
           ),
         }
 
         particle.data.animation = particle
           .tween(values, {
-            duration: Math.random() * 10000 + 5000,
+            duration: random() * 10000 + 5000,
             easing: "easeInOutQuad",
           })
           .then(randomize)
@@ -515,15 +516,13 @@ export const Tangram = () => {
 
       particlesRef.current[i] = particle
     }
-  }, [selectedTangram, showParticles])
-
-  useLayoutEffect(() => {
-    if (!showParticles && particlesGroupRef.current) {
-      particlesGroupRef.current.remove()
-      particlesGroupRef.current = null
+    return () => {
+      active = false
+      for (const particle of particleGroup.children) particle.data.animation.stop()
+      particleGroup.remove()
       particlesRef.current = null
     }
-  }, [showParticles])
+  }, [selectedTangram, showParticles])
 
   useLayoutEffect(() => {
     for (const pieceGroup of piecesGroupRef.current!.children) {
@@ -534,6 +533,7 @@ export const Tangram = () => {
     }
 
     const pieceColors = Object.values(theme.colors.pieces)
+    const colorRandom = createGameRandom()
 
     if (!showParticles) {
       return
@@ -541,7 +541,7 @@ export const Tangram = () => {
 
     for (const particle of particlesRef.current!) {
       particle.fillColor =
-        new paper.Color(pieceColors[Math.floor(Math.random() * pieceColors.length)])
+        new paper.Color(pieceColors[Math.floor(colorRandom() * pieceColors.length)])
     }
   }, [theme.colors, selectedTangram, showParticles])
 

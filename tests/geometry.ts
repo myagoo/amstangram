@@ -7,6 +7,30 @@ import { getSnapVector } from "../src/utils/getSnapVector"
 import { getTangramDifficulty } from "../src/utils/getTangramDifficulty"
 import { SMALL_TRIANGLE_BASE } from "../src/constants"
 
+export function readTan(id: string) {
+  const pieces = paper.project.activeLayer.children.find(item =>
+    item instanceof paper.Group && item.children.length === 7 && item.children.some(child => child.data.id === id)
+  ) as PiecesGroup
+  const tan = pieces.children.find(piece => piece.data.id === id)!
+  const path = tan.children.display
+  const point = paper.view.projectToView(path.interiorPoint)
+  return { x: point.x, y: point.y, area: path.area,
+    points: path.segments.map(({ point }) => [point.x, point.y]) }
+}
+
+export function readScene() {
+  const particles = paper.project.getItems({ class: paper.Path }).filter(item =>
+    typeof item.data.index === "number"
+  )
+  return {
+    tans: ["st1", "st2", "mt1", "lt1", "lt2", "sq", "rh"].map(readTan),
+    particles: particles.map(item => ({
+      x: item.position.x, y: item.position.y, width: item.bounds.width,
+      opacity: item.opacity, color: item.fillColor?.toCSS(true),
+    })),
+  }
+}
+
 export function checkGeometry() {
   const pieces = paper.project.activeLayer.children.find(item =>
     item instanceof paper.Group && item.children.length === 7 && item.children[0].data.id === "st1"

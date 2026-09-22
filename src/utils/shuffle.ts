@@ -1,4 +1,8 @@
-export const shuffle = <T>(array: T[]) => {
+import { createGameRandom } from "./createRandom"
+
+const playlistRandom = createGameRandom()
+
+export const shuffle = <T>(array: T[], random = playlistRandom) => {
   let currentIndex = array.length
   let temporaryValue
   let randomIndex
@@ -6,7 +10,7 @@ export const shuffle = <T>(array: T[]) => {
   // While there remain elements to shuffle...
   while (0 !== currentIndex) {
     // Pick a remaining element...
-    randomIndex = Math.floor(Math.random() * currentIndex)
+    randomIndex = Math.floor(random() * currentIndex)
     currentIndex -= 1
 
     // And swap it with the current element.

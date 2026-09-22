@@ -20,6 +20,34 @@ The browser test replaces Firebase only in its own Vite config and blocks remote
 requests. It checks submitted metadata in memory, never writes community data,
 and does not verify real authentication or Firestore permissions.
 
+### Reproducible randomness
+
+Open `/?seed=42` to reproduce all game-owned randomness: tan positions and
+orientations, gallery shuffling, random emojis, particles and victory effects.
+The seed is an unsigned 32-bit decimal integer (0–4294967295); missing or invalid
+seeds keep normal random play. Each puzzle initialization starts a fresh layout
+sequence. Playlist and emoji streams advance independently until page reload;
+particles have independent streams so animation timing cannot affect gameplay.
+
+Replay with the same puzzle data, viewport, settings and actions. Seeding does
+not freeze time or network data: animation screenshots also need a controlled
+clock/frame boundary. Tests use Firebase fixtures and freeze animation frames
+when comparing initial particle geometry and colors. Third-party internals and
+security-sensitive randomness are not globally overridden.
+
+Unit tests can use `createRandom("42")` from `src/utils/createRandom.ts` and pass
+the returned function to `shuffle`, `getRandomEmoji`, `createPiecesGroup`, or
+`scrambleGroup` without changing global `Math.random`.
+
+The `seeded square` E2E test replays a manually recorded solution at 627×863 using
+only mouse clicks/drags, then checks the victory emoji and Quit button. It uses the
+existing square fixture and a guest account, not direct geometry mutation or a
+mock completion check. Run it with:
+
+```sh
+PLAYWRIGHT_CHANNEL=chrome yarn test --grep "seeded square"
+```
+
 ## Migration baseline and known issues
 
 The TypeScript migration starts from `7003b42762d7c48eaec354720c641e8ce4fb4915`.
