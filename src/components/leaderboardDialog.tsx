@@ -1,3 +1,7 @@
+import {
+  calculatePlayerStats,
+  EMPTY_PLAYER_STATS,
+} from "../utils/calculatePlayerStats"
 import React, { useContext, useMemo, useState } from "react"
 import { DIALOG_CLOSED_REASON } from "../constants"
 import { DialogContext } from "../contexts/dialog"
@@ -48,42 +52,16 @@ export const LeaderboardDialog = ({
   }
 
   const users = useMemo(() => {
-    const starsByUserId: Record<string, number> = {}
-    const createdTangramsByUserId: Record<string, number> = {}
-    const completedTangramsByUserId: Record<string, number> = {}
-    for (const { id, uid } of approvedTangrams!) {
-      if (!createdTangramsByUserId[uid]) {
-        createdTangramsByUserId[uid] = 0
-        starsByUserId[uid] = 0
-      }
-
-      for (const starredByUid in tangramsStarredBy![id]) {
-        if (starredByUid !== uid && tangramsStarredBy![id][starredByUid]) {
-          starsByUserId[uid] += 1
-        }
-      }
-
-      createdTangramsByUserId[uid] += 1
-
-      for (const completedByUid in tangramsCompletedBy![id]) {
-        if (!completedTangramsByUserId[completedByUid]) {
-          completedTangramsByUserId[completedByUid] = 0
-        }
-        completedTangramsByUserId[completedByUid] += 1
-      }
-    }
-
-    return Object.keys(usersMetadata!).map((uid) => {
-      const userMetadata = usersMetadata![uid]
-
-      return {
-        uid,
-        ...userMetadata,
-        stars: starsByUserId[uid] || 0,
-        completed: completedTangramsByUserId[uid] || 0,
-        created: createdTangramsByUserId[uid] || 0,
-      }
-    })
+    const stats = calculatePlayerStats(
+      approvedTangrams!,
+      tangramsStarredBy!,
+      tangramsCompletedBy!
+    )
+    return Object.entries(usersMetadata!).map(([uid, metadata]) => ({
+      uid,
+      ...metadata,
+      ...(stats[uid] ?? EMPTY_PLAYER_STATS),
+    }))
   }, [approvedTangrams, tangramsStarredBy, tangramsCompletedBy, usersMetadata])
 
   const sortedUsers = useMemo(() => {

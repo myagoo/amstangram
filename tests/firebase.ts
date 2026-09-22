@@ -55,6 +55,15 @@ const user = {
 if (localStorage.getItem("test-two-puzzles")) {
   records.tangrams["square-copy"] = { ...records.tangrams.square }
 }
+if (localStorage.getItem("test-statistics")) {
+  records.users.maker = { username: "Maker", signupDate: 1700000000000 }
+  records.tangrams.square.uid = "maker"
+  records.tangrams.zero = { ...records.tangrams.square }
+  records.tangrams.pending = { ...records.tangrams.square, approved: false }
+  records.stats.square = { tester: { starred: true }, maker: { starred: true } }
+  records.stats.zero = { tester: { completed: 0 } }
+  records.stats.pending = { tester: { completed: 123, starred: true } }
+}
 export const writes: { collection: string; data: Record<string, unknown> }[] =
   []
 const snapshot = (id: string, data: Record<string, unknown>) => ({

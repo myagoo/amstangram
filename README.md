@@ -190,6 +190,18 @@ boundary, without mocking completion. The stale-victory and double-initializatio
 regressions both failed before their fixes. Geometry, seeded random sequences,
 Firebase contracts and generator integration are unchanged.
 
+**0.2.5 🥟.🐼.📊 — shared player statistics (ticket 04).** Profile and leaderboard
+use `calculatePlayerStats` for created puzzles, earned stars and completions.
+Only approved puzzles contribute, self-stars do not count as earned stars, and
+completion values are checked for presence rather than truthiness (zero counts).
+Star-only records no longer inflate completed totals. No Firebase data migration
+or writes are needed: the fix changes calculation/display only.
+
+Literal unit fixtures cover zero/nonzero times, absent activity, self-stars and
+unapproved puzzles. `PLAYWRIGHT_CHANNEL=chrome bun run test:e2e tests/statistics.spec.ts`
+checks the leaderboard and its nested profile against the same external-service
+fixture; it reproduced the incorrect completion total before the fix.
+
 Remaining defects found while typing/reviewing:
 
 - Secondary snapping reads an absent `shape` property from a Paper.js path.

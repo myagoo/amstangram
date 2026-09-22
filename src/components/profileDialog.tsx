@@ -1,3 +1,7 @@
+import {
+  calculatePlayerStats,
+  EMPTY_PLAYER_STATS,
+} from "../utils/calculatePlayerStats"
 import firebase from "../utils/firebase"
 import { getErrorCode } from "../utils/getErrorCode"
 import React, { useCallback, useContext, useMemo, useState } from "react"
@@ -329,34 +333,15 @@ export const ProfileDialog = ({
   const { approvedTangrams } = useContext(TangramsContext)
   const { tangramsStarredBy, tangramsCompletedBy } = useContext(GalleryContext)
 
-  const { stars, completed, created } = useMemo(() => {
-    let stars = 0
-    let created = 0
-    let completed = 0
-    for (const tangram of approvedTangrams!) {
-      if (tangram.uid === uid) {
-        created++
-        for (const starredByUid in tangramsStarredBy![tangram.id]) {
-          if (
-            starredByUid !== uid &&
-            tangramsStarredBy![tangram.id][starredByUid]
-          ) {
-            stars += 1
-          }
-        }
-      }
-      for (const completedByUid in tangramsCompletedBy![tangram.id]) {
-        if (completedByUid === uid) {
-          completed += 1
-        }
-      }
-    }
-    return {
-      stars,
-      completed,
-      created,
-    }
-  }, [approvedTangrams, tangramsCompletedBy, tangramsStarredBy, uid])
+  const { stars, completed, created } = useMemo(
+    () =>
+      calculatePlayerStats(
+        approvedTangrams!,
+        tangramsStarredBy!,
+        tangramsCompletedBy!
+      )[uid] ?? EMPTY_PLAYER_STATS,
+    [approvedTangrams, tangramsCompletedBy, tangramsStarredBy, uid]
+  )
 
   const handleLogout = async () => {
     if (
