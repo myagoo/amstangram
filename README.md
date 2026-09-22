@@ -161,10 +161,17 @@ The old implementation reproduced a false success and changed the fixture's
 username before the fix. This does not establish whether real accounts were
 affected; no historical account investigation or production data changes were made.
 
+**0.2.3 🥟.🐼.📧 — correct email changes (ticket 02).** The email form now passes
+the new email and current password in the correct order, reauthenticating with
+the current account email first. Wrong passwords, invalid/occupied emails and
+service failures retain feedback without false success or unhandled rejections.
+Five browser checks cover these paths using the existing external-service fixture;
+the failure cases verify that email, credentials and profile remain unchanged.
+Run the same account test command above. Firebase remains unchanged; these tests
+do not verify real account configuration or send verification emails.
+
 Remaining defects found while typing/reviewing:
 
-- The change-email form reverses email/password arguments (ticket 02).
-  No real accounts were used during verification.
 - Secondary snapping reads an absent `shape` property from a Paper.js path.
 - The unused local sound helper's invalid effect-dependency object was replaced
   with an empty dependency array; the game uses the external `use-sound` package.

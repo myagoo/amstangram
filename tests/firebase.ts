@@ -41,6 +41,12 @@ const user = {
       throw Object.assign(new Error("Fixture password rejection"), { code })
     account.password = password
   },
+  async updateEmail(email: string) {
+    const code = localStorage.getItem("test-email-error")
+    if (code)
+      throw Object.assign(new Error("Fixture email rejection"), { code })
+    this.email = email
+  },
   async updateProfile(data: Record<string, unknown>) {
     account.profileUpdates.push(data)
   },

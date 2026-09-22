@@ -38,7 +38,7 @@ const ChangeEmailForm = ({
   const onSubmit = useCallback(
     async ({ password, newEmail }: { password: string; newEmail: string }) => {
       try {
-        await updateEmail(currentUser, password, newEmail)
+        await updateEmail(currentUser, newEmail, password)
         notify(intl.formatMessage({ id: "Email address updated successfuly" }))
         onClose()
       } catch (error) {
@@ -67,7 +67,7 @@ const ChangeEmailForm = ({
             notify(
               intl.formatMessage({ id: "An error occured, please retry later" })
             )
-            throw error
+            return
         }
       }
     },
