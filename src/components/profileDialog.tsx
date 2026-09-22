@@ -14,7 +14,7 @@ import { Badge } from "./badge"
 import { DangerButton, PrimaryButton } from "./button"
 import { Dialog } from "./dialog"
 import { Input } from "./input"
-import { Error, InlineIcon, Similink, Title } from "./primitives"
+import { ErrorText, InlineIcon, Similink, Title } from "./primitives"
 import { Text } from "./text"
 import { View, FormView } from "./view"
 
@@ -81,7 +81,7 @@ const ChangeEmailForm = ({ currentUser, onClose }: { currentUser: import("../typ
             })}
           ></Input>
           {formState.errors.password && (
-            <Error>{formState.errors.password.message}</Error>
+            <ErrorText>{formState.errors.password.message}</ErrorText>
           )}
         </View>
         <View css={{ gap: "2" }}>
@@ -93,7 +93,7 @@ const ChangeEmailForm = ({ currentUser, onClose }: { currentUser: import("../typ
             })}
           ></Input>
           {formState.errors.newEmail && (
-            <Error>{formState.errors.newEmail.message}</Error>
+            <ErrorText>{formState.errors.newEmail.message}</ErrorText>
           )}
         </View>
       </View>
@@ -157,7 +157,7 @@ const ChangeUsernameForm = ({ currentUser, onClose }: { currentUser: import("../
             })}
           ></Input>
           {formState.errors.newUsername && (
-            <Error>{formState.errors.newUsername.message}</Error>
+            <ErrorText>{formState.errors.newUsername.message}</ErrorText>
           )}
         </View>
       </View>
@@ -239,7 +239,7 @@ const ChangePasswordForm = ({ currentUser, onClose }: { currentUser: import("../
             })}
           ></Input>
           {formState.errors.password && (
-            <Error>{formState.errors.password.message}</Error>
+            <ErrorText>{formState.errors.password.message}</ErrorText>
           )}
         </View>
         <View css={{ gap: "2" }}>
@@ -252,7 +252,7 @@ const ChangePasswordForm = ({ currentUser, onClose }: { currentUser: import("../
             })}
           ></Input>
           {formState.errors.newPassword && (
-            <Error>{formState.errors.newPassword.message}</Error>
+            <ErrorText>{formState.errors.newPassword.message}</ErrorText>
           )}
         </View>
 
@@ -268,7 +268,7 @@ const ChangePasswordForm = ({ currentUser, onClose }: { currentUser: import("../
             })}
           ></Input>
           {formState.errors.newPasswordConfirm && (
-            <Error>{formState.errors.newPasswordConfirm.message}</Error>
+            <ErrorText>{formState.errors.newPasswordConfirm.message}</ErrorText>
           )}
         </View>
       </View>

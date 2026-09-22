@@ -5,7 +5,7 @@ import { styled } from "../../styled-system/jsx"
 import { FiStar } from "react-icons/fi"
 import { View } from "./view"
 
-export const Error = styled(Text, {
+export const ErrorText = styled(Text, {
   base: {
     fontSize: "2",
     color: "errorText",

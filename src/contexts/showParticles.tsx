@@ -7,7 +7,7 @@ import React, {
   useContext,
 } from "react"
 
-export const ShowParticlesContext = createContext<[boolean, () => void]>([true, () => { }])
+export const ShowParticlesContext = createContext<[boolean, () => void]>([true, () => { /* No-op outside the provider. */ }])
 
 export const useShowParticles = () =>
   useContext(ShowParticlesContext)

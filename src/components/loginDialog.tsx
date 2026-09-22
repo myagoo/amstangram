@@ -8,7 +8,7 @@ import { NotifyContext } from "../contexts/notify"
 import { PrimaryButton } from "./button"
 import { Dialog } from "./dialog"
 import { Input } from "./input"
-import { Error, Similink, Title } from "./primitives"
+import { ErrorText, Similink, Title } from "./primitives"
 import { View, FormView } from "./view"
 
 const ResetPasswordTab = ({ setTab }: { setTab(tab: string): void }) => {
@@ -62,7 +62,7 @@ const ResetPasswordTab = ({ setTab }: { setTab(tab: string): void }) => {
           })}
         ></Input>
         {formState.errors.email && (
-          <Error>{formState.errors.email.message}</Error>
+          <ErrorText>{formState.errors.email.message}</ErrorText>
         )}
       </View>
 
@@ -159,7 +159,7 @@ const SignUpTab = ({ onSignUp, setTab }: { onSignUp(user: import("../types").Cur
             })}
           ></Input>
           {formState.errors.username && (
-            <Error>{formState.errors.username.message}</Error>
+            <ErrorText>{formState.errors.username.message}</ErrorText>
           )}
         </View>
 
@@ -172,7 +172,7 @@ const SignUpTab = ({ onSignUp, setTab }: { onSignUp(user: import("../types").Cur
             })}
           ></Input>
           {formState.errors.email && (
-            <Error>{formState.errors.email.message}</Error>
+            <ErrorText>{formState.errors.email.message}</ErrorText>
           )}
         </View>
 
@@ -186,7 +186,7 @@ const SignUpTab = ({ onSignUp, setTab }: { onSignUp(user: import("../types").Cur
             })}
           ></Input>
           {formState.errors.password && (
-            <Error>{formState.errors.password.message}</Error>
+            <ErrorText>{formState.errors.password.message}</ErrorText>
           )}
         </View>
 
@@ -203,7 +203,7 @@ const SignUpTab = ({ onSignUp, setTab }: { onSignUp(user: import("../types").Cur
             })}
           ></Input>
           {formState.errors.passwordConfirm && (
-            <Error>{formState.errors.passwordConfirm.message}</Error>
+            <ErrorText>{formState.errors.passwordConfirm.message}</ErrorText>
           )}
         </View>
       </View>
@@ -294,7 +294,7 @@ const SignInTab = ({ onSignIn, setTab }: { onSignIn(user: import("../types").Cur
             })}
           ></Input>
           {formState.errors.email && (
-            <Error>{formState.errors.email.message}</Error>
+            <ErrorText>{formState.errors.email.message}</ErrorText>
           )}
         </View>
 
@@ -307,7 +307,7 @@ const SignInTab = ({ onSignIn, setTab }: { onSignIn(user: import("../types").Cur
             })}
           ></Input>
           {formState.errors.password && (
-            <Error>{formState.errors.password.message}</Error>
+            <ErrorText>{formState.errors.password.message}</ErrorText>
           )}
           <Similink
             css={{ alignSelf: "flex-end", fontSize: "2" }}

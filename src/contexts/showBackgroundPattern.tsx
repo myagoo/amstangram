@@ -7,7 +7,7 @@ import React, {
   useContext,
 } from "react"
 
-export const ShowBackgroundPatternContext = createContext<[boolean, () => void]>([true, () => { }])
+export const ShowBackgroundPatternContext = createContext<[boolean, () => void]>([true, () => { /* No-op outside the provider. */ }])
 
 export const useShowBackgroundPattern = () =>
   useContext(ShowBackgroundPatternContext)

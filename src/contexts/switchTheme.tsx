@@ -11,7 +11,7 @@ export type { AppTheme } from "../theme"
 
 export const ThemeContext = createContext(THEMES.light)
 
-export const SwitchThemeContext = createContext<[string, (key: string) => void]>(["", () => { }])
+export const SwitchThemeContext = createContext<[string, (key: string) => void]>(["", () => { /* No-op outside the provider. */ }])
 
 export const useSwitchTheme = () => useContext(SwitchThemeContext)
 

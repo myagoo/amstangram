@@ -60,6 +60,7 @@ export const useSound = (
   // When the `src` changes, we have to do a whole thing where we recreate
   // the Howl instance. This is because Howler doesn't expose a way to
   // tweak the sound
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Recreate only when the serialized source changes, preserving this legacy helper's behavior.
   React.useEffect(() => {
     if (HowlConstructor.current && sound) {
       setSound(
@@ -78,11 +79,11 @@ export const useSound = (
     // Passing array to the useEffect dependencies list will result in
     // ifinite loop so we need to stringify it, for more details check
     // https://github.com/facebook/react/issues/14476#issuecomment-471199055
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(src)])
 
   // Whenever volume/playbackRate are changed, change those properties
   // on the sound instance.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Preserve the existing sound-change exclusion described below.
   React.useEffect(() => {
     if (sound) {
       sound.volume(volume)
@@ -92,7 +93,6 @@ export const useSound = (
     // error on unmount, where the state loses track of the sprites??
     // No idea, but anyway I don't need to re-run this if only the `sound`
     // changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [volume, playbackRate])
 
   const play = React.useCallback(

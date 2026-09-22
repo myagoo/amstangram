@@ -13,7 +13,7 @@ import { PrimaryButton } from "./button"
 import { Card } from "./card"
 import { Dialog } from "./dialog"
 import { Input, Select } from "./input"
-import { Error, Hint, InlineIcon, Similink, Title } from "./primitives"
+import { ErrorText, Hint, InlineIcon, Similink, Title } from "./primitives"
 import { Text } from "./text"
 import { View } from "./view"
 
@@ -238,7 +238,7 @@ const SaveTangramDialog = ({ tangram, deferred }: { tangram: import("../types").
               <label>{intl.formatMessage({ id: "Path" })}</label>
               <Input as="textarea" {...register("path")}></Input>
               {formState.errors.path && (
-                <Error>{formState.errors.path.message}</Error>
+                <ErrorText>{formState.errors.path.message}</ErrorText>
               )}
             </View>
           </>

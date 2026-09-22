@@ -11,8 +11,11 @@ scripts outside `src` remain JavaScript.
 - `bun run typecheck`: application and browser geometry harness types.
 - `bun run build`: typecheck and production bundle.
 - `bun run preview`: serve the production bundle locally.
-- `bun run lint`: application TypeScript (not vendored scripts); existing hook and
-  unused-code warnings remain.
+- `bun run lint`: Biome application linting; hook, unused-code and Fast Refresh
+  warnings remain visible without failing the command.
+- `bun run format`: format owned source, tests and root JS/TS/JSON configuration.
+- `bun run format:check`: check formatting without changing files.
+- `bun run check`: lint, formatting check and explicit TypeScript checking.
 - `bun run test:unit`: Vitest tests for seeded random streams.
 - `bun run test:e2e`: Playwright browser tests, including square completion,
   theme/layout snapshots and real Web Audio playback. `bun run test` runs both suites.
@@ -65,9 +68,8 @@ PLAYWRIGHT_CHANNEL=chrome bun run test:e2e --grep "seeded square"
 
 React/DOM 19.3.0, Vite 8.3.0, its React plugin 6.1.1, Panda 1.12.1 and Vitest
 5.0.1 run under the pinned Bun version. React Intl, React Hook Form, React Icons
-and use-sound were upgraded with React. TypeScript stays at 5.7.3 until the
-Biome task: TypeScript 7 removes the compiler API required by the existing
-ESLint parser (even the current parser's peer range excludes TypeScript 7).
+and use-sound were upgraded with React. TypeScript 7.0.2 now runs after replacing
+the incompatible ESLint parser with Biome 2.5.14.
 
 Panda replaces css-system; `bun install` generates the ignored `styled-system/`
 directory via `prepare`. Run `bun run prepare` after changing Panda configuration.
@@ -88,6 +90,33 @@ Visual baselines were captured before replacing css-system on macOS/Chrome at
 changes before updating snapshots. The existing large-bundle warning and a
 harmless misplaced PURE annotation warning from Panda's generated code remain.
 
+### Biome linting and formatting
+
+`biome.json` explicitly maps the former ESLint rules instead of enabling an
+unrelated preset. Hook placement and explicit `any` remain errors; exhaustive
+dependencies, unused variables/imports/parameters and Fast Refresh remain warnings.
+Fast Refresh permits constant exports for Vite. TypeScript still checks names
+and props; linting is not a replacement for `bun run typecheck`.
+
+The mapping is not identical: Biome checks more hook dependencies and mixed
+exports, unused parameters before used ones, and unused React imports without
+the old name exemption. Underscore-prefixed variables/parameters remain exempt.
+The baseline is 68 warnings, not a warning-free lint pass. Some legacy React
+class/display-name/deprecation and dynamic-RegExp checks have no migrated
+equivalent. Biome also rejects more global-name shadows and empty function bodies;
+the error-text component was renamed and intentional context no-ops documented.
+The two existing effect suppressions in the unused sound helper were translated
+with reasons; no hook behavior or blanket suppression was introduced.
+
+Formatting retains two spaces, LF, double quotes, optional semicolons and ES5
+trailing commas. Its mechanical changes are committed separately. Import
+organization and lint autofixes are not part of `bun run format`. Lint scope
+remains `src`; formatting also covers tests and root JS/TS/JSON configuration.
+Vendored `public/`, maintenance `tools/`, generated `styled-system/`, dependencies,
+build/test artifacts, HTML and documentation are outside this formatting scope.
+Panda still depends on Prettier internally for code generation; it is no longer
+the project's formatter and its transitive dependency is not overridden.
+
 ## Migration baseline and known issues
 
 Non-Firebase dependency maintenance updates Paper.js to 0.12.18, gh-pages to
@@ -104,9 +133,11 @@ dependency tree also includes flagged gRPC, protobufjs, Undici and websocket-dri
 versions. An advisory is not proof that this browser app exposes every affected
 code path; assess those separately before choosing a Firebase security update.
 Do not run the legacy maintenance scripts against production as an audit test.
-Tooling advisories will be reassessed after the ESLint-to-Biome replacement;
-run `bun audit` to see the current complete list. No forced dependency overrides
-have been introduced merely to suppress the report.
+After removing ESLint, tooling advisories remain in Panda's pinned Browserslist,
+PostCSS and postcss-selector-parser dependencies. These require an upstream Panda
+update or a separately verified override; they process build inputs, not the
+community puzzle data. Run `bun audit` for the current complete list. No forced
+dependency overrides have been introduced merely to suppress the report.
 
 The TypeScript migration starts from `7003b42762d7c48eaec354720c641e8ce4fb4915`.
 Puzzle metadata/storage shapes and Paper.js algorithms are unchanged. Panda now

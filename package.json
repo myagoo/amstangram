@@ -13,7 +13,10 @@
     "test": "bun run test:unit && bun run test:e2e",
     "test:unit": "bun run --bun vitest run",
     "test:e2e": "bun run --bun playwright test",
-    "lint": "bun run --bun eslint src --ext ts,tsx --report-unused-disable-directives",
+    "lint": "bun run --bun biome lint .",
+    "format": "bun run --bun biome format --write .",
+    "format:check": "bun run --bun biome format .",
+    "check": "bun run lint && bun run format:check && bun run typecheck",
     "preview": "bun run --bun vite preview",
     "deploy": "bun run build && bun run --bun gh-pages -d dist"
   },
@@ -28,20 +31,15 @@
     "use-sound": "5.0.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.14",
     "@pandacss/dev": "1.12.1",
     "@playwright/test": "1.63.0",
     "@types/howler": "2.2.13",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
-    "@typescript-eslint/eslint-plugin": "8.18.0",
-    "@typescript-eslint/parser": "8.18.0",
     "@vitejs/plugin-react": "6.1.1",
-    "eslint": "8.57.1",
-    "eslint-plugin-react": "^7.33.2",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.4",
     "gh-pages": "6.3.0",
-    "typescript": "5.7.3",
+    "typescript": "7.0.2",
     "vite": "8.3.0",
     "vitest": "5.0.1"
   }
