@@ -1,0 +1,23 @@
+import { createPrimitive } from "../utils/styles"
+
+export const Input = createPrimitive("input", {
+  type: "text",
+  css: {
+    color: "inherit",
+    fontFamily: "inherit",
+    fontWeight: "bolder",
+    fontSize: "inherit",
+    bg: "inputBackground",
+    border: "none",
+    borderRadius: 2,
+    borderColor: "currentColor",
+    p: 2,
+    "&:disabled": {
+      opacity: 0.5,
+      cursor: "not-allowed",
+    },
+    "&:focus": {
+      outline: "none",
+    },
+  },
+})
