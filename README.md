@@ -4,17 +4,27 @@ Community driven tangrams
 
 ## Development
 
-Use Node.js 20+ and Yarn 1. Install with `yarn install --frozen-lockfile`, then
-`yarn dev`. Application code is strict TypeScript; Vite config and maintenance
+Use Bun 1.4.2 (pinned in `.bun-version` and `packageManager`). Install with
+`bun install --frozen-lockfile`, then `bun run dev`. Application code is strict TypeScript; Vite config and maintenance
 scripts outside `src` remain JavaScript.
 
-- `yarn typecheck`: application and browser geometry harness types.
-- `yarn build`: typecheck and production bundle.
-- `yarn lint`: application TypeScript (not vendored scripts); existing hook and
+- `bun run typecheck`: application and browser geometry harness types.
+- `bun run build`: typecheck and production bundle.
+- `bun run preview`: serve the production bundle locally.
+- `bun run lint`: application TypeScript (not vendored scripts); existing hook and
   unused-code warnings remain.
-- `yarn playwright install chromium`, then `yarn test`: gallery → play → tan
+- `bun run --bun playwright install chromium`, then `bun run test`: gallery → play → tan
   geometry → save submission and rejected-login smoke tests. To use installed Chrome instead:
-  `PLAYWRIGHT_CHANNEL=chrome yarn test`.
+  `PLAYWRIGHT_CHANNEL=chrome bun run test`.
+- `bun run deploy`: explicitly build before publishing with the existing gh-pages
+  workflow. Bun does not automatically run npm-style pre/post script hooks.
+
+Development, production builds, typechecking, linting, preview and Playwright
+explicitly select Bun, including the Vite subprocess used by tests. Playwright
+was upgraded to 1.63.0 and verified with Bun 1.4.2; the older 1.51.1/Bun 1.4.0
+combination silently exited without executing tests. Use `bun run test`, not
+`bun test` (which invokes Bun's own test runner). Bun is the only package manager;
+commit `bun.lock` and do not regenerate a Yarn/npm lockfile.
 
 The browser test replaces Firebase only in its own Vite config and blocks remote
 requests. It checks submitted metadata in memory, never writes community data,
@@ -45,7 +55,7 @@ existing square fixture and a guest account, not direct geometry mutation or a
 mock completion check. Run it with:
 
 ```sh
-PLAYWRIGHT_CHANNEL=chrome yarn test --grep "seeded square"
+PLAYWRIGHT_CHANNEL=chrome bun run test --grep "seeded square"
 ```
 
 ## Migration baseline and known issues

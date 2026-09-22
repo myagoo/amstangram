@@ -3,6 +3,10 @@ import { createRandom } from "../src/utils/createRandom"
 import { shuffle } from "../src/utils/shuffle"
 import { getRandomEmoji } from "../src/utils/getRandomEmoji"
 
+test("test workers run under Bun rather than silently falling back to Node", () => {
+  expect(process.versions.bun).toBeTruthy()
+})
+
 test("seeded streams preserve the recorded sequence and validate URL seeds", () => {
   expect(Array.from({ length: 3 }, createRandom("42"))).toEqual([
     0.2523451747838408, 0.08812504541128874, 0.5772811982315034,
