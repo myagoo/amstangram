@@ -116,6 +116,10 @@ const firebase = {
         }
       },
       signInWithEmailAndPassword: async () => {
+        if (localStorage.getItem("test-signin-success")) {
+          userService.auth(true)
+          return { user }
+        }
         throw Object.assign(new Error("Fixture authentication rejection"), {
           code: "auth/wrong-password",
         })

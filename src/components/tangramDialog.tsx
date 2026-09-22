@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { FiStar } from "react-icons/fi"
 import { FormattedMessage, useIntl } from "react-intl"
-import { CATEGORIES, DIALOG_CLOSED_REASON, DIGITS, LETTERS } from "../constants"
+import { CATEGORIES, DIGITS, LETTERS } from "../constants"
 import { GalleryContext } from "../contexts/gallery"
 import { NotifyContext } from "../contexts/notify"
 import { UserContext } from "../contexts/user"
@@ -19,10 +19,10 @@ import { View } from "./view"
 
 const ReadTangramDialog = ({
   tangram,
-  deferred,
+  onClose,
 }: {
   tangram: import("../types").Tangram
-  deferred: import("../utils/deferred").Deferred
+  onClose(): void
 }) => {
   const { tangramsStarredBy } = useContext(GalleryContext)
 
@@ -37,10 +37,7 @@ const ReadTangramDialog = ({
   }, [tangram, tangramsStarredBy])
 
   return (
-    <Dialog
-      onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
-      css={{ gap: "3" }}
-    >
+    <Dialog onClose={onClose} css={{ gap: "3" }}>
       <View
         css={{ gap: "3", overflow: "auto", flex: "1", alignItems: "center" }}
       >
@@ -66,10 +63,10 @@ const ReadTangramDialog = ({
 
 const SaveTangramDialog = ({
   tangram,
-  deferred,
+  onClose,
 }: {
   tangram: import("../types").Tangram
-  deferred: import("../utils/deferred").Deferred
+  onClose(): void
 }) => {
   const intl = useIntl()
   const notify = useContext(NotifyContext)
@@ -155,7 +152,7 @@ const SaveTangramDialog = ({
     ) {
       await firebase.firestore().collection("tangrams").doc(tangram.id).delete()
       notify(intl.formatMessage({ id: "Tangram deleted successfuly" }))
-      deferred.resolve()
+      onClose()
     }
   }
 
@@ -179,7 +176,7 @@ const SaveTangramDialog = ({
       notify(intl.formatMessage({ id: "Tangram modified successfuly" }))
     }
 
-    deferred.resolve()
+    onClose()
   }
 
   const stars = useMemo(() => {
@@ -206,7 +203,7 @@ const SaveTangramDialog = ({
             : intl.formatMessage({ id: "Edit your tangram" })}
         </Title>
       }
-      onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
+      onClose={onClose}
       as="form"
       onSubmit={handleSubmit(onSubmit)}
       css={{ gap: "3" }}
@@ -323,10 +320,10 @@ const SaveTangramDialog = ({
 
 export const TangramDialog = ({
   tangram,
-  deferred,
+  onClose,
 }: {
   tangram: import("../types").Tangram
-  deferred: import("../utils/deferred").Deferred
+  onClose(): void
 }) => {
   const { currentUser } = useContext(UserContext)
   const isEdit =
@@ -334,8 +331,8 @@ export const TangramDialog = ({
     (currentUser!.isAdmin || !tangram.id || tangram.uid === currentUser.uid)
 
   return isEdit ? (
-    <SaveTangramDialog tangram={tangram} deferred={deferred} />
+    <SaveTangramDialog tangram={tangram} onClose={onClose} />
   ) : (
-    <ReadTangramDialog tangram={tangram} deferred={deferred} />
+    <ReadTangramDialog tangram={tangram} onClose={onClose} />
   )
 }

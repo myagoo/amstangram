@@ -141,10 +141,8 @@ export const Tangram = () => {
       }
 
       const asyncTask = async () => {
-        if (!currentUser) {
-          await showLogin()
-        }
-        await showTangram(pathData)
+        if (!currentUser && !(await showLogin())) return
+        showTangram(pathData)
       }
 
       asyncTask()

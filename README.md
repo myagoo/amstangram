@@ -250,6 +250,23 @@ metadata and later username updates. The normal profile UI also verifies usernam
 writes and all existing password/email regressions. Real Firebase rules and
 network failures remain outside these fixtures.
 
+**0.2.8 🥟.🐼.💬 — simpler dialog workflows (ticket 07).** Ordinary dialogs
+now use local open/data state and close callbacks instead of deferred promises.
+They remain independently nestable: closing a profile or tangram detail preserves
+the gallery and its selection. Starting the gallery closes it and any parent
+menu, without assuming a menu exists. Login and challenge startup still await
+meaningful decisions. Login returns the authenticated user or `null` on cancel;
+cancelling save-flow login stops the workflow without opening another dialog or
+writing a puzzle.
+
+`PLAYWRIGHT_CHANNEL=chrome bun run test:e2e tests/dialogs.spec.ts tests/gallery.spec.ts`
+covers cancelled and successful save-flow login, parentless gallery start, nested
+profile/detail closing, gallery selection and challenge accept/cancel. The save
+tests reuse the existing Paper geometry fixture to prepare a valid arrangement;
+only external Firebase is substituted. Both cancellation and the old null-parent
+promise error reproduced before the fix. No modal framework or exclusive-dialog
+policy was introduced; existing challenge selection rules are unchanged.
+
 Remaining defects found while typing/reviewing:
 
 - Secondary snapping reads an absent `shape` property from a Paper.js path.

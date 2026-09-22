@@ -8,7 +8,6 @@ import React, {
 } from "react"
 import { FiShare2, FiStar } from "react-icons/fi"
 import { FormattedMessage, useIntl } from "react-intl"
-import { DIALOG_CLOSED_REASON } from "../constants"
 import { DialogContext } from "../contexts/dialog"
 import { GalleryContext } from "../contexts/gallery"
 import { TangramsContext } from "../contexts/tangrams"
@@ -41,9 +40,11 @@ const FadedView = styled(View, {
 const GALLERY_BATCH_SIZE = 48
 
 export const GalleryDialog = ({
-  deferred,
+  onClose,
+  onStart,
 }: {
-  deferred: import("../utils/deferred").Deferred
+  onClose(): void
+  onStart(): void
 }) => {
   const intl = useIntl()
 
@@ -116,10 +117,8 @@ export const GalleryDialog = ({
       startRandomPlaylist()
     }
 
-    deferred.resolve()
+    onStart()
   }
-
-  const handleCloseClick = () => deferred.reject(DIALOG_CLOSED_REASON)
 
   const tangramsByCategory = useMemo(() => {
     const tangrams =
@@ -202,7 +201,7 @@ export const GalleryDialog = ({
           gap: "3",
           width: "568px",
         }}
-        onClose={handleCloseClick}
+        onClose={onClose}
       >
         {
           <>

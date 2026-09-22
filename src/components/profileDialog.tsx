@@ -8,7 +8,6 @@ import React, { useCallback, useContext, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { FiStar } from "react-icons/fi"
 import { FormattedMessage, useIntl } from "react-intl"
-import { DIALOG_CLOSED_REASON } from "../constants"
 import { GalleryContext } from "../contexts/gallery"
 import { LanguageContext } from "../contexts/language"
 import { NotifyContext } from "../contexts/notify"
@@ -316,10 +315,10 @@ const ChangePasswordForm = ({
 }
 export const ProfileDialog = ({
   uid,
-  deferred,
+  onClose,
 }: {
   uid: string
-  deferred: import("../utils/deferred").Deferred
+  onClose(): void
 }) => {
   const intl = useIntl()
   const notify = useContext(NotifyContext)
@@ -350,14 +349,14 @@ export const ProfileDialog = ({
       )
     ) {
       await firebase.auth().signOut()
-      deferred.reject(DIALOG_CLOSED_REASON)
+      onClose()
       notify(intl.formatMessage({ id: "Logged out" }))
     }
   }
 
   return (
     <Dialog
-      onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
+      onClose={onClose}
       css={{
         overflow: "auto",
         pt: "4",

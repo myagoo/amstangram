@@ -3,7 +3,6 @@ import {
   EMPTY_PLAYER_STATS,
 } from "../utils/calculatePlayerStats"
 import React, { useContext, useMemo, useState } from "react"
-import { DIALOG_CLOSED_REASON } from "../constants"
 import { DialogContext } from "../contexts/dialog"
 
 import { TangramsContext } from "../contexts/tangrams"
@@ -18,11 +17,7 @@ import { useIntl } from "react-intl"
 import { FiStar } from "react-icons/fi"
 import { GalleryContext } from "../contexts/gallery"
 
-export const LeaderboardDialog = ({
-  deferred,
-}: {
-  deferred: import("../utils/deferred").Deferred
-}) => {
+export const LeaderboardDialog = ({ onClose }: { onClose(): void }) => {
   const intl = useIntl()
 
   const { showProfile } = useContext(DialogContext)
@@ -78,7 +73,7 @@ export const LeaderboardDialog = ({
   return (
     <Dialog
       title={<Title>{intl.formatMessage({ id: "Leaderboard" })}</Title>}
-      onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
+      onClose={onClose}
       css={{
         gap: "3",
       }}

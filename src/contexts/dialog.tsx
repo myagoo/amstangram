@@ -21,14 +21,13 @@ import { DIALOG_CLOSED_REASON } from "../constants"
 import { MenuDialog } from "../components/menuDialog"
 
 export const DialogContext = createContext<{
-  menuDialogDeferred: Deferred | null
-  showMenu(): Promise<void>
-  showProfile(uid: string): Promise<void>
-  showLeaderboard(): Promise<void>
-  showGallery(): Promise<void>
-  showLogin(): Promise<void>
-  showTangram(tangram: import("../types").Tangram): Promise<void>
-  showSettings(): Promise<void>
+  showMenu(): void
+  showProfile(uid: string): void
+  showLeaderboard(): void
+  showGallery(): void
+  showLogin(): Promise<import("../types").CurrentUser | null>
+  showTangram(tangram: import("../types").Tangram): void
+  showSettings(): void
 }>(null!)
 
 export const DialogProvider = ({ children }: React.PropsWithChildren) => {
@@ -46,79 +45,17 @@ export const DialogProvider = ({ children }: React.PropsWithChildren) => {
 
   const [initialized, setInitialized] = useState(false)
 
-  const [profileDialogData, setProfileDialogData] = useState<{
-    uid: string
-    deferred: Deferred
-  } | null>(null)
+  const [profileUid, setProfileUid] = useState<string | null>(null)
+  const showProfile = useCallback((uid: string) => setProfileUid(uid), [])
 
-  const showProfile = useCallback(async (uid: string) => {
-    const deferred = new Deferred()
-    setProfileDialogData({ uid, deferred })
-    try {
-      await deferred.promise
-    } catch (error) {
-      if (error !== DIALOG_CLOSED_REASON) {
-        throw error
-      }
-    } finally {
-      setProfileDialogData(null)
-    }
-  }, [])
+  const [leaderboardOpen, setLeaderboardOpen] = useState(false)
+  const showLeaderboard = useCallback(() => setLeaderboardOpen(true), [])
 
-  const [leaderboardDeferred, setLeaderboardDeferred] =
-    useState<Deferred | null>(null)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const showMenu = useCallback(() => setMenuOpen(true), [])
 
-  const showLeaderboard = useCallback(async () => {
-    const deferred = new Deferred()
-    setLeaderboardDeferred(deferred)
-
-    try {
-      await deferred.promise
-    } catch (error) {
-      if (error !== DIALOG_CLOSED_REASON) {
-        throw error
-      }
-    } finally {
-      setLeaderboardDeferred(null)
-    }
-  }, [])
-
-  const [menuDialogDeferred, setMenuDialogDeferred] = useState<Deferred | null>(
-    null
-  )
-
-  const showMenu = useCallback(async () => {
-    const deferred = new Deferred()
-
-    setMenuDialogDeferred(deferred)
-    try {
-      await deferred.promise
-    } catch (error) {
-      if (error !== DIALOG_CLOSED_REASON) {
-        throw error
-      }
-    } finally {
-      setMenuDialogDeferred(null)
-    }
-  }, [])
-
-  const [galleryDeferred, setGalleryDeferred] = useState<Deferred | null>(null)
-
-  const showGallery = useCallback(async () => {
-    const deferred = new Deferred()
-    setGalleryDeferred(deferred)
-
-    try {
-      await deferred.promise
-      menuDialogDeferred!.resolve()
-    } catch (error) {
-      if (error !== DIALOG_CLOSED_REASON) {
-        throw error
-      }
-    } finally {
-      setGalleryDeferred(null)
-    }
-  }, [menuDialogDeferred])
+  const [galleryOpen, setGalleryOpen] = useState(false)
+  const showGallery = useCallback(() => setGalleryOpen(true), [])
 
   const [loginDeferred, setLoginDeferred] = useState<Deferred<
     import("../types").CurrentUser
@@ -128,56 +65,25 @@ export const DialogProvider = ({ children }: React.PropsWithChildren) => {
     const deferred = new Deferred<import("../types").CurrentUser>()
     setLoginDeferred(deferred)
     try {
-      await deferred.promise
+      return await deferred.promise
     } catch (error) {
-      if (error !== DIALOG_CLOSED_REASON) {
-        throw error
-      }
+      if (error !== DIALOG_CLOSED_REASON) throw error
+      return null
     } finally {
       setLoginDeferred(null)
     }
   }, [])
 
-  const [tangramDialogData, setTangramDialogData] = useState<{
-    tangram: import("../types").Tangram
-    deferred: Deferred
-  } | null>(null)
-
+  const [tangramDialogData, setTangramDialogData] = useState<
+    import("../types").Tangram | null
+  >(null)
   const showTangram = useCallback(
-    async (tangram: import("../types").Tangram) => {
-      const deferred = new Deferred()
-      setTangramDialogData({ deferred, tangram })
-      try {
-        await deferred.promise
-      } catch (error) {
-        if (error !== DIALOG_CLOSED_REASON) {
-          throw error
-        }
-      } finally {
-        setTangramDialogData(null)
-      }
-    },
+    (tangram: import("../types").Tangram) => setTangramDialogData(tangram),
     []
   )
 
-  const [settingsDialogDeferred, setSettingsDialogDeferred] =
-    useState<Deferred | null>(null)
-
-  const showSettings = useCallback(async () => {
-    const deferred = new Deferred()
-
-    setSettingsDialogDeferred(deferred)
-
-    try {
-      await deferred.promise
-    } catch (error) {
-      if (error !== DIALOG_CLOSED_REASON) {
-        throw error
-      }
-    } finally {
-      setSettingsDialogDeferred(null)
-    }
-  }, [])
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const showSettings = useCallback(() => setSettingsOpen(true), [])
 
   const [challengeDialogData, setChallengeDialogData] = useState<{
     uid: string | null
@@ -247,7 +153,6 @@ export const DialogProvider = ({ children }: React.PropsWithChildren) => {
 
   const contextValue = useMemo(() => {
     return {
-      menuDialogDeferred,
       showMenu,
       showProfile,
       showLeaderboard,
@@ -257,7 +162,6 @@ export const DialogProvider = ({ children }: React.PropsWithChildren) => {
       showSettings,
     }
   }, [
-    menuDialogDeferred,
     showMenu,
     showProfile,
     showLeaderboard,
@@ -270,27 +174,32 @@ export const DialogProvider = ({ children }: React.PropsWithChildren) => {
   return (
     <DialogContext.Provider value={contextValue}>
       {children}
-      {menuDialogDeferred && (
-        <MenuDialog deferred={menuDialogDeferred}></MenuDialog>
-      )}
-      {loginDeferred && <LoginDialog deferred={loginDeferred}></LoginDialog>}
-      {galleryDeferred && (
-        <GalleryDialog deferred={galleryDeferred}></GalleryDialog>
+      {menuOpen && <MenuDialog onClose={() => setMenuOpen(false)} />}
+      {loginDeferred && <LoginDialog deferred={loginDeferred} />}
+      {galleryOpen && (
+        <GalleryDialog
+          onClose={() => setGalleryOpen(false)}
+          onStart={() => {
+            setGalleryOpen(false)
+            setMenuOpen(false)
+          }}
+        />
       )}
       {tangramDialogData && (
-        <TangramDialog {...tangramDialogData}></TangramDialog>
+        <TangramDialog
+          tangram={tangramDialogData}
+          onClose={() => setTangramDialogData(null)}
+        />
       )}
-      {profileDialogData && (
-        <ProfileDialog {...profileDialogData}></ProfileDialog>
+      {profileUid !== null && (
+        <ProfileDialog uid={profileUid} onClose={() => setProfileUid(null)} />
       )}
-      {leaderboardDeferred && (
-        <LeaderboardDialog deferred={leaderboardDeferred}></LeaderboardDialog>
+      {leaderboardOpen && (
+        <LeaderboardDialog onClose={() => setLeaderboardOpen(false)} />
       )}
-      {challengeDialogData && (
-        <ChallengeDialog {...challengeDialogData}></ChallengeDialog>
-      )}
-      {settingsDialogDeferred && (
-        <SettingsDialog deferred={settingsDialogDeferred}></SettingsDialog>
+      {challengeDialogData && <ChallengeDialog {...challengeDialogData} />}
+      {settingsOpen && (
+        <SettingsDialog onClose={() => setSettingsOpen(false)} />
       )}
     </DialogContext.Provider>
   )

@@ -138,4 +138,11 @@ test("a touch long-press still opens details for an incrementally loaded card", 
     touchPoints: [],
   })
   await expect(page.getByText("Earned 1", { exact: true })).toBeVisible()
+  await page.mouse.click(1, 1)
+  await expect(
+    page.getByRole("button", { name: "Show more tangrams", exact: true })
+  ).toBeVisible()
+  await expect(
+    page.locator('#dialogContainer svg[viewBox="0 0 200 200"]')
+  ).toHaveCount(96)
 })

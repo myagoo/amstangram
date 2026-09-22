@@ -1,7 +1,6 @@
 import React, { useContext } from "react"
 import { FiMoon, FiSun, FiVolume2, FiVolumeX } from "react-icons/fi"
 import { useIntl } from "react-intl"
-import { DIALOG_CLOSED_REASON } from "../constants"
 import { LanguageContext, supportedLanguages } from "../contexts/language"
 import { useShowBackgroundPattern } from "../contexts/showBackgroundPattern"
 import { SoundContext } from "../contexts/sound"
@@ -16,11 +15,7 @@ import { View } from "./view"
 import { useShowParticles } from "../contexts/showParticles"
 import { useSwitchTheme } from "../contexts/switchTheme"
 
-export const SettingsDialog = ({
-  deferred,
-}: {
-  deferred: import("../utils/deferred").Deferred
-}) => {
+export const SettingsDialog = ({ onClose }: { onClose(): void }) => {
   const { soundEnabled, toggleSound } = useContext(SoundContext)
   const { tipsEnabled, toggleTips, resetTips } = useContext(TipsContext)
   const [showBackgroundPattern, toggleShowBackgroundPattern] =
@@ -40,7 +35,7 @@ export const SettingsDialog = ({
   return (
     <Dialog
       title={<Title>{intl.formatMessage({ id: "Settings" })}</Title>}
-      onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
+      onClose={onClose}
       css={{ gap: "4" }}
     >
       <View css={{ gap: "3" }}>

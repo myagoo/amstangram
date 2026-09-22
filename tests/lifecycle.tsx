@@ -2,7 +2,7 @@ import "../src/index.css"
 import { useContext, useState } from "react"
 import { createRoot } from "react-dom/client"
 import { Tangram } from "../src/components/tangram"
-import { DialogProvider } from "../src/contexts/dialog"
+import { DialogContext, DialogProvider } from "../src/contexts/dialog"
 import { GalleryContext, GalleryProvider } from "../src/contexts/gallery"
 import { LanguageProvider } from "../src/contexts/language"
 import { NotifyProvider } from "../src/contexts/notify"
@@ -17,6 +17,7 @@ import { UserContext, UserProvider } from "../src/contexts/user"
 // Real providers and gameplay, with only React mount control added by the fixture.
 function LifecycleFixture() {
   const [mounted, setMounted] = useState(true)
+  const { showGallery } = useContext(DialogContext)
   const { initialized: usersReady } = useContext(UserContext)
   const { initialized: tangramsReady } = useContext(TangramsContext)
   const { initialized: galleryReady, playlist } = useContext(GalleryContext)
@@ -24,6 +25,12 @@ function LifecycleFixture() {
   return (
     <>
       {mounted && <Tangram />}
+      <button
+        style={{ position: "fixed", top: 0, right: 0, zIndex: 10 }}
+        onClick={showGallery}
+      >
+        Open gallery
+      </button>
       <button
         style={{ position: "fixed", bottom: 0, right: 0, zIndex: 10 }}
         onClick={() => setMounted((value) => !value)}

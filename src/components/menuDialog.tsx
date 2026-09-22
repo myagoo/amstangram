@@ -2,7 +2,6 @@ import React, { useContext } from "react"
 import { FiAward, FiGrid, FiSave, FiSettings, FiUser } from "react-icons/fi"
 import { useIntl } from "react-intl"
 import { version } from "../../package.json"
-import { DIALOG_CLOSED_REASON } from "../constants"
 import { DialogContext } from "../contexts/dialog"
 import { GalleryContext } from "../contexts/gallery"
 import { SoundContext } from "../contexts/sound"
@@ -44,11 +43,7 @@ const MenuItem = ({
   )
 }
 
-export const MenuDialog = ({
-  deferred,
-}: {
-  deferred: import("../utils/deferred").Deferred
-}) => {
+export const MenuDialog = ({ onClose }: { onClose(): void }) => {
   const { currentUser } = useContext(UserContext)
   const intl = useIntl()
 
@@ -59,7 +54,7 @@ export const MenuDialog = ({
 
   return (
     <Dialog
-      onClose={() => deferred.reject(DIALOG_CLOSED_REASON)}
+      onClose={onClose}
       title={
         <View css={{ flexDirection: "row", gap: "3", alignItems: "center" }}>
           <Logo
@@ -105,7 +100,7 @@ export const MenuDialog = ({
         <MenuItem
           action={() => {
             requestSave()
-            deferred.reject(DIALOG_CLOSED_REASON)
+            onClose()
           }}
           icon={FiSave}
           text={intl.formatMessage({ id: "Save tangram" })}
@@ -149,7 +144,7 @@ export const MenuDialog = ({
         >
           {intl.formatMessage(
             { id: "Version {code}" },
-            { code: `${version} 🥟.🐼.👤` }
+            { code: `${version} 🥟.🐼.💬` }
           )}
         </Link>
       </View>
