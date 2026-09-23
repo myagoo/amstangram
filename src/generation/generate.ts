@@ -5,6 +5,7 @@ import { computeOutline } from "../../vendor/tangram-generator/tan"
 import { SMALL_TRIANGLE_BASE } from "../constants"
 import type { Tangram } from "../types"
 import { createRandom } from "../utils/createRandom"
+import { getRandomEmoji } from "../utils/getRandomEmoji"
 import { MIN_GENERATED_EDGES, MAX_GENERATED_EDGES } from "./settings"
 
 // The generator's small tan has legs 6√2; the game's has legs base√2.
@@ -44,7 +45,6 @@ export function convertTangram(candidate: EngineTangram): Tangram | null {
       width: Math.round(outline.bounds.width),
       height: Math.round(outline.bounds.height),
       length: Math.round(outline.length),
-      emoji: "🎲",
     }
   } finally {
     outline.remove()
@@ -68,6 +68,7 @@ export function generatePuzzle(edges: number, seed: string): Tangram {
     )
       continue
     const puzzle = convertTangram(candidate)
-    if (puzzle?.edges === edges) return puzzle
+    if (puzzle?.edges === edges)
+      return { ...puzzle, emoji: getRandomEmoji(random) }
   }
 }

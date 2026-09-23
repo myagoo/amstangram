@@ -1,4 +1,4 @@
-import { useContext, useMemo } from "react"
+import React, { useContext, useState, useMemo, useEffect, useRef } from "react"
 import { FiCheck, FiPlay, FiX, FiStar } from "react-icons/fi"
 import { useIntl } from "react-intl"
 import { PrimaryButton } from "./button"
@@ -25,6 +25,11 @@ export const Victory = ({
   onStarToggle?: () => void
 }) => {
   const intl = useIntl()
+  const [emojiSpinEnded, setEmojiSpinEnded] = useState(false)
+  const spinTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  )
+  useEffect(() => () => clearTimeout(spinTimeout.current), [])
   const { playStar } = useContext(SoundContext)
   const { tangramsStarredBy, isTangramStarred } = useContext(GalleryContext)
 
@@ -41,138 +46,137 @@ export const Victory = ({
 
   const starred = tangram.id ? isTangramStarred(tangram.id) : false
 
+  const handleEmojiSpinAnimationEnd = () => {
+    clearTimeout(spinTimeout.current)
+    spinTimeout.current = setTimeout(() => setEmojiSpinEnded(true), 1000)
+  }
+
   return (
     <View
       css={{
         position: "absolute",
+        top: "0",
         left: "0",
         right: "0",
-        bottom: "3",
+        bottom: "0",
         alignItems: "center",
-        pointerEvents: "none",
+        justifyContent: "center",
+        gap: "3",
       }}
     >
       <View
         css={{
-          flexDirection: "row",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: "2",
-          p: "2",
-          maxWidth: "calc(100% - 32px)",
-          bg: "dialogBackground",
-          borderRadius: "3",
-          boxShadow: "0 4px 20px #00000030",
-          pointerEvents: "auto",
+          position: "relative",
         }}
       >
         <View
+          key="emojiSpin"
+          data-testid="victory-emoji"
+          onAnimationEnd={handleEmojiSpinAnimationEnd}
           css={{
-            fontSize: "40px",
-            lineHeight: 1,
-            p: "2",
-            animation: "450ms victoryPop ease-out",
-            _motionReduce: { animation: "none" },
+            textShadow: "0px 5px 10px #00000080",
+            fontSize: "30vmin",
+            animation: `2000ms emojiSpin cubic-bezier(.6,1.56,.58,.92) forwards`,
           }}
         >
           {tangram.emoji}
         </View>
-        <View
-          css={{
-            flexDirection: "row",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            gap: "2",
-            "& > button": {
-              animation: "none",
-              bg: "pieces.lt2",
-              boxShadow: "none",
-            },
-          }}
-        >
-          {onApprove && (
-            <PrimaryButton
-              onClick={onApprove}
-              css={{
-                display: "flex",
-                boxShadow: "0px 5px 10px #00000080",
-                flexDirection: "row",
-                gap: "2",
-                alignItems: "flex-end",
-              }}
-            >
-              <View as={FiCheck} css={{ boxSize: "icon" }}></View>
-              <Text>{intl.formatMessage({ id: "Approve" })}</Text>
-            </PrimaryButton>
-          )}
-          {onStarToggle && (
-            <PrimaryButton
-              mute
-              onClick={() => {
-                playStar()
-                onStarToggle()
-              }}
-              css={{
-                display: "flex",
-                boxShadow: "0px 5px 10px #00000080",
-                flexDirection: "row",
-                gap: "2",
-                alignItems: "flex-end",
-              }}
-            >
-              <Text>{stars}</Text>
-              <View
-                as={FiStar}
+        {emojiSpinEnded && (
+          <View
+            css={{
+              mt: "3",
+              position: "absolute",
+              top: "100%",
+              left: "50%",
+              transform: "translateX(-50%)",
+              flexDirection: "row",
+              gap: "3",
+              animation: "{durations.fade} fadeIn ease both",
+            }}
+          >
+            {onApprove && (
+              <PrimaryButton
+                onClick={onApprove}
                 css={{
-                  boxSize: "icon",
-                  fill: starred ? "currentColor" : undefined,
+                  display: "flex",
+                  boxShadow: "0px 5px 10px #00000080",
+                  flexDirection: "row",
+                  gap: "2",
+                  alignItems: "flex-end",
                 }}
-              ></View>
-            </PrimaryButton>
-          )}
-          {onNext ? (
-            <PrimaryButton
-              onClick={onNext}
-              disabled={nextLoading}
-              aria-busy={nextLoading}
-              aria-live="polite"
-              css={{
-                display: "flex",
-                boxShadow: "0px 5px 10px #00000080",
-                flexDirection: "row",
-                gap: "2",
-                alignItems: "flex-end",
-              }}
-            >
-              <View as={FiPlay} css={{ boxSize: "icon" }}></View>
-              <Text>
-                {intl.formatMessage({
-                  id: nextLoading
-                    ? "Generating…"
-                    : nextFailed
-                      ? "Retry"
-                      : "Next",
-                })}
-              </Text>
-            </PrimaryButton>
-          ) : (
-            <PrimaryButton
-              onClick={onStop}
-              css={{
-                display: "flex",
-                boxShadow: "0px 5px 10px #00000080",
-                flexDirection: "row",
-                gap: "2",
-                alignItems: "flex-end",
-              }}
-            >
-              <View as={FiX} css={{ boxSize: "icon" }}></View>
-              <Text>{intl.formatMessage({ id: "Quit" })}</Text>
-            </PrimaryButton>
-          )}
-        </View>
-        {nextFailed && (
+              >
+                <View as={FiCheck} css={{ boxSize: "icon" }}></View>
+                <Text>{intl.formatMessage({ id: "Approve" })}</Text>
+              </PrimaryButton>
+            )}
+            {onStarToggle && (
+              <PrimaryButton
+                mute
+                onClick={() => {
+                  playStar()
+                  onStarToggle()
+                }}
+                css={{
+                  display: "flex",
+                  boxShadow: "0px 5px 10px #00000080",
+                  flexDirection: "row",
+                  gap: "2",
+                  alignItems: "flex-end",
+                }}
+              >
+                <Text>{stars}</Text>
+                <View
+                  as={FiStar}
+                  css={{
+                    boxSize: "icon",
+                    fill: starred ? "currentColor" : undefined,
+                  }}
+                ></View>
+              </PrimaryButton>
+            )}
+            {onNext ? (
+              <PrimaryButton
+                onClick={onNext}
+                disabled={nextLoading}
+                aria-busy={nextLoading}
+                aria-live="polite"
+                css={{
+                  display: "flex",
+                  boxShadow: "0px 5px 10px #00000080",
+                  flexDirection: "row",
+                  gap: "2",
+                  alignItems: "flex-end",
+                }}
+              >
+                <View as={FiPlay} css={{ boxSize: "icon" }}></View>
+                <Text>
+                  {intl.formatMessage({
+                    id: nextLoading
+                      ? "Generating…"
+                      : nextFailed
+                        ? "Retry"
+                        : "Next",
+                  })}
+                </Text>
+              </PrimaryButton>
+            ) : (
+              <PrimaryButton
+                onClick={onStop}
+                css={{
+                  display: "flex",
+                  boxShadow: "0px 5px 10px #00000080",
+                  flexDirection: "row",
+                  gap: "2",
+                  alignItems: "flex-end",
+                }}
+              >
+                <View as={FiX} css={{ boxSize: "icon" }}></View>
+                <Text>{intl.formatMessage({ id: "Quit" })}</Text>
+              </PrimaryButton>
+            )}
+          </View>
+        )}
+        {emojiSpinEnded && nextFailed && (
           <p role="alert">
             {intl.formatMessage({ id: "Generation failed. Please try again." })}
           </p>

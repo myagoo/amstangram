@@ -155,7 +155,7 @@ test("prefetch starts during play; victory waits, then Next consumes one ready p
     await expect(next).toBeEnabled({ timeout: 20000 })
     expect(requests).toBe(2)
     await next.click()
-    await expect(page.getByText("🎲", { exact: true })).toHaveCount(0)
+    await expect(page.getByTestId("victory-emoji")).toHaveCount(0)
     await expect.poll(() => requests).toBe(3)
     const second = await readTarget(page)
     expect(second.edges).toBe(first.edges)

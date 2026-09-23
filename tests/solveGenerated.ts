@@ -31,7 +31,16 @@ export async function solveGenerated(
       break
     }
   }
-  await expect(page.getByText("🎲", { exact: true })).toBeVisible({
+  await expect(page.getByTestId("victory-emoji")).toBeVisible({
     timeout: 10000,
   })
+  const emoji = await page.evaluate(
+    async ({ seed, edges }) =>
+      (await import("/src/generation/generate.ts")).generatePuzzle(
+        edges,
+        String(seed)
+      ).emoji!,
+    { seed, edges }
+  )
+  await expect(page.getByTestId("victory-emoji")).toHaveText(emoji)
 }

@@ -30,13 +30,13 @@ test("118 converted solutions fit actual game tans, covering all levels, holes a
   expect(result.holes).toBeGreaterThan(0)
 })
 
-test("real workers reproduce every slider level and reject invalid difficulty", async ({
+test("real workers reproduce levels and random success emojis and reject invalid difficulty", async ({
   page,
 }) => {
   const results = await page.evaluate(async (seeds) => {
     const run = (edges: number, seed: number) =>
       new Promise<{
-        puzzle?: { edges: number; path: string }
+        puzzle?: { edges: number; path: string; emoji: string }
         error?: boolean
       }>((resolve, reject) => {
         const worker = new Worker("/src/generation/generate.worker.ts", {
@@ -56,7 +56,11 @@ test("real workers reproduce every slider level and reject invalid difficulty", 
     for (const [edges, seed] of Object.entries(seeds)) {
       puzzles.push(await run(Number(edges), seed))
     }
+    const { getRandomEmoji } = await import("/src/utils/getRandomEmoji.ts")
     return {
+      emojiPool: Array.from({ length: 10 }, (_, i) =>
+        getRandomEmoji(() => i / 10)
+      ),
       puzzles,
       again: await run(14, seeds[14]),
       invalid: await run(4, 42),
@@ -66,6 +70,9 @@ test("real workers reproduce every slider level and reject invalid difficulty", 
     Array.from({ length: 18 }, (_, i) => i + 5)
   )
   expect(results.again).toEqual(results.puzzles[9])
+  const emojis = results.puzzles.map(({ puzzle }) => puzzle!.emoji)
+  for (const emoji of emojis) expect(results.emojiPool).toContain(emoji)
+  expect(new Set(emojis).size).toBeGreaterThan(1)
   expect(results.invalid).toEqual({ error: true })
 })
 
