@@ -181,10 +181,17 @@ TypeScript path workaround has been removed.
 
 ### Codebase health releases
 
-The app displays only the emoji release code (currently `🥟.🎲.🎉`), without
+The app displays only the emoji release code (currently `🥟.🎲.⚡`), without
 the numeric version. Numeric versions remain in `package.json` and release notes
 for tooling and traceability. Release 0.2.11 makes this display-only change; the
 menu browser regression checks the exact emoji label and excludes digits.
+
+**0.3.6 🥟.🎲.⚡ — faster tangram generation.** Backports Tangramix's geometry
+optimizations and skips unused candidate scoring during puzzle search. Difficulty,
+orientation probabilities, seeded layouts and the random stream are preserved;
+maximum-difficulty seed `42` still selects the same puzzle after 2,392 candidates.
+Regression checks cover the original layout fingerprint, real browser workers,
+pre-generation and all 16 hole fixtures, including rendering and mouse completion.
 
 **0.3.5 🥟.🎲.🎉 — original victory animation and random generated-puzzle emojis.**
 Reverts the animation redesign from `323738f`, restoring the previous particle
