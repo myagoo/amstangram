@@ -57,6 +57,20 @@ export class Tan {
         return this.anchor.dup().add(InsideDirections[this.tanType][this.orientation][0]);
     }
 
+    containsPoint(point: Point) {
+        // Every tan is convex. Opposite edge signs mean outside; zero means
+        // boundary only when the point satisfies all the other half-planes.
+        const points = this.getPoints();
+        let side = 0, boundary = false;
+        for (let i = 0; i < points.length; i++) {
+            const orientation = relativeOrientation(points[i], points[(i + 1) % points.length], point);
+            if (orientation === 0) boundary = true;
+            else if (side !== 0 && side !== orientation) return -1;
+            else side = orientation;
+        }
+        return boundary ? 0 : 1;
+    }
+
     getInsidePoints() {
         if (generating && typeof this.insidePoints != 'undefined') {
             return this.insidePoints;
@@ -323,7 +337,8 @@ export const containsPoint = function(outline: Point[], point: Point) {
         var secondPoint = pointId === outline.length - 1 ? outline[0] : outline[(pointId + 1)];
         /* Check each segment for containment */
         if (point.eq(firstPoint) || point.eq(secondPoint)
-            || new LineSegment(firstPoint, secondPoint).onSegment(point)) {
+            || (relativeOrientation(firstPoint, secondPoint, point) === 0
+                && new LineSegment(firstPoint, secondPoint).onSegment(point))) {
             return 0;
         }
         /* Line segments are only considered if they are either pointing upward or

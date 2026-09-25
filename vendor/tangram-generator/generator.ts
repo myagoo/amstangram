@@ -3,13 +3,22 @@ import { IntAdjoinSqrt2 } from "./intadjoinsqrt2.js";
 import { comparePoints, Point } from "./point.js";
 import { compareLineSegments, LineSegment } from "./lineSegement.js";
 import { Directions, SegmentDirections, numOrientations } from "./directions.js";
-import { getAllPoints, computeBoundingBox, containsPoint, Tan } from "./tan.js";
+import { getAllPoints, computeBoundingBox, Tan } from "./tan.js";
 import { compareTangrams, Tangram } from "./tangram.js";
 import { createRandom } from "./random.js";
 
 var range = new IntAdjoinSqrt2(50, 0);
 
 var increaseProbability = 50;
+
+// All tan edges follow one of eight 45-degree directions. Compare their signs
+// instead of repeatedly dividing exact-number vectors for every trial orientation.
+const directionCode = (direction: Point) => {
+    const x = direction.toFloatX(), y = direction.toFloatY();
+    return (x > 0 ? 3 : x < 0 ? -3 : 0) + (y > 0 ? 1 : y < 0 ? -1 : 0);
+};
+const segmentDirections = SegmentDirections.map(orientations =>
+    orientations.map(points => points.map(directions => directions.map(directionCode))));
 
 const checkNewTan = function(currentTans: Tan[], newTan: Tan) {
     /* For each point of the new piece, check if it overlaps with already placed
@@ -21,7 +30,7 @@ const checkNewTan = function(currentTans: Tan[], newTan: Tan) {
         var currentPoints = currentTans[tansId].getPoints();
         var onSegmentCounter = 0;
         for (var pointId = 0; pointId < allTanPoints.length; pointId++) {
-            var contains = containsPoint(currentPoints, allTanPoints[pointId]);
+            var contains = currentTans[tansId].containsPoint(allTanPoints[pointId]);
             if (contains === 1) {
                 return false;
             } else if (contains === 0) {
@@ -38,7 +47,7 @@ const checkNewTan = function(currentTans: Tan[], newTan: Tan) {
         onSegmentCounter = 0;
         currentPoints = currentPoints.concat(currentTans[tansId].getInsidePoints());
         for (pointId = 0; pointId < currentPoints.length; pointId++) {
-            contains = containsPoint(points, currentPoints[pointId]);
+            contains = newTan.containsPoint(currentPoints[pointId]);
             if (contains === 1) {
                 return false;
             } else if (contains === 0) {
@@ -148,24 +157,26 @@ const normalizeProbability = function(distribution: number[]) {
 
 const computeOrientationProbability = function(tans: Tan[], point: Point, tanType: number, pointId: number, allSegments: LineSegment[]) {
     var distribution = [];
-    var segmentDirections = [];
+    var adjacentDirections = [];
     /* Get directions of the segments that are adjacent with the given connecting
      * point in a way that the directions point to the respective other point */
     for (var segmentId = 0; segmentId < allSegments.length; segmentId++) {
         if (allSegments[segmentId].point1.eq(point)) {
-            segmentDirections.push(allSegments[segmentId].direction());
+            const direction = allSegments[segmentId].direction();
+            adjacentDirections.push(directionCode(direction));
         } else if (allSegments[segmentId].point2.eq(point)) {
-            segmentDirections.push(allSegments[segmentId].direction().neg());
+            const direction = allSegments[segmentId].direction().neg();
+            adjacentDirections.push(directionCode(direction));
         }
     }
     /* Segments align is the direction vectors are a multiple of each other */
     for (var orientId = 0; orientId < numOrientations; orientId++) {
         distribution.push(1);
-        for (segmentId = 0; segmentId < segmentDirections.length; segmentId++) {
-            if (segmentDirections[segmentId].multipleOf(SegmentDirections[tanType][orientId][pointId][0])) {
+        for (segmentId = 0; segmentId < adjacentDirections.length; segmentId++) {
+            if (adjacentDirections[segmentId] === segmentDirections[tanType][orientId][pointId][0]) {
                 distribution[orientId] += increaseProbability;
             }
-            if (segmentDirections[segmentId].multipleOf(SegmentDirections[tanType][orientId][pointId][1])) {
+            if (adjacentDirections[segmentId] === segmentDirections[tanType][orientId][pointId][1]) {
                 distribution[orientId] += increaseProbability;
             }
         }
@@ -216,7 +227,7 @@ const updateSegments = function(currentSegments: LineSegment[], newTan: Tan) {
     return allSegments;
 };
 
-const generateTangramEdges = function(random: () => number): Tangram {
+const generateTangramEdges = function(random: () => number, evaluate: boolean): Tangram {
     /* Generate an order in which the tan pieces are to be placed and decide on
      * whether the parallelogram is flipped or not */
     var flipped = Math.floor(random() * 2);
@@ -272,24 +283,26 @@ const generateTangramEdges = function(random: () => number): Tangram {
             /* Try again - can this ever happen? */
             if (counter > 100) {
                 console.log("Infinity loop!");
-                return generateTangramEdges(random);
+                return generateTangramEdges(random, evaluate);
             }
         }
     }
-    return new Tangram(tans);
+    return new Tangram(tans, evaluate);
 };
-export function generateTangrams(count: number, onProgress?: (index: number) => void, random = createRandom()): Tangram[] {
+// The game searches by outline edges, so it can omit unused symmetry/convexity
+// scores. Scored batches retain their original evaluation and sorting behavior.
+export function generateTangrams(count: number, onProgress?: (index: number) => void, random = createRandom(), evaluate = true): Tangram[] {
     if (!Number.isSafeInteger(count) || count < 0) throw new RangeError("Count must be a nonnegative safe integer");
     setGenerating(true);
     try {
         const generated: Tangram[] = [];
         for (let index = 0; index < count; index++) {
-            const tangram = generateTangramEdges(random);
+            const tangram = generateTangramEdges(random, evaluate);
             generated.push(tangram);
             onProgress?.(index);
             for (const tan of tangram.tans) { delete tan.points; delete tan.segments; delete tan.insidePoints; }
         }
-        return generated.sort(compareTangrams);
+        return evaluate ? generated.sort(compareTangrams) : generated;
     } finally { setGenerating(false); }
 }
 export { Tangram } from "./tangram.js";

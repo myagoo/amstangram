@@ -63,6 +63,7 @@ test("real workers reproduce levels and random success emojis and reject invalid
       ),
       puzzles,
       again: await run(14, seeds[14]),
+      maximum: await run(5, 42),
       invalid: await run(4, 42),
     }
   }, generationSeeds)
@@ -70,6 +71,10 @@ test("real workers reproduce levels and random success emojis and reject invalid
     Array.from({ length: 18 }, (_, i) => i + 5)
   )
   expect(results.again).toEqual(results.puzzles[9])
+  expect(results.maximum.puzzle).toMatchObject({
+    edges: 5,
+    path: "M70.71068,0l141.42136,141.42136l-141.42136,141.42136h-70.71068v-282.84271z",
+  })
   const emojis = results.puzzles.map(({ puzzle }) => puzzle!.emoji)
   for (const emoji of emojis) expect(results.emojiPool).toContain(emoji)
   expect(new Set(emojis).size).toBeGreaterThan(1)

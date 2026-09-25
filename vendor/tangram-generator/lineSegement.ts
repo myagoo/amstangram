@@ -1,4 +1,5 @@
 import { comparePoints, relativeOrientation, Point } from "./point.js";
+import { generating } from "./helpers.js";
 
 export class LineSegment {
     point1: Point; point2: Point;
@@ -179,6 +180,18 @@ export class LineSegment {
     }
 
     intersects(other: LineSegment) {
+        if (generating) {
+            // With exact generation coordinates, a proper crossing has strictly
+            // opposite signs on both lines. Touching/collinear edges are allowed.
+            const a = relativeOrientation(this.point1, this.point2, other.point1);
+            if (a === 0) return false;
+            const b = relativeOrientation(this.point1, this.point2, other.point2);
+            if (b === 0 || a === b) return false;
+            const c = relativeOrientation(other.point1, other.point2, this.point1);
+            if (c === 0) return false;
+            const d = relativeOrientation(other.point1, other.point2, this.point2);
+            return d !== 0 && c !== d;
+        }
         /* First check if any of the endpoints are contained in the respective other
          * segment */
         if (this.onSegmentIncludingEndpoints(other.point1) || this.onSegmentIncludingEndpoints(other.point2) ||

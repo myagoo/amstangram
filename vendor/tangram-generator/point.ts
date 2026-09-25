@@ -1,4 +1,4 @@
-import { toRadians, toDegrees, clipAngle, numberEq, numberNEq } from "./helpers.js";
+import { toRadians, toDegrees, clipAngle, numberEq, numberNEq, generating } from "./helpers.js";
 import { IntAdjoinSqrt2 } from "./intadjoinsqrt2.js";
 
 export class Point {
@@ -264,12 +264,20 @@ export const closePoint = function(pointA: Point, pointB: Point, range: number) 
 };
 
 export const relativeOrientation = function(pointA: Point, pointB: Point, pointC: Point) {
-    var determinant = pointA.dup().subtract(pointC).determinant(pointB.dup().subtract(pointC));
-    if (determinant.isZero()) {
-        return 0;
-    } else {
-        return determinant.toFloat() > 0 ? 1 : -1;
-    }
+    // Keep the exact a + b√2 determinant, without allocating eight temporary
+    // objects for every containment/intersection test (the native hot path).
+    const ax = pointA.x.coeffInt - pointC.x.coeffInt;
+    const ar = pointA.x.coeffSqrt - pointC.x.coeffSqrt;
+    const ay = pointA.y.coeffInt - pointC.y.coeffInt;
+    const as = pointA.y.coeffSqrt - pointC.y.coeffSqrt;
+    const bx = pointB.x.coeffInt - pointC.x.coeffInt;
+    const br = pointB.x.coeffSqrt - pointC.x.coeffSqrt;
+    const by = pointB.y.coeffInt - pointC.y.coeffInt;
+    const bs = pointB.y.coeffSqrt - pointC.y.coeffSqrt;
+    const integer = (ax * by + 2 * ar * bs) - (ay * bx + 2 * as * br);
+    const radical = (ax * bs + ar * by) - (ay * br + as * bx);
+    if (generating ? integer === 0 && radical === 0 : numberEq(integer, 0) && numberEq(radical, 0)) return 0;
+    return integer + radical * Math.SQRT2 > 0 ? 1 : -1;
 };
 
 export const bothPointsMultipleTimes = function(pointArray: Point[], pointA: Point, pointB: Point) {

@@ -62,7 +62,7 @@ export function generatePuzzle(edges: number, seed: string): Tangram {
   const random = createRandom(seed)
   // ponytail: exact-match rejection search; tune the engine if extreme levels are too slow.
   for (;;) {
-    const candidate = generateTangrams(1, undefined, random)[0]
+    const candidate = generateTangrams(1, undefined, random, false)[0]
     if (
       candidate.outline?.reduce((sum, ring) => sum + ring.length, 0) !== edges
     )
