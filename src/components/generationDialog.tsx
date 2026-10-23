@@ -1,10 +1,4 @@
-import {
-  type CSSProperties,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { useIntl } from "react-intl"
 import { GalleryContext } from "../contexts/gallery"
 import {
@@ -31,8 +25,7 @@ const thumb = {
 const track = {
   height: "20px",
   borderRadius: "99999px",
-  background:
-    "linear-gradient(to right, currentColor var(--difficulty-progress), {colors.inputBackground} var(--difficulty-progress))",
+  bg: "currentColor",
 } as const
 const DifficultySlider = styled("input", {
   base: {
@@ -159,12 +152,9 @@ export const GenerationDialog = ({
           }
         )}
         onChange={(event) => setDifficulty(Number(event.target.value))}
-        style={
-          {
-            color: theme.colors.difficulties[getTangramDifficulty({ edges })],
-            "--difficulty-progress": `${(difficulty / (MAX_GENERATED_EDGES - MIN_GENERATED_EDGES)) * 100}%`,
-          } as CSSProperties
-        }
+        style={{
+          color: theme.colors.difficulties[getTangramDifficulty({ edges })],
+        }}
       />
       <View css={{ flexDirection: "row", justifyContent: "space-between" }}>
         <span>{intl.formatMessage({ id: "Easy" })}</span>
