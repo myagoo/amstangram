@@ -4,8 +4,7 @@ export default {
   "Generating…": "Génération…",
   "Generation failed. Please try again.": "La génération a échoué. Réessaie.",
   Start: "Commencer",
-  Close: "Fermer",
-  Retry: "Réessayer",
+  Cancel: "Annuler",
   Amstangram: "Amstangram",
 
   Language: "Langage",

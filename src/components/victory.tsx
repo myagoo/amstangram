@@ -11,16 +11,12 @@ export const Victory = ({
   tangram,
   onStop,
   onNext,
-  nextLoading = false,
-  nextFailed = false,
   onApprove,
   onStarToggle,
 }: {
   tangram: import("../types").Tangram
   onStop(): void
   onNext?: () => void
-  nextLoading?: boolean
-  nextFailed?: boolean
   onApprove?: () => void
   onStarToggle?: () => void
 }) => {
@@ -136,9 +132,6 @@ export const Victory = ({
             {onNext ? (
               <PrimaryButton
                 onClick={onNext}
-                disabled={nextLoading}
-                aria-busy={nextLoading}
-                aria-live="polite"
                 css={{
                   display: "flex",
                   boxShadow: "0px 5px 10px #00000080",
@@ -148,15 +141,7 @@ export const Victory = ({
                 }}
               >
                 <View as={FiPlay} css={{ boxSize: "icon" }}></View>
-                <Text>
-                  {intl.formatMessage({
-                    id: nextLoading
-                      ? "Generating…"
-                      : nextFailed
-                        ? "Retry"
-                        : "Next",
-                  })}
-                </Text>
+                <Text>{intl.formatMessage({ id: "Next" })}</Text>
               </PrimaryButton>
             ) : (
               <PrimaryButton
@@ -174,11 +159,6 @@ export const Victory = ({
               </PrimaryButton>
             )}
           </View>
-        )}
-        {emojiSpinEnded && nextFailed && (
-          <p role="alert">
-            {intl.formatMessage({ id: "Generation failed. Please try again." })}
-          </p>
         )}
       </View>
     </View>
