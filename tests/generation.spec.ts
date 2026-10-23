@@ -117,15 +117,18 @@ for (const viewport of [
       fit.viewport.height * (landscape ? 0.8 : 0.7),
       landscape ? 600 : 700
     )
-    const scales = fit.candidates.map((candidate) =>
-      Math.min(width / candidate.width, height / candidate.height)
+    const originalScale = Math.min(
+      width / fit.original.width,
+      height / fit.original.height
     )
-    const best = scales.reduce(
-      (best, scale, index) => (scale > scales[best] + 1e-9 ? index : best),
-      0
+    const rotatedScale = Math.min(
+      width / fit.original.height,
+      height / fit.original.width
     )
-    expect(fit.scale).toBeCloseTo(scales[best], 5)
-    expect(fit.candidates[best].difference).toBeLessThan(0.1)
+    expect(fit.scale).toBeCloseTo(Math.max(originalScale, rotatedScale), 5)
+    expect(fit.differences[rotatedScale > originalScale ? 1 : 0]).toBeLessThan(
+      0.1
+    )
     expect(fit.actual.width).toBeLessThanOrEqual(width + 0.001)
     expect(fit.actual.height).toBeLessThanOrEqual(height + 0.001)
 
