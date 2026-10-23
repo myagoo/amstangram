@@ -96,15 +96,9 @@ export default defineConfig({
         from: { transform: "translate(0, 0)" },
         to: { transform: "translate(30px, -30px)" },
       },
-      victoryPulse: {
-        "0%, 100%": { transform: "scale(1)" },
-        "22%": { transform: "scale(1.035)" },
-        "55%": { transform: "scale(0.99)" },
-      },
-      victoryPop: {
-        "0%": { transform: "scale(0.6) rotate(-12deg)" },
-        "65%": { transform: "scale(1.15) rotate(4deg)" },
-        "100%": { transform: "scale(1) rotate(0)" },
+      emojiSpin: {
+        from: { opacity: "0", transform: "rotate(0) scale(0)" },
+        to: { opacity: "1", transform: "rotate(1800deg) scale(1)" },
       },
     },
   },
