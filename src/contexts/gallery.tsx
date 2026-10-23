@@ -16,7 +16,6 @@ import { TangramsContext } from "./tangrams"
 import { UserContext } from "./user"
 
 import type {
-  Tangram,
   SavedTangram,
   CompletionMap,
   StarMap,
@@ -26,16 +25,19 @@ interface GalleryContextValue {
   initialized: boolean
   requestSave(): void
   saveRequestId: number
-  playlist: Tangram[] | null
+  playlist: SavedTangram[] | null
   currentTangramIndex: number
   advancePlaylist(): void
-  setPlaylist: React.Dispatch<React.SetStateAction<Tangram[] | null>>
+  setPlaylist: React.Dispatch<React.SetStateAction<SavedTangram[] | null>>
   shareTangrams(tangrams: SavedTangram[]): void
   startRandomPlaylist(sortDifficulty?: boolean): void
   tangramsCompletedBy: CompletionMap | null
   tangramsStarredBy: StarMap | null
-  toggleTangramStar(tangram: Tangram): Promise<void>
-  markTangramAsComplete(tangram: Tangram, completionTime: number): Promise<void>
+  toggleTangramStar(tangram: SavedTangram): Promise<void>
+  markTangramAsComplete(
+    tangram: SavedTangram,
+    completionTime: number
+  ): Promise<void>
   isTangramCompleted(tangramId: string): boolean
   isTangramStarred(tangramId: string): boolean
 }
@@ -53,7 +55,7 @@ export const GalleryProvider = ({ children }: React.PropsWithChildren) => {
   const [tangramsStarredBy, setTangramsLikedBy] = useState<StarMap | null>(null)
 
   const [{ playlist, currentTangramIndex }, setSession] = useState<{
-    playlist: Tangram[] | null
+    playlist: SavedTangram[] | null
     currentTangramIndex: number
   }>({ playlist: null, currentTangramIndex: 0 })
   const setPlaylist = useCallback<GalleryContextValue["setPlaylist"]>(
@@ -174,9 +176,8 @@ export const GalleryProvider = ({ children }: React.PropsWithChildren) => {
   )
 
   const markTangramAsComplete = useCallback(
-    async (tangram: Tangram, completionTime: number) => {
+    async (tangram: SavedTangram, completionTime: number) => {
       if (
-        tangram.id &&
         currentUser &&
         approvedTangrams!.some(
           (approvedTangram) => approvedTangram.id === tangram.id
@@ -201,9 +202,8 @@ export const GalleryProvider = ({ children }: React.PropsWithChildren) => {
   )
 
   const toggleTangramStar = useCallback(
-    async (tangram: Tangram) => {
+    async (tangram: SavedTangram) => {
       if (
-        tangram.id &&
         currentUser &&
         approvedTangrams!.some(
           (approvedTangram) => approvedTangram.id === tangram.id

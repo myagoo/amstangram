@@ -14,7 +14,7 @@ export const Victory = ({
   onApprove,
   onStarToggle,
 }: {
-  tangram: import("../types").Tangram
+  tangram: import("../types").SavedTangram
   onStop(): void
   onNext?: () => void
   onApprove?: () => void
@@ -31,7 +31,6 @@ export const Victory = ({
 
   const stars = useMemo(() => {
     let stars = 0
-    if (!tangram.id) return stars
     for (const starredByUid in tangramsStarredBy![tangram.id]) {
       if (tangramsStarredBy![tangram.id][starredByUid]) {
         stars += 1
@@ -40,7 +39,7 @@ export const Victory = ({
     return stars
   }, [tangram, tangramsStarredBy])
 
-  const starred = tangram.id ? isTangramStarred(tangram.id) : false
+  const starred = isTangramStarred(tangram.id)
 
   const handleEmojiSpinAnimationEnd = () => {
     clearTimeout(spinTimeout.current)

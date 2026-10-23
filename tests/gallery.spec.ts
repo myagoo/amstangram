@@ -36,10 +36,7 @@ test("gallery mounts batches and preserves share and play order across them", as
   await page.goto("/?seed=42")
   await expect(page.locator("canvas")).toBeVisible({ timeout: 15000 })
   await page.locator("svg").first().click()
-  await page
-    .getByRole("button", { name: "Tangram gallery", exact: true })
-    .focus()
-  await page.keyboard.press("Enter")
+  await page.getByText("Tangram gallery", { exact: true }).click()
   const cards = page.locator('#dialogContainer svg[viewBox="0 0 200 200"]')
   await expect(cards).toHaveCount(48)
   const results = page.getByRole("region", {
