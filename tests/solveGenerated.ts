@@ -3,11 +3,10 @@ import { expect, type Page } from "@playwright/test"
 export async function solveGenerated(
   page: Page,
   seed = 1083814273,
-  edges = 14,
-  order = ["rh", "lt1", "lt2", "mt1", "st1", "st2", "sq"]
+  edges = 14
 ) {
   // Orient the mirrored tan before placing neighbors that could obscure it.
-  for (const id of order) {
+  for (const id of ["rh", "lt1", "lt2", "mt1", "st1", "st2", "sq"]) {
     for (let turn = 0; turn < 17; turn++) {
       const move = await page.evaluate(
         async ({ id, seed, edges }) =>
