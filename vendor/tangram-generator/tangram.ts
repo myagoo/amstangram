@@ -5,13 +5,13 @@ import { Evaluation } from "./evaluation.js";
 
 export class Tangram {
     tans: Tan[]; outline: Point[][] | undefined; evaluation?: Evaluation;
-    constructor(tans: Tan[], evaluate = true) {
+    constructor(tans: Tan[]) {
         this.tans = tans.sort(function(a, b) {
             return a.tanType - b.tanType;
         });
         /* Outline is an array of points describing the outline of the tangram */
         this.outline = computeOutline(this.tans, true);
-        if (evaluate && typeof this.outline != 'undefined') {
+        if (typeof this.outline != 'undefined') {
             this.evaluation = new Evaluation(this.tans, this.outline);
         }
     }
